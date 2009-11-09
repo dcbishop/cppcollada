@@ -4,7 +4,7 @@
  * Gets the object's ID.
  * @return The ID of the object.
  */
-string Id::getId() {
+const string Id::getId() {
    return id_;
 }
 

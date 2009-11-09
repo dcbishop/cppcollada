@@ -9,7 +9,7 @@ using namespace std;
  */
 class Id {
    public:
-      string getId();
+      const string getId();
       void setId(string id);
 
    private:

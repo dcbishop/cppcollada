@@ -9,7 +9,7 @@ using namespace std;
  */
 class Name {
    public:
-      string getName();
+      const string getName();
       void setName(string name);
 
    private:

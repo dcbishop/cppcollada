@@ -4,7 +4,7 @@
  * Gets the name of the object.
  * @return The name.
  */
-string Name::getName() {
+const string Name::getName() {
    return name_;
 }
 

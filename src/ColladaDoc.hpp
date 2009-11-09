@@ -25,6 +25,8 @@ class Id;
 class Name;
 class Position;
 class Rotation;
+class RotationGL;
+class Scale;
 
 typedef map<string, DOMElement*> ElementIdMap;
 typedef ElementIdMap::iterator ElementIdMapIterator;
@@ -49,8 +51,11 @@ class ColladaDoc {
       Node* loadNode(DOMElement* element);
       float* getFloatArray(string text, int count);
       void loadTranslation(DOMElement* element, Position* position);
-      void loadRotations(DOMElement* element, Rotation* rotation);
-
+      void loadRotation(DOMElement* element, RotationGL* rotation, int number);
+      void loadRotations(DOMElement* element, RotationGL* rotation);
+      void loadScale(DOMElement* element, Scale* scale);
+      void loadInstances(DOMElement* element, Node* node);
+      ColladaObject* loadInstance(DOMElement* element, Node* node);
 
 
       Collada* getCollada();

@@ -11,6 +11,8 @@
 #include "ColladaObject.hpp"
 #include "Position.hpp"
 #include "Rotation.hpp"
+#include "Scale.hpp"
+#include "RotationGL.hpp"
 
 
 
@@ -189,7 +191,6 @@ ColladaObject* ColladaDoc::loadColladaObject(DOMElement* element) {
    
    #warning ['TODO']: Load the object into the correct collada object...
    if(XMLString::compareIString(tagName, visual_scene_tag) == 0) {
-      cout << "It's a Visual Scene...\n";
       VisualScene* visualScene = loadVisualScene(element);
       colladaObject = visualScene;
    } else if(XMLString::compareIString(tagName, node_tag) == 0) {
@@ -215,6 +216,12 @@ ColladaObject* ColladaDoc::loadColladaObject(DOMElement* element) {
    return ch;
 }*/
 
+/**
+ * Gets an attribute from a DOMElement
+ * @param element The DOMElement.
+ * @param attribute The name of the attribute.
+ * @return The atribute.
+ */
 string ColladaDoc::getAttribute(DOMElement* element, string attribute) {
    XMLCh* attrx = XMLString::transcode(attribute.c_str());
    char *value_c = XMLString::transcode(element->getAttribute(attrx));
@@ -266,7 +273,11 @@ VisualScene* ColladaDoc::loadVisualScene(DOMElement* element) {
    return visualScene;
 }
 
-//TODO: Maybe make this a template?
+/**
+ * Turns a string containing floats, into a float array.
+ * @param text A string containing a float array.
+ * @param count The number of floats.
+ */
 float* ColladaDoc::getFloatArray(string text, int count) {
    float* array = new float[count];
 
@@ -276,7 +287,6 @@ float* ColladaDoc::getFloatArray(string text, int count) {
    int i = 0;
    char* token = strtok(data_clone, " ");
    while(token) {
-      cout << token << endl;
       float f = atof(token);
       if(i > count) {
          cout << "ERROR: ColladaDoc::getFloatArray: Too many elements in array...\n";
@@ -290,6 +300,11 @@ float* ColladaDoc::getFloatArray(string text, int count) {
    return array;
 }
 
+/**
+ * Loads a translation from the DOMElement.
+ * @param element The DOMElement.
+ * @param position The object to apply the translation too.
+ */
 void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
    cout << "DEBUG: loadTranslation(...)\n";
 
@@ -316,7 +331,6 @@ void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
 
    DOMNodeIterator* iterator = xmlDoc_->createNodeIterator(node, DOMNodeFilter::SHOW_TEXT, NULL, true);
    for(DOMNode* current = iterator->nextNode(); current != 0; current = iterator->nextNode() ) {
-      cout << "Do nothing...\n";
       const XMLCh* data_x = current->getTextContent();
       char* data_c = XMLString::transcode(data_x);
 
@@ -330,7 +344,68 @@ void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
    }
 }
 
-void ColladaDoc::loadRotations(DOMElement* element, Rotation* rotation) {
+/**
+ * 
+ */
+void ColladaDoc::loadScale(DOMElement* element, Scale* scale) {
+   cout << "DEBUG: loadScale(...)\n";
+
+   XMLCh* tag = XMLString::transcode("scale");
+   DOMNodeList* elements = element->getElementsByTagName(tag);
+   XMLString::release(&tag);
+
+   // No scale on node...
+   if(!elements) {
+      return;
+   }
+
+   // Multiple scale on node...
+   if(elements->getLength() > 1) {
+      cerr << "ERROR: Multiple <scale>'s found in node..." << endl;
+      return;
+   }
+
+   DOMNode* node = elements->item(0);
+   if(!node) {
+      cerr << "Weird. Could not get scale from element list..." << endl;
+      return;
+   }
+
+   DOMNodeIterator* iterator = xmlDoc_->createNodeIterator(node, DOMNodeFilter::SHOW_TEXT, NULL, true);
+   for(DOMNode* current = iterator->nextNode(); current != 0; current = iterator->nextNode() ) {
+      const XMLCh* data_x = current->getTextContent();
+      char* data_c = XMLString::transcode(data_x);
+
+      float* array = getFloatArray(data_c, 3);
+      scale->setScaleXYZ(array[0], array[1], array[2]);
+
+      delete(array);
+      XMLString::release(&data_c);
+   }
+}
+
+/**
+ * Loads a specific rotation from the DOMElement.
+ * @param element The DOMElement.
+ * @param rotation The object to apply the rotation too.
+ */
+void ColladaDoc::loadRotation(DOMElement* element, RotationGL* rotation, int number) {
+   const XMLCh* data_x = element->getTextContent();
+   char* data_c = XMLString::transcode(data_x);
+
+   float* array = getFloatArray(data_c, 4);
+   rotation->setRotationGL(number, array[0], array[1], array[2], array[3]);
+
+   delete(array);
+   XMLString::release(&data_c);
+}
+
+/**
+ * Loads the rotations from the DOMElement.
+ * @param element The DOMElement.
+ * @param rotation The object to apply the rotations too.
+ */
+void ColladaDoc::loadRotations(DOMElement* element, RotationGL* rotation) {
    cout << "DEBUG: loadRotations(...)\n";
 
    XMLCh* tag = XMLString::transcode("rotate");
@@ -347,27 +422,9 @@ void ColladaDoc::loadRotations(DOMElement* element, Rotation* rotation) {
       DOMNode* currentNode = elements->item(i);
       if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
          DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         loadRotation(currentElement, rotation, i);
       }
    }
-
-   /*DOMNodeIterator* iterator = xmlDoc_->createNodeIterator(elements, DOMNodeFilter::SHOW_ELEMENT, NULL, true);
-   for(DOMNode* current = iterator->nextNode(); current != 0; current = iterator->nextNode() ) {
-      
-   }*/
-
-
-   /*
-   // Multiple  on node...
-   if(elements->getLength() > 1) {
-      cerr << "ERROR: Multiple <translate>'s found in node..." << endl;
-      return;
-   }*/
-
-   /*DOMNode* node = elements->item(0);
-   if(!node) {
-      cerr << "Weird. Could not get translation from element list..." << endl;
-      return;
-   }*/
 }
 
 /**
@@ -378,11 +435,58 @@ void ColladaDoc::loadRotations(DOMElement* element, Rotation* rotation) {
 Node* ColladaDoc::loadNode(DOMElement* element) {
    cout << "DEBUG: loadNode(...)\n";
    Node* node = new Node();
+  
    loadTranslation(element, node);
    loadRotations(element, node);
-   // TODO: Load scale...
-   // TODO: Load instances...
+   loadScale(element, node);
+   loadInstances(element, node);
    return node;
+}
+
+void ColladaDoc::loadInstances(DOMElement* element, Node* node) {
+   cout << "DEBUG: ColladaDoc::loadInstances(...)\n";
+   DOMNodeList* children = element->getChildNodes();
+   int length = children->getLength();
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         ColladaObject* instance = loadInstance(currentElement, node);
+         //TODO: node->addInstance(instance);
+      }
+   }
+}
+
+ColladaObject* ColladaDoc::loadInstance(DOMElement* element, Node* node) {
+   cout << "DEBUG: ColladaDoc::loadInstance(...)\n";
+
+   const XMLCh* tagName = element->getTagName();
+   XMLCh* geometry_tag = XMLString::transcode("instance_geometry");
+   XMLCh* light_tag = XMLString::transcode("instance_light");
+   ColladaObject* colladaObject = NULL;
+   
+   #warning ['TODO']: Add translate, camera, node, scale, etc... 
+   if(XMLString::compareIString(tagName, geometry_tag) == 0) {
+      cout << "Geometry\n";
+      //Geometry* geometry = loadGeometry(element);
+      //colladaObject = geometry;
+   } else if(XMLString::compareIString(tagName, light_tag) == 0) {
+      cout << "Light\n";
+      //Light* light = loadLight(element);
+      //colladaObject = light;
+   }
+   
+   char* testtag = XMLString::transcode(tagName);
+   cout << testtag << endl;
+
+   //XMLString::release(&tagName);
+   XMLString::release(&geometry_tag);
+   XMLString::release(&light_tag);
+
+   //loadId(element, colladaObject);
+   //loadName(element, colladaObject);
+
+   return colladaObject;
 }
 
 /**
@@ -431,7 +535,7 @@ Scene* ColladaDoc::getScene() {
          if(XMLString::compareIString(tagName, "instance_visual_scene") == 0) {
             cout << "DEBUG: getScene visual url: '" << url << "'\n";
             VisualScene* visualScene = getVisualScene(url);
-            cout << "DEBUG: getScene  got \n";
+            cout << "DEBUG: got scene\n";
             scene->setVisualScene(visualScene);
          } else if(XMLString::compareIString(tagName, "instance_physics_scene") == 0) {
             // TODO: Load physics scene...

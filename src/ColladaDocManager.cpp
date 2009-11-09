@@ -1,6 +1,7 @@
 #include "ColladaDocManager.hpp"
 
 #include "ColladaDoc.hpp"
+#include "ColladaUrl.hpp"
 
 /**
  * Gets a COLLADA XML document from URL.
@@ -33,17 +34,8 @@ Scene* ColladaDocManager::getScene(string url) {
    return NULL;
 }
 
-/**
- * Returns the URL without the id component (The # and beyond).
- * @param url The URL to be stripped.
- * @return The URL without the id.
- */
-string ColladaDocManager::stripUrlId(string url) {
-   return url.substr(0, url.rfind("#"));
-}
-
 ColladaObject* ColladaDocManager::getColladaObjectByUrl(string url) {
-   ColladaDoc* colladaDoc = getColladaDoc(stripUrlId(url));
+   ColladaDoc* colladaDoc = getColladaDoc(ColladaUrl::getStrippedUrl(url));
    if(!colladaDoc) {
       return NULL;
    }
