@@ -1,9 +1,12 @@
 #ifndef COLLADACPP_ROTATION_HPP_
 #define COLLADACPP_ROTATION_HPP_
 
-class Rotation {
+#include "Renderable.hpp"
+
+class Rotation: public Renderable {
    public:
-      virtual Rotation getRotation();
+      //virtual Rotation getRotation();
+      COLLADA_PURE_RENDER_FUNCTION
 };
 
 #endif /* COLLADACPP_ROTATION_HPP_ */

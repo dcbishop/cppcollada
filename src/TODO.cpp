@@ -10,6 +10,7 @@
 #include "ColladaManager.hpp"
 #include "ColladaDocManager.hpp"
 #include "ColladaDoc.hpp"
+#include "ViewWindow.hpp"
 
 using namespace std;
 using namespace xercesc;
@@ -17,9 +18,11 @@ using namespace xercesc;
 int main(int argc, char* args[]) {
    string filename = "/home/hegemon/tmp/cube.dae";
 
-   /*ColladaDocManager cdm;
-   ColladaDoc* test = cdm.getColladaDoc(filename);*/
-   
    ColladaManager cm;
    Collada *collada = cm.getCollada(filename);
+
+   ViewWindow vw(800, 600);
+   vw.setCollada(collada);
+   vw.setTitle(filename);
+   vw.mainLoop();
 }

@@ -20,13 +20,14 @@ using namespace std;
 using namespace xercesc;
 
 class ColladaObject;
-class Node;
+class ColladaNode;
 class Id;
 class Name;
 class Position;
 class Rotation;
 class RotationGL;
 class Scale;
+class Geometry;
 
 typedef map<string, DOMElement*> ElementIdMap;
 typedef ElementIdMap::iterator ElementIdMapIterator;
@@ -43,20 +44,20 @@ class ColladaDoc {
       ColladaObject* getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
+      float* getFloatArray(string text, int count);
       ColladaObject* loadColladaObject(DOMElement* element);
       string getAttribute(DOMElement* element, string attribute);
       void loadId(DOMElement* element, Id* id);
       void loadName(DOMElement* element, Name* name);
       VisualScene* loadVisualScene(DOMElement* element);
-      Node* loadNode(DOMElement* element);
-      float* getFloatArray(string text, int count);
+      ColladaNode* loadColladaNode(DOMElement* element);
+      Geometry* loadGeometry(DOMElement* element);
       void loadTranslation(DOMElement* element, Position* position);
       void loadRotation(DOMElement* element, RotationGL* rotation, int number);
       void loadRotations(DOMElement* element, RotationGL* rotation);
       void loadScale(DOMElement* element, Scale* scale);
-      void loadInstances(DOMElement* element, Node* node);
-      ColladaObject* loadInstance(DOMElement* element, Node* node);
-
+      void loadInstances(DOMElement* element, ColladaNode* node);
+      ColladaObject* loadInstance(DOMElement* element, ColladaNode* node);
 
       Collada* getCollada();
       Scene* getScene();
@@ -67,6 +68,7 @@ class ColladaDoc {
 
    private:
       void buildIdMap_();
+      bool isString_(const XMLCh* tag1, string tag2);
 
       string url_;
       XercesDOMParser* parser_;

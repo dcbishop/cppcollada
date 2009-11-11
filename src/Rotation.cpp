@@ -4,6 +4,6 @@
  * Gets the Rotation.
  * @return The Rotation.
  */
-Rotation Rotation::getRotation() {
-	return *this;
-}
+/*Rotation Rotation::getRotation() {
+	return this;
+}*/

@@ -1,5 +1,5 @@
-#ifndef COLLADACPP_CONTAINER_HPP
-#define COLLADACPP_CONTAINER_HPP
+#ifndef COLLADACPP_CONTAINER_HPP_
+#define COLLADACPP_CONTAINER_HPP_
 
 #include <vector>
 #include <map>
@@ -42,4 +42,4 @@ class Contained {
 		Container* getParent();
 };
 
-#endif /* COLLADACPP_CONTAINER_HPP */
+#endif /* COLLADACPP_CONTAINER_HPP_ */

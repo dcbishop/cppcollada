@@ -1,3 +1,6 @@
+#ifndef COLLADACPP_COLLADAURL_HPP_
+#define COLLADACPP_COLLADAURL_HPP_
+
 #include <string>
 using namespace std;
 
@@ -11,3 +14,4 @@ namespace ColladaUrl {
    string getFilename(string url);
 }
 
+#endif /* COLLADACPP_COLLADAURL_HPP_ */

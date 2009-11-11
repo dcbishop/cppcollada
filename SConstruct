@@ -12,7 +12,7 @@ debug_flag = ARGUMENTS.get('debug', 0)
 #env.Tool('colourful', toolpath=['scons-tools'])
 #env.AppendUnique(LIBS=['m', 'IL', 'mxml', 'rcbc', 'luabind'])
 #env.Tool('qt')
-env.AppendUnique(LIBS=['xerces-c'])
+env.AppendUnique(LIBS=['xerces-c', 'GL', 'GLU'])
 
 #if int(win32):
 #	env.Tool('crossmingw', toolpath = ['scons-tools'])
@@ -39,7 +39,8 @@ env.AppendUnique(LIBS=['xerces-c'])
 #	env['QT_LIB'] = 'QtGui'
 #	env.ParseConfig('pkg-config --libs --cflags QtGui')
 
-env.ParseConfig('pkg-config --libs --cflags xerces-c')
+#env.ParseConfig('pkg-config --libs --cflags xerces-c')
+env.ParseConfig('sdl-config --cflags --libs')
 
 if int(debug_flag):
 	env.Append(CCFLAGS = ['-g'])

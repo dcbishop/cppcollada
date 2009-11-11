@@ -1,10 +1,12 @@
-#ifndef COLLADACPP_POSITION_HPP
-#define COLLADACPP_POSITION_HPP
+#ifndef COLLADACPP_POSITION_HPP_
+#define COLLADACPP_POSITION_HPP_
+
+#include "Renderable.hpp"
 
 /**
  * An abstract class for objects with x, y, z coordinates.
  */
-class Position {
+class Position : private Renderable {
 	public:
 		Position();
 		virtual Position getPosition();
@@ -19,6 +21,7 @@ class Position {
 		virtual const float getDistanceTo(Position& position);
 		virtual const float getDistanceTo2D(Position& position);
 		virtual const float getDirectionTo2D(Position& position);
+		COLLADA_RENDER_FUNCTION
 
 	private:
 		float x_;
@@ -26,4 +29,4 @@ class Position {
 		float z_;
 };
 
-#endif /* COLLADACPP_POSITION_HPP */
+#endif /* COLLADACPP_POSITION_HPP_ */
