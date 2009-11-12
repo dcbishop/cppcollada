@@ -29,6 +29,8 @@ class RotationGL;
 class Scale;
 class Geometry;
 
+#include "SmartPointers.hpp"
+
 typedef map<string, DOMElement*> ElementIdMap;
 typedef ElementIdMap::iterator ElementIdMapIterator;
 typedef pair<string, DOMElement*> ElementIdMapPair;
@@ -41,30 +43,30 @@ class ColladaDoc {
       DOMDocument* loadColladaDocFile(string filename);
       DOMNodeList* getElementsByTagName(string tag);
       DOMElement* getElementById(string id);
-      ColladaObject* getColladaObjectById(string id);
+      shared_ptr<ColladaObject> getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
       float* getFloatArray(string text, int count);
-      ColladaObject* loadColladaObject(DOMElement* element);
+      shared_ptr<ColladaObject> loadColladaObject(DOMElement* element);
       string getAttribute(DOMElement* element, string attribute);
       void loadId(DOMElement* element, Id* id);
       void loadName(DOMElement* element, Name* name);
-      VisualScene* loadVisualScene(DOMElement* element);
-      ColladaNode* loadColladaNode(DOMElement* element);
-      Geometry* loadGeometry(DOMElement* element);
+      shared_ptr<VisualScene> loadVisualScene(DOMElement* element);
+      shared_ptr<ColladaNode> loadColladaNode(DOMElement* element);
+      shared_ptr<Geometry> loadGeometry(DOMElement* element);
       void loadTranslation(DOMElement* element, Position* position);
       void loadRotation(DOMElement* element, RotationGL* rotation, int number);
       void loadRotations(DOMElement* element, RotationGL* rotation);
       void loadScale(DOMElement* element, Scale* scale);
       void loadInstances(DOMElement* element, ColladaNode* node);
-      ColladaObject* loadInstance(DOMElement* element, ColladaNode* node);
+      shared_ptr<ColladaObject> loadInstance(DOMElement* element, ColladaNode* node);
 
-      Collada* getCollada();
-      Scene* getScene();
+      shared_ptr<Collada> getCollada();
+      shared_ptr<Scene> getScene();
       bool isUrlLocal(string url);
       string getUrlId(string url);
-      VisualScene* getVisualScene(string url);
-      ColladaObject* getColladaObjectByUrl(string url);
+      shared_ptr<VisualScene> getVisualScene(string url);
+      shared_ptr<ColladaObject> getColladaObjectByUrl(string url);
 
    private:
       void buildIdMap_();

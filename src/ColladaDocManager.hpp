@@ -5,6 +5,8 @@
 #include <string>
 using namespace std;
 
+#include "SmartPointers.hpp"
+
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
@@ -15,26 +17,24 @@ using namespace xercesc;
 class VisualScene;
 class ColladaDoc;
 class Scene;
+class ColladaObject;
 
-#warning ['TODO']: Used for ColladaObject, remove me when its a real thing...
-#include "ColladaDoc.hpp"
-
-typedef map<string, ColladaDoc*> ColladaDocMap;
+typedef map<string, shared_ptr<ColladaDoc>> ColladaDocMap;
 typedef ColladaDocMap::iterator ColladaDocMapIterator;
-typedef pair<string, ColladaDoc*> ColladaDocMapPair;
+typedef pair<string, shared_ptr<ColladaDoc>> ColladaDocMapPair;
 
 /**
  * 
  */
 class ColladaDocManager {
    public:
-      ColladaDoc* getColladaDoc(string url);
-      Scene* getColladaScene(string url);
-      VisualScene* getColladaVisualScene(string url, string id);
-      Scene* getScene(string url);
+      shared_ptr<ColladaDoc> getColladaDoc(string url);
+      shared_ptr<Scene> getColladaScene(string url);
+      shared_ptr<VisualScene> getColladaVisualScene(string url, string id);
+      shared_ptr<Scene> getScene(string url);
 
       string stripUrlId(string url);
-      ColladaObject* getColladaObjectByUrl(string url);
+      shared_ptr<ColladaObject> getColladaObjectByUrl(string url);
 
    private:
       ColladaDocMap colladaDocs_;

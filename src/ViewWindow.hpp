@@ -5,6 +5,8 @@ class Collada;
 
 #include <string>
 using namespace std;
+
+#include "SmartPointers.hpp"
 #include "ColladaRendererGL.hpp"
 
 /**
@@ -13,7 +15,7 @@ using namespace std;
 class ViewWindow {
    public:
       ViewWindow(int width, int height);
-      void setCollada(Collada* collada);
+      void setCollada(shared_ptr<Collada> collada);
       void setTitle(const string title);
       void mainLoop();
       int getComputerTime();
@@ -26,7 +28,7 @@ class ViewWindow {
 
       int width_;
       int height_;
-      Collada* collada_;
+      shared_ptr<Collada> collada_;
       bool finished_;
       ColladaRendererGL renderer_;
 };

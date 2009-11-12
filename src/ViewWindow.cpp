@@ -28,7 +28,7 @@ ViewWindow::ViewWindow(int width, int height) {
    }
 }
 
-void ViewWindow::setCollada(Collada* collada) {
+void ViewWindow::setCollada(shared_ptr<Collada> collada) {
    collada_ = collada;
    collada_->setRenderer(&renderer_);
 }

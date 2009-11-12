@@ -22,14 +22,14 @@ using namespace xercesc;
 
 class VisualScene;
 
-typedef map<string, Collada*> ColladaMap;
+typedef map<string, shared_ptr<Collada>> ColladaMap;
 typedef ColladaMap::iterator ColladaMapIterator;
-typedef pair<string, Collada*> ColladaMapPair;
+typedef pair<string, shared_ptr<Collada>> ColladaMapPair;
 
 class ColladaManager {
    public:
-      Collada* getCollada(string url);
-      VisualScene* getVisualScene(string url);
+      shared_ptr<Collada> getCollada(string url);
+      shared_ptr<VisualScene> getVisualScene(string url);
 
    private:
       ColladaMap colladas_;

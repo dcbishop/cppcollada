@@ -12,6 +12,8 @@
 #include "ColladaDoc.hpp"
 #include "ViewWindow.hpp"
 
+#include "SmartPointers.hpp"
+
 using namespace std;
 using namespace xercesc;
 
@@ -19,10 +21,12 @@ int main(int argc, char* args[]) {
    string filename = "/home/hegemon/tmp/cube.dae";
 
    ColladaManager cm;
-   Collada *collada = cm.getCollada(filename);
+   shared_ptr<Collada> collada(cm.getCollada(filename));
 
    ViewWindow vw(800, 600);
    vw.setCollada(collada);
    vw.setTitle(filename);
    vw.mainLoop();
+   
+   shared_ptr<int> test(new int(10));
 }

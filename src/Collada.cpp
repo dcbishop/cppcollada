@@ -1,9 +1,9 @@
 #include "Collada.hpp"
 
-void Collada::setScene(Scene* scene) {
+void Collada::setScene(shared_ptr<Scene> scene) {
 	scene_ = scene;
 }
 
-Scene* Collada::getScene() {
+shared_ptr<Scene> Collada::getScene() {
    return scene_;
 }

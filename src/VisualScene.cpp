@@ -1,6 +1,6 @@
 #include "VisualScene.hpp"
 
-void VisualScene::addColladaNode(ColladaNode* node) {
+void VisualScene::addColladaNode(shared_ptr<ColladaNode> node) {
    nodes_.push_back(node);
    // TODO: Keep a map of the nodes...
 }

@@ -24,3 +24,4 @@ doc/*
 *.jar
 tmp/*
 colladatest
+build/*

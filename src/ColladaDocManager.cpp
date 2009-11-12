@@ -8,7 +8,7 @@
  * Loads it if necessary.
  * @param url The URL to load...
  */
-ColladaDoc* ColladaDocManager::getColladaDoc(string url) {
+shared_ptr<ColladaDoc> ColladaDocManager::getColladaDoc(string url) {
    // See if we have already loaded it...
    ColladaDocMapIterator iter = colladaDocs_.find(url);
    if(iter != colladaDocs_.end()) {
@@ -16,7 +16,7 @@ ColladaDoc* ColladaDocManager::getColladaDoc(string url) {
    }
 
    // Otherwise load it...
-   ColladaDoc *colladaDoc = new ColladaDoc(this, url);
+   shared_ptr<ColladaDoc> colladaDoc(new ColladaDoc(this, url));
    colladaDocs_.insert(ColladaDocMapPair(url, colladaDoc));
    return colladaDoc;
 }
@@ -26,18 +26,18 @@ ColladaDoc* ColladaDocManager::getColladaDoc(string url) {
  * @param url The COLLADA .dae file in URL format.
  * @return The scene.
  */
-Scene* ColladaDocManager::getScene(string url) {
+shared_ptr<Scene> ColladaDocManager::getScene(string url) {
    /*if(isLocal(url)) {
       cerr << "Tried to get local scene from global manager..." << endl;
       return NULL;
    }*/
-   return NULL;
+   return shared_ptr<Scene>();
 }
 
-ColladaObject* ColladaDocManager::getColladaObjectByUrl(string url) {
-   ColladaDoc* colladaDoc = getColladaDoc(ColladaUrl::getStrippedUrl(url));
+shared_ptr<ColladaObject> ColladaDocManager::getColladaObjectByUrl(string url) {
+   shared_ptr<ColladaDoc> colladaDoc(getColladaDoc(ColladaUrl::getStrippedUrl(url)));
    if(!colladaDoc) {
-      return NULL;
+      return shared_ptr<ColladaObject>();
    }
    return colladaDoc->getColladaObjectByUrl(url);
 }

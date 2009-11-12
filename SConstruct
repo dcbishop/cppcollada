@@ -5,11 +5,11 @@ from glob import glob
 prog_target = 'colladatest'
 sources = glob('src/*.cpp')
 
-env = Environment()
+env = Environment(build_dir='build')
 win32 = ARGUMENTS.get('win32', 0)
 debug_flag = ARGUMENTS.get('debug', 0)
 
-#env.Tool('colourful', toolpath=['scons-tools'])
+env.Tool('colourful', toolpath=['scons-tools'])
 #env.AppendUnique(LIBS=['m', 'IL', 'mxml', 'rcbc', 'luabind'])
 #env.Tool('qt')
 env.AppendUnique(LIBS=['xerces-c', 'GL', 'GLU'])
@@ -44,9 +44,13 @@ env.ParseConfig('sdl-config --cflags --libs')
 
 if int(debug_flag):
 	env.Append(CCFLAGS = ['-g'])
-	env.MergeFlags('-D_DEBUG')
-	
+	#env.MergeFlags('-D_DEBUG')
+	env.Append(CPPDEFINES=['DEBUG'])
+
 env.Append(CCFLAGS = ['-Wall'])
+
+# For shared_ptr, other wise try  -D_TR1PTR or -D_BOOSTPTR (need to link include boost though)
+env.Append(CCFLAGS = ['-std=c++0x'])
 
 objects = env.Object(sources)
 target = env.Program(target = prog_target, source=objects)

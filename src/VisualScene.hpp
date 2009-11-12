@@ -4,19 +4,21 @@
 /**
  * A COLLADA visual_scene.
  */
+#include <vector>
+
+#include "SmartPointers.hpp"
 #include "ColladaObject.hpp"
 
-#include <vector>
 
 class ColladaNode;
 
-typedef vector<ColladaNode*> ColladaNodeVector;
+typedef vector<shared_ptr<ColladaNode>> ColladaNodeVector;
 typedef ColladaNodeVector::iterator ColladaNodeIterator;
 
 #warning ['TODO']: Keep a map of the nodes/ids...
 class VisualScene : public ColladaObject {
    public:
-      void addColladaNode(ColladaNode* node);
+      void addColladaNode(shared_ptr<ColladaNode> node);
       ColladaNodeIterator getFirstColladaNode();
       ColladaNodeIterator getEndColladaNode();
       COLLADA_RENDER_FUNCTION
