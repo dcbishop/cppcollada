@@ -10,6 +10,8 @@ class ColladaNode;
 class Position;
 class RotationGL;
 class Scale;
+class Camera;
+class Grid;
 
 class ColladaRenderer {
    public:
@@ -22,6 +24,8 @@ class ColladaRenderer {
       virtual void render(Position* position) = 0;
       virtual void render(RotationGL* rotation) = 0;
       virtual void render(Scale* scale) = 0;
+      virtual void render(Camera* camera) = 0;
+      virtual void render(Grid* grid) = 0;
 };
 
 #endif /* COLLADACPP_COLLADARENDERER_HPP_ */

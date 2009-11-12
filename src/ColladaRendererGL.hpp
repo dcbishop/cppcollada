@@ -16,6 +16,8 @@ class ColladaRendererGL : public ColladaRenderer {
       virtual void render(Position* position);
       virtual void render(RotationGL* rotation);
       virtual void render(Scale* scale);
+      virtual void render(Camera* camera);
+      virtual void render(Grid* grid);
 };
 
 #endif /* COLLADACPP_COLLADARENDERERGL_HPP_ */
