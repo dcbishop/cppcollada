@@ -28,6 +28,7 @@ class Rotation;
 class RotationGL;
 class Scale;
 class Geometry;
+class ColladaCamera;
 
 #include "SmartPointers.hpp"
 
@@ -60,6 +61,8 @@ class ColladaDoc {
       void loadScale(DOMElement* element, Scale* scale);
       void loadInstances(DOMElement* element, ColladaNode* node);
       shared_ptr<ColladaObject> loadInstance(DOMElement* element, ColladaNode* node);
+      shared_ptr<ColladaCamera> loadColladaCamera(DOMElement* element);
+
 
       shared_ptr<Collada> getCollada();
       shared_ptr<Scene> getScene();
@@ -77,6 +80,8 @@ class ColladaDoc {
       DOMDocument* xmlDoc_;
       ColladaDocManager* manager_;
       ElementIdMap idMap_;
+      shared_ptr<Collada> collada_;
+      shared_ptr<Scene> scene_;
 };
 
 #endif /* COLLADACPP_COLLADADOC_HPP_ */

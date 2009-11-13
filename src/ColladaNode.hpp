@@ -15,7 +15,6 @@
 
 class ColladaNode : public ColladaObject, public Position, public RotationGL, public Scale {
    public:
-      //virtual void render() { getRenderer()->render(this); }
       COLLADA_RENDER_FUNCTION
       
    private:

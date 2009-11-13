@@ -8,6 +8,8 @@ using namespace std;
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include "console.h"
+
 #include "Renderable.hpp"
 #include "Camera.hpp"
 #include "Collada.hpp"
@@ -88,7 +90,7 @@ void ViewWindow::draw_() {
       fps_ = frame*1000.0f/(current_time-last_fps_time);
       last_fps_time = current_time;
       frame = 0;
-      cout << "FPS: " << fps_ << ",\t MPF: " << mpf_ << endl;
+      LOG("FPS: %d,\tMPF: %d",fps_, mpf_);
    }
    last_render_time = current_time;
 
@@ -136,14 +138,14 @@ void ViewWindow::checkEvents_() {
             }
             break;
          case SDL_MOUSEBUTTONDOWN:
-            cout << "TODO FIXME: Mouse button %d down at (%d, %d)" << event.button.button <<  event.button.x << event.button.y << endl;
+            DEBUG_L("Mouse button %d down at (%d, %d)", event.button.button, event.button.x, event.button.y);
 
             if(event.button.button == 3) {
                cam_move_ = true;
             }
             break;
          case SDL_MOUSEBUTTONUP:
-            cout << "TODO FIXME: Mouse button %d up at (%d, %d)" << event.button.button << event.button.x << event.button.y << endl;
+            DEBUG_L("Mouse button %d up at (%d, %d)", event.button.button, event.button.x, event.button.y);
             switch(event.button.button) {
                case 1:
                   //handleMouse1_(event);
@@ -166,7 +168,7 @@ void ViewWindow::checkEvents_() {
             //resizeEvent_(event);
             break;
          default:
-            cout << "Unknown event occured...\n";
+            DEBUG_L("Unknown event occured...");
             break;
       }
    }
@@ -176,7 +178,7 @@ void ViewWindow::checkEvents_() {
  * The main rendering and input loop.
  */
 void ViewWindow::mainLoop() {
-   cout << "Interface::mainLoop()\n";
+   DEBUG_L("Interface::mainLoop()");
 
    while(!finished_) {
       checkEvents_();

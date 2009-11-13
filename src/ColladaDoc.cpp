@@ -14,8 +14,9 @@
 #include "Scale.hpp"
 #include "RotationGL.hpp"
 #include "Geometry.hpp"
+#include "ColladaCamera.hpp"
 
-
+#include "console.h"
 
 ColladaDoc::ColladaDoc(ColladaDocManager* manager, string url) {
    url_ = url;
@@ -26,6 +27,7 @@ ColladaDoc::ColladaDoc(ColladaDocManager* manager, string url) {
 
 ColladaDoc::~ColladaDoc() {
    // TODO: Delete xmlDoc_ here?
+   DEBUG_M("~ColladaDoc()");
    delete parser_;
 }
 
@@ -45,8 +47,7 @@ DOMDocument* ColladaDoc::loadColladaDoc(string url) {
    }*/
 
    /*string localFilename = url.substr(fileSep.length()-1);
-   string localFilename = ColladaUrl::getFilename(url);
-   cout << localFilename << endl;*/
+   string localFilename = ColladaUrl::getFilename(url);*/
    return loadColladaDocFile(ColladaUrl::getFilename(url));
 }
 
@@ -55,12 +56,12 @@ DOMDocument* ColladaDoc::loadColladaDoc(string url) {
  * @param filename The filename of the document to load.
  */
 DOMDocument* ColladaDoc::loadColladaDocFile(string filename) {
-   cout << "DEBUG: loadColladaDocFile(" << filename << ")" << endl;
+   DEBUG_M("DEBUG: loadColladaDocFile(%s)", filename.c_str());
    try {
       XMLPlatformUtils::Initialize();
    } catch (const XMLException& e) {
       char* errMsg = XMLString::transcode(e.getMessage());
-      cout << "Xerces XML ERROR: " << errMsg << endl;
+      ERROR("Xerces XML ERROR: %s", errMsg);
       XMLString::release(&errMsg);
       return NULL;
    }
@@ -78,23 +79,23 @@ DOMDocument* ColladaDoc::loadColladaDocFile(string filename) {
       parser_->parse(filename.c_str());
    } catch (const XMLException& e) {
       char* errMsg = XMLString::transcode(e.getMessage());
-      cout << "Xerces XML ERROR: " << errMsg << endl;
+      ERROR("Xerces XML ERROR: %s", errMsg);
       XMLString::release(&errMsg);
       return NULL;
    } catch (const DOMException& e) {
       char* errMsg = XMLString::transcode(e.msg);
-      cout << "Xerces DOM ERROR: " << errMsg << endl;
+      ERROR("Xerces DOM ERROR: %s", errMsg);
       XMLString::release(&errMsg);
       return NULL;
    } catch (...) {
-      cout << "Unknown Xerces ERROR...\n";
+      ERROR("Unknown Xerces ERROR...");
       return NULL;
    }
 
    DOMDocument* xmlDoc = parser_->getDocument();
    DOMElement* elementRoot = xmlDoc->getDocumentElement();
    if(!elementRoot) {
-      cout << "Empty XML document...\n";
+      ERROR("Empty XML document...");
       return NULL;
    }
 
@@ -113,7 +114,7 @@ DOMDocument* ColladaDoc::loadColladaDocFile(string filename) {
  * get it to work so we do it the stupid way.
  */
 void ColladaDoc::buildIdMap_() {
-   cout << "DEBUG: ColladaDoc::buildIdMap_()\n";
+   DEBUG_M("Entering function...");
    DOMElement* elementRoot = xmlDoc_->getDocumentElement();
    DOMTreeWalker *walker = xmlDoc_->createTreeWalker(elementRoot, DOMNodeFilter::SHOW_ELEMENT, NULL, true);
    XMLCh* xid = XMLString::transcode("id");
@@ -139,13 +140,13 @@ void ColladaDoc::buildIdMap_() {
  * @return the DOMElement with the id or null.
  */
 DOMElement* ColladaDoc::getElementById(string id) {
-   cout << "DEBUG: ColladaDoc::getElementById(" << id << ")\n";
+   DEBUG_M("Entering function... id='%s'", id.c_str());
 
    // See buildIDMap's comment...
    /*XMLCh* xid = XMLString::transcode(id.c_str());
    DOMElement* element = xmlDoc_->getElementById(xid);
    if(!element) {
-      cout << "WARNING: ColladaDoc::getElementById couldn't find element with id '" << id << "'\n";
+      WARNING("ColladaDoc::getElementById couldn't find element with id '%s'", id);
    }
    XMLString::release(&xid);*/
 
@@ -167,11 +168,11 @@ DOMNodeList* ColladaDoc::getElementsByTagName(string tag) {
 }
 
 shared_ptr<ColladaObject> ColladaDoc::getColladaObjectById(string id) {
-   cout << "DEBUG: ColladaDoc::getColladaObjectById(" << id << ")\n";
+   DEBUG_M("Entering function: id='%s'", id.c_str());
    shared_ptr<ColladaObject> colladaObject;
    DOMElement* element = getElementById(id);
    if(!element) {
-      cout << "WARNING: Failed to find XML node with id '" << id << "'\n";
+      WARNING("Failed to find XML node with id '%s'", id);
       return shared_ptr<ColladaObject>();
    }
 
@@ -195,7 +196,7 @@ bool ColladaDoc::isString_(const XMLCh* tag1, string tag2) {
 }
 
 shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(DOMElement* element) {
-   cout << "DEBUG: ColladaDoc::loadColladaObject(...)\n";
+   DEBUG_M("Entering function...");
 
    const XMLCh* tagName = element->getTagName();
    shared_ptr<ColladaObject> colladaObject;
@@ -208,16 +209,18 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(DOMElement* element) {
       shared_ptr<ColladaNode> node(loadColladaNode(element));
       colladaObject = node;
    } else if(isString_(tagName, "geometry")) {
-      cout << "Load geometry\n";
+      DEBUG_H("Load geometry");
       shared_ptr<Geometry> geometry(loadGeometry(element));
       colladaObject = geometry;
    } else if(isString_(tagName, "camera")) {
-      cout << "Load camera\n";
+      DEBUG_H("Load camera");
+      shared_ptr<ColladaCamera> camera(loadColladaCamera(element));
+      colladaObject = camera;
    } else {
-      cout << "WARNING: Tried to load unsupported object '" << tagName_c << "'\n";
+      WARNING("Tried to load unsupported object'%s'", tagName_c);
    }
 
-   cout << "Loading: " << tagName_c << endl;
+   DEBUG_H("Loading: '%s'", tagName_c);
 
    if(colladaObject != NULL) {
       loadId(element, colladaObject.get());
@@ -228,11 +231,16 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(DOMElement* element) {
    
 }
 
+shared_ptr<ColladaCamera> ColladaDoc::loadColladaCamera(DOMElement* element) {
+   WARNING("Stub function!");
+   return shared_ptr<ColladaCamera>();
+}
 shared_ptr<Geometry> ColladaDoc::loadGeometry(DOMElement* element) {
    // convex_mesh
    // mesh
    // spline
    // brep?
+   WARNING("Stub function!");
    return shared_ptr<Geometry>();
 }
 
@@ -264,7 +272,7 @@ string ColladaDoc::getAttribute(DOMElement* element, string attribute) {
  * @param id The object to apply the ID to.
  */
 void ColladaDoc::loadId(DOMElement* element, Id* id) {
-   cout << "DEBUG: ColladaDoc::loadId(...)\n";
+   DEBUG_M("Entering function...");
    id->setId(getAttribute(element, "id"));
 }
 
@@ -274,7 +282,7 @@ void ColladaDoc::loadId(DOMElement* element, Id* id) {
  * @param name The object to apply the name to.
  */
 void ColladaDoc::loadName(DOMElement* element, Name* name) {
-   cout << "DEBUG: ColladaDoc::loadName(...)\n";
+   DEBUG_M("Entering function...");
    name->setName(getAttribute(element, "name"));
 }
 
@@ -284,7 +292,8 @@ void ColladaDoc::loadName(DOMElement* element, Name* name) {
  * @return A new VisualScene.
  */
 shared_ptr<VisualScene> ColladaDoc::loadVisualScene(DOMElement* element) {
-   cout << "DEBUG: ColladaDoc::loadVisualScene(...)\n";
+   DEBUG_M("Entering function...");
+
    shared_ptr<VisualScene> visualScene(new VisualScene());
 
    DOMNodeList* children = element->getChildNodes();
@@ -317,7 +326,7 @@ float* ColladaDoc::getFloatArray(string text, int count) {
    while(token) {
       float f = atof(token);
       if(i > count) {
-         cout << "ERROR: ColladaDoc::getFloatArray: Too many elements in array...\n";
+         ERROR("ColladaDoc::getFloatArray: Too many elements in array...\n");
          return array;
       }
       array[i] = f;
@@ -334,7 +343,7 @@ float* ColladaDoc::getFloatArray(string text, int count) {
  * @param position The object to apply the translation too.
  */
 void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
-   cout << "DEBUG: loadTranslation(...)\n";
+   DEBUG_M("Entering function...");
 
    XMLCh* tag = XMLString::transcode("translate");
    DOMNodeList* elements = element->getElementsByTagName(tag);
@@ -376,7 +385,7 @@ void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
  * 
  */
 void ColladaDoc::loadScale(DOMElement* element, Scale* scale) {
-   cout << "DEBUG: loadScale(...)\n";
+   DEBUG_M("Entering function...");
 
    XMLCh* tag = XMLString::transcode("scale");
    DOMNodeList* elements = element->getElementsByTagName(tag);
@@ -434,7 +443,7 @@ void ColladaDoc::loadRotation(DOMElement* element, RotationGL* rotation, int num
  * @param rotation The object to apply the rotations too.
  */
 void ColladaDoc::loadRotations(DOMElement* element, RotationGL* rotation) {
-   cout << "DEBUG: loadRotations(...)\n";
+   DEBUG_M("Entering function...");
 
    XMLCh* tag = XMLString::transcode("rotate");
    DOMNodeList* elements = element->getElementsByTagName(tag);
@@ -461,7 +470,8 @@ void ColladaDoc::loadRotations(DOMElement* element, RotationGL* rotation) {
  * @return A new ColladaNode.
  */
 shared_ptr<ColladaNode> ColladaDoc::loadColladaNode(DOMElement* element) {
-   cout << "DEBUG: loadColladaNode(...)\n";
+   DEBUG_M("Entering function...");
+
    shared_ptr<ColladaNode> node(new ColladaNode());
   
    loadTranslation(element, node.get());
@@ -472,7 +482,8 @@ shared_ptr<ColladaNode> ColladaDoc::loadColladaNode(DOMElement* element) {
 }
 
 void ColladaDoc::loadInstances(DOMElement* element, ColladaNode* node) {
-   cout << "DEBUG: ColladaDoc::loadInstances(...)\n";
+   DEBUG_M("Entering function...");
+
    DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
    for(int i = 0; i < length; i++) {
@@ -488,11 +499,11 @@ void ColladaDoc::loadInstances(DOMElement* element, ColladaNode* node) {
 }
 
 shared_ptr<ColladaObject> ColladaDoc::loadInstance(DOMElement* element, ColladaNode* node) {
-   cout << "DEBUG: ColladaDoc::loadInstance(...)\n";
+   DEBUG_M("Entering function...");
 
    const XMLCh* tagName = element->getTagName();
-   XMLCh* geometry_tag = XMLString::transcode("instance_geometry");
-   XMLCh* light_tag = XMLString::transcode("instance_light");
+   //XMLCh* geometry_tag = XMLString::transcode("instance_geometry");
+   //XMLCh* light_tag = XMLString::transcode("instance_light");
    string url = getAttribute(element, "url");
 
    // Not an instance...
@@ -502,11 +513,9 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(DOMElement* element, ColladaN
 
    #warning ['TODO']: Add translate, camera, node, scale, etc... 
    /*if(XMLString::compareIString(tagName, geometry_tag) == 0) {
-      cout << "Geometry\n";
       //Geometry* geometry = loadGeometry(element);
       //colladaObject = geometry;
    } else if(XMLString::compareIString(tagName, light_tag) == 0) {
-      cout << "Light\n";
       //Light* light = loadLight(element);
       //colladaObject = light;
    } else {
@@ -518,11 +527,11 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(DOMElement* element, ColladaN
    shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
 
    char* testtag = XMLString::transcode(tagName);
-   cout << testtag << endl;
+   DEBUG_H("%s", testtag);
 
    //XMLString::release(&tagName);
-   XMLString::release(&geometry_tag);
-   XMLString::release(&light_tag);
+   //XMLString::release(&geometry_tag);
+   //XMLString::release(&light_tag);
 
    //loadId(element, colladaObject);
    //loadName(element, colladaObject);
@@ -540,32 +549,36 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(DOMElement* element, ColladaN
  * Gets the main Scene of the Collada file.
  */
 shared_ptr<Scene> ColladaDoc::getScene() {
-   cout << "DEBUG: ColladaDoc::getScene()" << endl;
+   DEBUG_M("Entering function...");
+
+   if(scene_) {
+      return scene_;
+   }
    // TODO: Check for an already loaded Scene!
-   
+
    XMLCh* tag = XMLString::transcode("scene");
    DOMNodeList* elements = xmlDoc_->getElementsByTagName(tag);
    XMLString::release(&tag);
 
    if(!elements) {
-      cerr << "No <scene> node found in file..." << endl;
+      ERROR("No <scene> node found in file...");
       return shared_ptr<Scene>();
    }
    
    if(elements->getLength() > 1) {
-      cerr << "Multiple <scene> node's found in file..." << endl;
+      ERROR("Multiple <scene> node's found in file...");
       return shared_ptr<Scene>();
    }
 
    DOMNode* node = elements->item(0);
    if(!node) {
-      cerr << "Weird. Could not get node from <scene> list..." << endl;
+      ERROR("Weird. Could not get node from <scene> list...");
       return shared_ptr<Scene>();
    }
 
    #warning ['TODO']: Keep a copy of the scene for quick retrevial...
 
-   shared_ptr<Scene> scene(new Scene());
+   shared_ptr<Scene> scene_(new Scene());
    #warning ['TODO']: Load the scene into the Scene node...
 
    DOMNodeList* children = node->getChildNodes();
@@ -578,12 +591,11 @@ shared_ptr<Scene> ColladaDoc::getScene() {
          char *tagName = XMLString::transcode(currentElement->getTagName());
          XMLCh* url_x = XMLString::transcode("url");
          char *url = XMLString::transcode(currentElement->getAttribute(url_x));
-         cout << "DEBUG: getScene " << tagName << endl;
          if(XMLString::compareIString(tagName, "instance_visual_scene") == 0) {
-            cout << "DEBUG: getScene visual url: '" << url << "'\n";
+            DEBUG_H("getScene visual url: '%s'", url);
             shared_ptr<VisualScene> visualScene(getVisualScene(url));
-            cout << "DEBUG: got scene\n";
-            scene->setVisualScene(visualScene);
+            DEBUG_H(" got scene");
+            scene_->setVisualScene(visualScene);
          } else if(XMLString::compareIString(tagName, "instance_physics_scene") == 0) {
             // TODO: Load physics scene...
             //PhysicsScene* physicsScene = getPhysicsScene(id);
@@ -594,11 +606,12 @@ shared_ptr<Scene> ColladaDoc::getScene() {
          XMLString::release(&url_x);
       }
    }
-   return scene;
+
+   return scene_;
 }
 
 shared_ptr<VisualScene> ColladaDoc::getVisualScene(string url) {
-   cout << "DEBUG: ColladaDoc::getVisualScene(" << url << ")\n";
+   DEBUG_M("Entering function... url='%s'", url.c_str());
    shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
    shared_ptr<VisualScene> visualScene(static_pointer_cast<VisualScene, ColladaObject>(colladaObject));
    #warning ['TODO']: Safer dynamic cast?
@@ -606,14 +619,14 @@ shared_ptr<VisualScene> ColladaDoc::getVisualScene(string url) {
 }
 
 shared_ptr<ColladaObject> ColladaDoc::getColladaObjectByUrl(string url) {
-   cout << "DEBUG: ColladaDoc::getColladaObjectByUrl(" << url << ")" << endl;
+   DEBUG_M("Entering function... url='%s'", url.c_str());
    if(url.length() == 0) {
-      cout << "DEBUG: Tried to load blank url..." << endl;
+      WARNING("Tried to load blank url...");
       return shared_ptr<ColladaObject>();
    }
 
    if(!ColladaUrl::isInternal(url)) {
-      cout << "Its External...\n";
+      DEBUG_H("It's an external url");
       if(!manager_) {
          // TODO: Alternativly, spawn its own manager...
          return shared_ptr<ColladaObject>();
@@ -625,7 +638,9 @@ shared_ptr<ColladaObject> ColladaDoc::getColladaObjectByUrl(string url) {
 }
 
 shared_ptr<Collada> ColladaDoc::getCollada() {
-   shared_ptr<Collada> collada(new Collada());
-   collada->setScene(getScene());
-   return collada;
+   if(!collada_) {
+      collada_ = shared_ptr<Collada>(new Collada());
+      collada_->setScene(getScene());
+   }
+   return collada_;
 }

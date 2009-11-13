@@ -3,15 +3,15 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#ifndef DEBUG_LEVEL
-#define DEBUG_LEVEL DEBUG_VERY_HIGH
-#endif
-
 #define DEBUG_VERY_HIGH 40
 #define DEBUG_HIGH 30
 #define DEBUG_MEDIUM 20
 #define DEBUG_LOW 10
 #define DEBUG_ALWAYS -10
+
+#ifndef DEBUG_LEVEL
+#define DEBUG_LEVEL DEBUG_MEDIUM
+#endif
 
 #define USE_COLOUR
 #define USE_UNICODE
@@ -59,10 +59,10 @@
 
 #define DEBUG(level, fmt, ...) debugit(level, "%s[%s%s:%u%s]: [%s%s%s] %s" fmt, COLOUR_WHITE, COLOUR_LIGHT_CYAN, __FILE__, __LINE__, COLOUR_WHITE, COLOUR_LIGHT_BLUE, __FUNCTION__, COLOUR_WHITE, COLOUR_NONE, ## __VA_ARGS__)
 
-#ifndef _DEBUG
-#undef DEBUG
-#define DEBUG(level, fmt, ...)
-#endif
+//#ifndef _DEBUG
+//#undef DEBUG
+//#define DEBUG(level, fmt, ...)
+//#endif
 
 #define DEBUG_A(fmt, ...) DEBUG(DEBUG_ALWAYS, fmt, ## __VA_ARGS__)
 #define DEBUG_L(fmt, ...) DEBUG(DEBUG_LOW, fmt, ## __VA_ARGS__)

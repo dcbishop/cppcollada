@@ -22,22 +22,21 @@ shared_ptr<ColladaDoc> ColladaDocManager::getColladaDoc(string url) {
 }
 
 /**
- * Gets a COLLADA scene from a url.
- * @param url The COLLADA .dae file in URL format.
- * @return The scene.
+ * Returns a Collada object from a URL.
+ * @param url The URL.
+ * @return the loaded object or NULL.
  */
-shared_ptr<Scene> ColladaDocManager::getScene(string url) {
-   /*if(isLocal(url)) {
-      cerr << "Tried to get local scene from global manager..." << endl;
-      return NULL;
-   }*/
-   return shared_ptr<Scene>();
-}
-
 shared_ptr<ColladaObject> ColladaDocManager::getColladaObjectByUrl(string url) {
    shared_ptr<ColladaDoc> colladaDoc(getColladaDoc(ColladaUrl::getStrippedUrl(url)));
    if(!colladaDoc) {
       return shared_ptr<ColladaObject>();
    }
    return colladaDoc->getColladaObjectByUrl(url);
+}
+
+/**
+ * Unloads all the raw XML COLLADA docs from memory.
+ */
+void ColladaDocManager::unloadColladaDocs() {
+   colladaDocs_.clear();
 }

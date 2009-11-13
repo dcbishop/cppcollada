@@ -12,6 +12,6 @@ namespace ColladaUrl {
    string getStrippedUrl(string url);
    bool isInternal(string url);
    string getFilename(string url);
-}
+};
 
 #endif /* COLLADACPP_COLLADAURL_HPP_ */

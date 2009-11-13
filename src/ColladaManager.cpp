@@ -6,7 +6,9 @@
 #include "VisualScene.hpp"
 
 /**
- * 
+ * Gets a Collada object from a URL.
+ * @param url No remote urls, only 'file://somedir/file.dae' or '/somedir/file.dae'.
+ * @return A Collada object.
  */
 shared_ptr<Collada> ColladaManager::getCollada(string url) {
    // See if the collada is already loaded...
@@ -22,9 +24,10 @@ shared_ptr<Collada> ColladaManager::getCollada(string url) {
    return collada;
 }
 
-shared_ptr<VisualScene> ColladaManager::getVisualScene(string url) {
-   shared_ptr<ColladaDoc> colladaDoc(colladaDocManager_.getColladaDoc(url));
-   #warning ['TODO']: Strip id from url...
-   string id = url;
-   return colladaDoc->getVisualScene(id);
+/**
+ * Unloads raw COLLARA XML documents from memory. Doesn't effect loaded
+ * Collada objects. Usefull to call after batch loading a bunch of .dae.
+ */
+void ColladaManager::scrub() {
+   colladaDocManager_.unloadColladaDocs();
 }

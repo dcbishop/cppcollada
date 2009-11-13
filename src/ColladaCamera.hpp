@@ -1,7 +1,7 @@
 #ifndef COLLADACPP_COLLADACAMERA_HPP_
 #define COLLADACPP_COLLADACAMERA_HPP_
 
-class ColladaCamera {
+class ColladaCamera : public ColladaObject {
    public:
       float getFov();
       void setFov(float fov);

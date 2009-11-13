@@ -29,11 +29,7 @@ typedef pair<string, shared_ptr<ColladaDoc>> ColladaDocMapPair;
 class ColladaDocManager {
    public:
       shared_ptr<ColladaDoc> getColladaDoc(string url);
-      shared_ptr<Scene> getColladaScene(string url);
-      shared_ptr<VisualScene> getColladaVisualScene(string url, string id);
-      shared_ptr<Scene> getScene(string url);
-
-      string stripUrlId(string url);
+      void unloadColladaDocs();
       shared_ptr<ColladaObject> getColladaObjectByUrl(string url);
 
    private:
