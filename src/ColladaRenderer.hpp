@@ -17,7 +17,7 @@ class ColladaRenderer {
    public:
       virtual void render(Renderable* renderable) = 0;
       virtual void render(Collada* collada) = 0;
-      virtual void render(ColladaObject* colladaObject) = 0;
+      //virtual void render(ColladaObject* colladaObject) = 0;
       virtual void render(Scene* scene) = 0;
       virtual void render(VisualScene* vs) = 0;
       virtual void render(ColladaNode* node) = 0;

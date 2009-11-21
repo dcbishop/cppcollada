@@ -44,12 +44,11 @@ env.ParseConfig('sdl-config --cflags --libs')
 
 if int(debug_flag):
 	env.Append(CCFLAGS = ['-g'])
-	#env.MergeFlags('-D_DEBUG')
-	env.Append(CPPDEFINES=['DEBUG'])
+	env.Append(CPPDEFINES=['_DEBUG'])
 
 env.Append(CCFLAGS = ['-Wall'])
 
-# For shared_ptr, other wise try  -D_TR1PTR or -D_BOOSTPTR (need to link include boost though)
+# For shared_ptr, other wise try  -D_TR1PTR or -D_BOOSTPTR (might need to add boost includes though)
 env.Append(CCFLAGS = ['-std=c++0x'])
 
 objects = env.Object(sources)

@@ -9,7 +9,7 @@ class ColladaRendererGL : public ColladaRenderer {
    public:
       virtual void render(Renderable* renderable);
       virtual void render(Collada* collada);
-      virtual void render(ColladaObject* colladaObject);
+      //virtual void render(ColladaObject* colladaObject);
       virtual void render(Scene* scene);
       virtual void render(VisualScene* vs);
       virtual void render(ColladaNode* node);

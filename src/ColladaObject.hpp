@@ -5,7 +5,7 @@
 #include "Name.hpp"
 #include "Renderable.hpp"
 
-class ColladaObject: public Id, public Name, public Renderable {
+class ColladaObject: public Id, public Name {
    public:
 };
 

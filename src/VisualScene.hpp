@@ -16,7 +16,7 @@ typedef vector<shared_ptr<ColladaNode>> ColladaNodeVector;
 typedef ColladaNodeVector::iterator ColladaNodeIterator;
 
 #warning ['TODO']: Keep a map of the nodes/ids...
-class VisualScene : public ColladaObject {
+class VisualScene : public ColladaObject, public Renderable {
    public:
       void addColladaNode(shared_ptr<ColladaNode> node);
       ColladaNodeIterator getFirstColladaNode();

@@ -10,6 +10,7 @@ class VisualScene;
 #include <iostream>
 #include <string>
 #include <map>
+#include <vector>
 using namespace std;
 
 #include <xercesc/parsers/XercesDOMParser.hpp>
@@ -29,6 +30,12 @@ class RotationGL;
 class Scale;
 class Geometry;
 class ColladaCamera;
+class ColladaLight;
+class Mesh;
+class Vertices;
+class Triangles;
+class Input;
+class Source;
 
 #include "SmartPointers.hpp"
 
@@ -47,7 +54,7 @@ class ColladaDoc {
       shared_ptr<ColladaObject> getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
-      float* getFloatArray(string text, int count);
+      shared_ptr<vector<float>> getFloats(string text);
       shared_ptr<ColladaObject> loadColladaObject(DOMElement* element);
       string getAttribute(DOMElement* element, string attribute);
       void loadId(DOMElement* element, Id* id);
@@ -60,9 +67,14 @@ class ColladaDoc {
       void loadRotations(DOMElement* element, RotationGL* rotation);
       void loadScale(DOMElement* element, Scale* scale);
       void loadInstances(DOMElement* element, ColladaNode* node);
+      shared_ptr<ColladaLight> loadColladaLight(DOMElement* element);
       shared_ptr<ColladaObject> loadInstance(DOMElement* element, ColladaNode* node);
       shared_ptr<ColladaCamera> loadColladaCamera(DOMElement* element);
-
+      shared_ptr<Mesh> loadMesh(DOMElement* element);
+      shared_ptr<Vertices> loadVertices(DOMElement* element);
+      shared_ptr<Triangles> loadTriangles(DOMElement* element);
+      shared_ptr<Source> loadSource(DOMElement* element);
+      void loadSourceTechnique(DOMElement* element, shared_ptr<Source> source);
 
       shared_ptr<Collada> getCollada();
       shared_ptr<Scene> getScene();
@@ -70,6 +82,8 @@ class ColladaDoc {
       string getUrlId(string url);
       shared_ptr<VisualScene> getVisualScene(string url);
       shared_ptr<ColladaObject> getColladaObjectByUrl(string url);
+      shared_ptr<Input> loadInput(DOMElement* element);
+      shared_ptr<vector<int>> loadPrimitives(DOMElement* element);
 
    private:
       void buildIdMap_();

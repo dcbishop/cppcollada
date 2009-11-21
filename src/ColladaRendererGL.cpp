@@ -17,10 +17,10 @@
 
 #include <iostream>
 
-void ColladaRendererGL::render(ColladaObject* colladaObject) {
+/*void ColladaRendererGL::render(ColladaObject* colladaObject) {
    DEBUG_H("ColladaRendererGL::render(ColladaObject* colladaObject)");
    colladaObject->render();
-}
+}*/
 
 void ColladaRendererGL::render(Collada* collada) {
    DEBUG_H("ColladaRendererGL::render(Collada* collada)");

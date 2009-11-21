@@ -15,10 +15,16 @@
 #include "RotationGL.hpp"
 #include "Geometry.hpp"
 #include "ColladaCamera.hpp"
+#include "ColladaLight.hpp"
+#include "Mesh.hpp"
+#include "Vertices.hpp"
+#include "Triangles.hpp"
+#include "Source.hpp"
 
 #include "console.h"
 
 ColladaDoc::ColladaDoc(ColladaDocManager* manager, string url) {
+   DEBUG_M("Entering function...");
    url_ = url;
    xmlDoc_ = loadColladaDoc(url);
    manager_ = manager;
@@ -36,6 +42,7 @@ ColladaDoc::~ColladaDoc() {
  * @param url The URL of the document to load.
  */
 DOMDocument* ColladaDoc::loadColladaDoc(string url) {
+   DEBUG_M("Entering function...");
    #warning ['TODO']: Process other URL formats...
 
    // Check to ensure we are loading a file://
@@ -56,7 +63,7 @@ DOMDocument* ColladaDoc::loadColladaDoc(string url) {
  * @param filename The filename of the document to load.
  */
 DOMDocument* ColladaDoc::loadColladaDocFile(string filename) {
-   DEBUG_M("DEBUG: loadColladaDocFile(%s)", filename.c_str());
+   DEBUG_M("loadColladaDocFile(%s)", filename.c_str());
    try {
       XMLPlatformUtils::Initialize();
    } catch (const XMLException& e) {
@@ -118,8 +125,8 @@ void ColladaDoc::buildIdMap_() {
    DOMElement* elementRoot = xmlDoc_->getDocumentElement();
    DOMTreeWalker *walker = xmlDoc_->createTreeWalker(elementRoot, DOMNodeFilter::SHOW_ELEMENT, NULL, true);
    XMLCh* xid = XMLString::transcode("id");
-   for(DOMNode *currentColladaNode = walker->nextNode(); currentColladaNode != 0; currentColladaNode = walker->nextNode()) {
-      DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentColladaNode);
+   for(DOMNode *currentNode = walker->nextNode(); currentNode != 0; currentNode = walker->nextNode()) {
+      DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
       if(currentElement) {
          const XMLCh* thexid = currentElement->getAttribute(xid);
          if(!thexid || XMLString::stringLen(thexid) == 0) {
@@ -162,6 +169,7 @@ DOMElement* ColladaDoc::getElementById(string id) {
  * 
  */
 DOMNodeList* ColladaDoc::getElementsByTagName(string tag) {
+   DEBUG_M("Entering function...");
    XMLCh* xtag = XMLString::transcode(tag.c_str());
    return xmlDoc_->getElementsByTagName(xtag);
    XMLString::release(&xtag);
@@ -172,7 +180,7 @@ shared_ptr<ColladaObject> ColladaDoc::getColladaObjectById(string id) {
    shared_ptr<ColladaObject> colladaObject;
    DOMElement* element = getElementById(id);
    if(!element) {
-      WARNING("Failed to find XML node with id '%s'", id);
+      WARNING("Failed to find XML node with id '%s'", id.c_str());
       return shared_ptr<ColladaObject>();
    }
 
@@ -184,6 +192,7 @@ shared_ptr<ColladaObject> ColladaDoc::getColladaObjectById(string id) {
 }
 
 bool ColladaDoc::isString_(const XMLCh* tag1, string tag2) {
+   DEBUG_H("Entering function...");
    XMLCh* tag2_c = XMLString::transcode(tag2.c_str());
 
    int result = XMLString::compareIString(tag1, tag2_c);
@@ -216,6 +225,14 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(DOMElement* element) {
       DEBUG_H("Load camera");
       shared_ptr<ColladaCamera> camera(loadColladaCamera(element));
       colladaObject = camera;
+   } else if(isString_(tagName, "light")) {
+      DEBUG_H("Load light");
+      shared_ptr<ColladaLight> light(loadColladaLight(element));
+      colladaObject = light;
+   } else if(isString_(tagName, "source")) {
+      DEBUG_H("Load source");
+      shared_ptr<Source> source(loadSource(element));
+      colladaObject = source;
    } else {
       WARNING("Tried to load unsupported object'%s'", tagName_c);
    }
@@ -231,18 +248,272 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(DOMElement* element) {
    
 }
 
+shared_ptr<ColladaLight> ColladaDoc::loadColladaLight(DOMElement* element) {
+   DEBUG_M("Entering function...");
+   WARNING("Stub function!");
+   return shared_ptr<ColladaLight>();
+}
+
 shared_ptr<ColladaCamera> ColladaDoc::loadColladaCamera(DOMElement* element) {
+   DEBUG_M("Entering function...");
    WARNING("Stub function!");
    return shared_ptr<ColladaCamera>();
 }
+
 shared_ptr<Geometry> ColladaDoc::loadGeometry(DOMElement* element) {
+   DEBUG_M("Entering function...");
    // convex_mesh
    // mesh
    // spline
    // brep?
-   WARNING("Stub function!");
+   shared_ptr<Geometry> geometry;
+   
+   DOMNodeList* children = element->getChildNodes();
+   int length = children->getLength();
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+
+         const XMLCh* tagName = currentElement->getTagName();
+         if(isString_(tagName, "mesh")) {
+            shared_ptr<Mesh> mesh(loadMesh(currentElement));
+            geometry = static_pointer_cast<Geometry, Mesh>(mesh);
+            return mesh;
+         } else if(isString_(tagName, "convex_mesh")) {
+            WARNING("convex_mesh not supported!");
+         } else if(isString_(tagName, "spline")) {
+            WARNING("spline not supported!");
+         } else if(isString_(tagName, "brep")) {
+            WARNING("brep not supported!");
+         }
+
+         // TODO: Other types, convex_mesg, spline, brep, nodes...
+      }
+   }
+   
    return shared_ptr<Geometry>();
 }
+
+shared_ptr<Mesh> ColladaDoc::loadMesh(DOMElement* element) {
+   DEBUG_M("Entering function...");
+
+   DOMNodeList* children = element->getChildNodes();
+   int length = children->getLength();
+   DEBUG_M("Children: %i", length);
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         const XMLCh* tagName = currentElement->getTagName();
+         if(isString_(tagName, "lines")) {
+            WARNING("lines not yet supported.");
+         } else if(isString_(tagName, "linestripes")) {
+            WARNING("linestripes not yet supported.");
+         } else if(isString_(tagName, "polygons")) {
+            WARNING("polygons not yet supported.");
+         } else if(isString_(tagName, "polylist")) {
+            WARNING("polylist not yet supported.");
+         } else if(isString_(tagName, "triangles")) {
+            WARNING("triangles not yet supported.");
+            shared_ptr<Triangles> triangles = loadTriangles(currentElement);
+         } else if(isString_(tagName, "trifans")) {
+            WARNING("trifans not yet supported.");
+         } else if(isString_(tagName, "tristrips")) {
+            WARNING("tristrips not yet supported.");
+         }
+      }
+   }
+
+   return shared_ptr<Mesh>();
+}
+
+shared_ptr<Triangles> ColladaDoc::loadTriangles(DOMElement* element) {
+   DEBUG_M("Entering function...");
+   WARNING("STUB FUNCTION!");
+
+   shared_ptr<Triangles> triangles(new Triangles);
+
+   string count = getAttribute(element, "count");
+   string material = getAttribute(element, "material");
+
+   DOMNodeList* children = element->getChildNodes();
+   int length = children->getLength();
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         const XMLCh* tagName = currentElement->getTagName();
+
+         if(isString_(tagName, "input")) {
+            shared_ptr<Input> input = loadInput(currentElement);
+            string semantic = getAttribute(currentElement, "semantic");
+
+            if(semantic.compare("VERTEX") == 0) {
+               triangles->setVertex(input);
+            } else if(semantic.compare("NORMAL") == 0) {
+               triangles->setNormal(input);
+            }
+         } else if(isString_(tagName, "p")) {
+            shared_ptr<vector<int>> primitives = loadPrimitives(currentElement);
+            triangles->setPrimitives(primitives);
+         }
+      }
+   }
+
+   return shared_ptr<Triangles>();
+}
+
+shared_ptr<vector<int>> ColladaDoc::loadPrimitives(DOMElement* element) {
+   DEBUG_M("Entering function...");
+
+   const XMLCh* data_x = element->getTextContent();
+   char* data_c = XMLString::transcode(data_x);
+
+   shared_ptr<vector<int>> primitives(new vector<int>);
+
+   //TODO: Do this in a C++ way... or at least look at using strtok_r...
+   int i = 0;
+   char* token = strtok(data_c, " ");
+   while(token) {
+      int num = atoi(token);
+      primitives->push_back(num);
+      i++;
+      token = strtok(NULL, " ");
+   }
+
+   return primitives;
+}
+
+shared_ptr<Input> ColladaDoc::loadInput(DOMElement* element) {
+   DEBUG_M("Entering function...");
+
+   shared_ptr<Input> input(new Input);
+
+   string offset = getAttribute(element, "offset");
+   input->setOffset(atoi(offset.c_str()));
+   
+   string url = getAttribute(element, "source");
+   shared_ptr<ColladaObject> sourceObj = getColladaObjectByUrl(url);
+   shared_ptr<Source> source(static_pointer_cast<Source, ColladaObject>(sourceObj));
+   input->setSource(source);
+
+   return input;
+}
+
+#warning ['TODO']: Load the accessor first, that should pull in the float_array or whatever...
+shared_ptr<Source> ColladaDoc::loadSource(DOMElement* element) {
+   DEBUG_M("Entering function...");
+
+   shared_ptr<Source> source(new Source);
+
+   DOMNodeList* children = element->getChildNodes();
+   int length = children->getLength();
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         const XMLCh* tagName = currentElement->getTagName();
+
+         if(isString_(tagName, "float_array")) {
+            const XMLCh* data_x = currentElement->getTextContent();
+            char* data_c = XMLString::transcode(data_x);
+            source->setFloats(getFloats(data_c));
+            XMLString::release(&data_c);
+         } else if (isString_(tagName, "technique_common")) {
+            loadSourceTechnique(currentElement, source);
+         }
+      }
+   }
+
+   return source;
+}
+
+void ColladaDoc::loadSourceTechnique(DOMElement* element, shared_ptr<Source> source) {
+   DEBUG_M("Entering function...");
+
+   XMLCh* tag = XMLString::transcode("accessor");
+   DOMNodeList* elements = element->getElementsByTagName(tag);
+   XMLString::release(&tag);
+
+   // No translation on node...
+   if(!elements) {
+      return;
+   }
+
+   // Multiple translations on node...
+   if(elements->getLength() > 1) {
+      cerr << "ERROR: Multiple <translate>'s found in node..." << endl;
+      return;
+   }
+
+   DOMNode* node = elements->item(0);
+   if(!node) {
+      cerr << "Weird. Could not get translation from element list..." << endl;
+      return;
+   }
+
+   DOMElement* accessorElement = dynamic_cast<xercesc::DOMElement*>(node);
+   string strideStr = getAttribute(accessorElement, "stride");
+   source->setStride(atoi(strideStr.c_str()));
+   
+   int params = 0;
+   DOMNodeList* children = node->getChildNodes();
+   int length = children->getLength();
+   DEBUG_M("Children: %i", length);
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         
+         const XMLCh* tagName = currentElement->getTagName();
+         char* data_c = XMLString::transcode(tagName);
+
+         DEBUG_M("LOOP: '%s'", data_c);
+
+         if(isString_(tagName, "param")) {
+            string name = getAttribute(currentElement, "name");
+            if(name.compare("X") == 0) {
+               DEBUG_M("SETXOFF");
+               source->setXOff(params);
+            } else if(name.compare("Y") == 0) {
+               DEBUG_M("SETYOFF");
+               source->setYOff(params);
+            } else if(name.compare("Z") == 0) {
+               DEBUG_M("SETZOFF");
+               source->setZOff(params);
+            }
+
+            params++;
+         }
+         XMLString::release(&data_c);
+      }
+   }
+}
+
+shared_ptr<Vertices> ColladaDoc::loadVertices(DOMElement* element) {
+   DEBUG_M("Entering function...");
+   WARNING("STUB FUNCTION!");
+
+   XMLCh* tag = XMLString::transcode("input");
+   DOMNodeList* elements = xmlDoc_->getElementsByTagName(tag);
+   XMLString::release(&tag);
+
+   if(!elements) {
+      ERROR("No <input> node found in file...");
+      return shared_ptr<Vertices>();
+   }
+
+   if(elements->getLength() > 1) {
+      ERROR("Multiple <input> node's found in file...");
+      return shared_ptr<Vertices>();
+   }
+
+   return shared_ptr<Vertices>();
+}
+
 
 /*string ColladaDoc::getStringFromXMLCh(XMLCh* xmlch) {
    char* ch = XMLString::transcode(xmlch);
@@ -258,6 +529,7 @@ shared_ptr<Geometry> ColladaDoc::loadGeometry(DOMElement* element) {
  * @return The atribute.
  */
 string ColladaDoc::getAttribute(DOMElement* element, string attribute) {
+   DEBUG_M("Entering function... '%s'", attribute.c_str());
    XMLCh* attrx = XMLString::transcode(attribute.c_str());
    char *value_c = XMLString::transcode(element->getAttribute(attrx));
    string value_s = value_c;
@@ -299,9 +571,9 @@ shared_ptr<VisualScene> ColladaDoc::loadVisualScene(DOMElement* element) {
    DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
    for(int i = 0; i < length; i++) {
-      DOMNode* currentColladaNode = children->item(i);
-      if(currentColladaNode->getNodeType() && currentColladaNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
-         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentColladaNode);
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
          shared_ptr<ColladaObject> colladaObject(getColladaObjectById(getAttribute(currentElement, "id")));
          shared_ptr<ColladaNode> node(static_pointer_cast<ColladaNode, ColladaObject>(colladaObject));
          visualScene->addColladaNode(node);
@@ -313,28 +585,26 @@ shared_ptr<VisualScene> ColladaDoc::loadVisualScene(DOMElement* element) {
 /**
  * Turns a string containing floats, into a float array.
  * @param text A string containing a float array.
- * @param count The number of floats.
+ * @param floats A vector of floats.
  */
-float* ColladaDoc::getFloatArray(string text, int count) {
-   float* array = new float[count];
+shared_ptr<vector<float>> ColladaDoc::getFloats(string text) {
+   DEBUG_M("Entering function...");
 
-   char* data_clone = (char*)text.c_str();  //TODO: How safe is this?
+   shared_ptr<vector<float>> floats(new vector<float>);
+
+   char* data_clone = (char*)text.c_str();
 
    //TODO: Do this in a C++ way... or at least look at using strtok_r...
    int i = 0;
    char* token = strtok(data_clone, " ");
+
    while(token) {
       float f = atof(token);
-      if(i > count) {
-         ERROR("ColladaDoc::getFloatArray: Too many elements in array...\n");
-         return array;
-      }
-      array[i] = f;
+      floats->push_back(f);
       i++;
       token = strtok(NULL, " ");
    }
-   
-   return array;
+   return floats;
 }
 
 /**
@@ -371,12 +641,12 @@ void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
       const XMLCh* data_x = current->getTextContent();
       char* data_c = XMLString::transcode(data_x);
 
-      float* array = getFloatArray(data_c, 3);
-      position->setX(array[0]);
-      position->setY(array[1]);
-      position->setZ(array[2]);
+      shared_ptr<vector<float>> floats(getFloats(data_c));
 
-      delete(array);
+      position->setX(floats->at(0));
+      position->setY(floats->at(1));
+      position->setZ(floats->at(2));
+
       XMLString::release(&data_c);
    }
 }
@@ -413,10 +683,10 @@ void ColladaDoc::loadScale(DOMElement* element, Scale* scale) {
       const XMLCh* data_x = current->getTextContent();
       char* data_c = XMLString::transcode(data_x);
 
-      float* array = getFloatArray(data_c, 3);
-      scale->setScaleXYZ(array[0], array[1], array[2]);
+      shared_ptr<vector<float>> floats(getFloats(data_c));
 
-      delete(array);
+      scale->setScaleXYZ(floats->at(0), floats->at(1), floats->at(2));
+
       XMLString::release(&data_c);
    }
 }
@@ -427,13 +697,14 @@ void ColladaDoc::loadScale(DOMElement* element, Scale* scale) {
  * @param rotation The object to apply the rotation too.
  */
 void ColladaDoc::loadRotation(DOMElement* element, RotationGL* rotation, int number) {
+   DEBUG_M("Entering function...");
    const XMLCh* data_x = element->getTextContent();
    char* data_c = XMLString::transcode(data_x);
 
-   float* array = getFloatArray(data_c, 4);
-   rotation->setRotationGL(number, array[0], array[1], array[2], array[3]);
+   shared_ptr<vector<float>> floats(getFloats(data_c));
 
-   delete(array);
+   rotation->setRotationGL(number, floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+
    XMLString::release(&data_c);
 }
 
@@ -456,9 +727,9 @@ void ColladaDoc::loadRotations(DOMElement* element, RotationGL* rotation) {
 
    int length = elements->getLength();
    for(int i = 0; i < length; i++) {
-      DOMNode* currentColladaNode = elements->item(i);
-      if(currentColladaNode->getNodeType() && currentColladaNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
-         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentColladaNode);
+      DOMNode* currentNode = elements->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
          loadRotation(currentElement, rotation, i);
       }
    }
@@ -487,9 +758,9 @@ void ColladaDoc::loadInstances(DOMElement* element, ColladaNode* node) {
    DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
    for(int i = 0; i < length; i++) {
-      DOMNode* currentColladaNode = children->item(i);
-      if(currentColladaNode->getNodeType() && currentColladaNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
-         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentColladaNode);
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
          shared_ptr<ColladaObject> instance = loadInstance(currentElement, node);
          if(instance != NULL) {
             //TODO: node->addInstance(instance); or whatever...
@@ -501,7 +772,7 @@ void ColladaDoc::loadInstances(DOMElement* element, ColladaNode* node) {
 shared_ptr<ColladaObject> ColladaDoc::loadInstance(DOMElement* element, ColladaNode* node) {
    DEBUG_M("Entering function...");
 
-   const XMLCh* tagName = element->getTagName();
+   //const XMLCh* tagName = element->getTagName();
    //XMLCh* geometry_tag = XMLString::transcode("instance_geometry");
    //XMLCh* light_tag = XMLString::transcode("instance_light");
    string url = getAttribute(element, "url");
@@ -526,8 +797,8 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(DOMElement* element, ColladaN
 
    shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
 
-   char* testtag = XMLString::transcode(tagName);
-   DEBUG_H("%s", testtag);
+   /*char* testtag = XMLString::transcode(tagName);
+   DEBUG_H("%s", testtag);*/
 
    //XMLString::release(&tagName);
    //XMLString::release(&geometry_tag);
@@ -584,9 +855,9 @@ shared_ptr<Scene> ColladaDoc::getScene() {
    DOMNodeList* children = node->getChildNodes();
    int length = children->getLength();
    for(int i = 0; i < length; i++) {
-      DOMNode* currentColladaNode = children->item(i);
-      if(currentColladaNode->getNodeType() && currentColladaNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
-         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentColladaNode);
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
 
          char *tagName = XMLString::transcode(currentElement->getTagName());
          XMLCh* url_x = XMLString::transcode("url");
@@ -637,7 +908,11 @@ shared_ptr<ColladaObject> ColladaDoc::getColladaObjectByUrl(string url) {
    return getColladaObjectById(ColladaUrl::getId(url));
 }
 
+/**
+ * Returns a Collada object based on the xml file.
+ */
 shared_ptr<Collada> ColladaDoc::getCollada() {
+   DEBUG_M("Entering function...");
    if(!collada_) {
       collada_ = shared_ptr<Collada>(new Collada());
       collada_->setScene(getScene());
