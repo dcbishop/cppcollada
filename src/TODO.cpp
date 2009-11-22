@@ -21,7 +21,7 @@ using namespace xercesc;
 
 int main(int argc, char* args[]) {
    //DEBUG_A("Starting...");
-   string filename = "/home/hegemon/tmp/cube.dae";
+   string filename = "/home/hegemon/tmp/monkeyhead.dae";
 
    DEBUG_A("Spawning ColladaManager...");
    ColladaManager cm;

@@ -185,11 +185,17 @@ void ColladaRendererGL::render(Triangles* triangles) {
 void ColladaRendererGL::render(GeometricPrimitive* geometry) {
    DEBUG_H("ColladaRendererGL::render(GeometricPrimitive* geometry)");
 
+   static int what;
+   if(!what) {
+      WARNING("Inefficient primitive rendering!, convert to vertex buffer object first!");
+      what = 1;
+   } 
+
    PrimIterator iter = geometry->getFirstPrimitive();
    int inputCount = geometry->getInputCount();
    while(iter != geometry->getEndPrimitive()) {
       int primNum = geometry->getVertexNum(*iter);
-      DEBUG_H("%d %d %d", *iter, primNum, inputCount);
+      DEBUG_H("%d %d x=%f. y=%f, z=%f", *iter, primNum, geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       //float x = geometry->getX(primNum);
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       iter+=inputCount;

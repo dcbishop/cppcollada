@@ -19,17 +19,17 @@ PrimIterator GeometricPrimitive::getEndPrimitive() {
    return primitives_->end();
 }
 
-int GeometricPrimitive::getX(int num) {
+float GeometricPrimitive::getX(int num) {
    DEBUG_H("getX(%d)", num);
    return vertex_->getX(num);
 }
 
-int GeometricPrimitive::getY(int num) {
+float GeometricPrimitive::getY(int num) {
    DEBUG_H("getY(%d)", num);
    return vertex_->getY(num);
 }
 
-int GeometricPrimitive::getZ(int num) {
+float GeometricPrimitive::getZ(int num) {
    DEBUG_H("getZ(%d)", num);
    return vertex_->getZ(num);
 }

@@ -19,9 +19,9 @@ class GeometricPrimitive : public Renderable {
 
       int getVertexNum(int num);
 
-      int getX(int num);
-      int getY(int num);
-      int getZ(int num);
+      float getX(int num);
+      float getY(int num);
+      float getZ(int num);
       
       void setCount(int count) { count_ = count; }
       int getCount() { return count_; }
