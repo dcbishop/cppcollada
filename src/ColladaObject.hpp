@@ -5,8 +5,9 @@
 #include "Name.hpp"
 #include "Renderable.hpp"
 
-class ColladaObject: public Id, public Name {
+class ColladaObject: public Id, public Name, public Renderable {
    public:
+      COLLADA_RENDER_FUNCTION
 };
 
 #endif /* COLLADACPP_COLLADAOBJECT_HPP_ */

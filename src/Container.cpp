@@ -5,18 +5,18 @@
  * @param child The thing to be contained.
  */
 void Container::add(Contained* child) {
-	if(!child) {
-		return;
-	}
+   if(!child) {
+      return;
+   }
 
-	// Stop adding the child more than once
-	ChildrenIterator found = find(getChildBegin(), getChildEnd(), child);
-	if(found != getChildEnd()) {
-		return;
-	}
+   // Stop adding the child more than once
+   ChildrenIterator found = find(getChildBegin(), getChildEnd(), child);
+   if(found != getChildEnd()) {
+      return;
+   }
 
-	child->setParent(this);
-	children_.push_back(child);
+   child->setParent(this);
+   children_.push_back(child);
 }
 
 /**
@@ -24,19 +24,19 @@ void Container::add(Contained* child) {
  * @param child The thing to be contained.
  */
 void Container::remove(Contained* child) {
-	//DEBUG_M("Entering function remove...");
-	if(!child) {
-		return;
-	}
+   //DEBUG_M("Entering function remove...");
+   if(!child) {
+      return;
+   }
 
-	//DEBUG_H("\tRemoving object from container object vector.");
-	ChildrenIterator found = find(getChildBegin(), getChildEnd(), child);
+   //DEBUG_H("\tRemoving object from container object vector.");
+   ChildrenIterator found = find(getChildBegin(), getChildEnd(), child);
 
-	if(found != getChildEnd()) {
-		if(*found && ((*found) == child)) {
-			children_.erase(found);
-		}
-	}
+   if(found != getChildEnd()) {
+      if(*found && ((*found) == child)) {
+         children_.erase(found);
+      }
+   }
 }
 
 /**
@@ -44,7 +44,7 @@ void Container::remove(Contained* child) {
  * @return Iterator to the first contained element.
  */
 ChildrenIterator Container::getChildBegin() {
-	return children_.begin();
+   return children_.begin();
 }
 
 /**
@@ -52,7 +52,7 @@ ChildrenIterator Container::getChildBegin() {
  * @return Iterator to the last contained element.
  */
 ChildrenIterator Container::getChildEnd() {
-	return children_.end();
+   return children_.end();
 }
 
 /**
@@ -60,7 +60,7 @@ ChildrenIterator Container::getChildEnd() {
  * @param parent The thing within which this thing is contained.
  */
 void Contained::setParent(Container* parent) {
-	parent_ = parent;
+   parent_ = parent;
 }
 
 /**
@@ -68,5 +68,5 @@ void Contained::setParent(Container* parent) {
  * @return Pointer to the parent Container.
  */
 Container* Contained::getParent() {
-	return parent_;
+   return parent_;
 }

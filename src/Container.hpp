@@ -17,15 +17,15 @@ typedef ChildrenVector::iterator ChildrenIterator;
  * Useabble for maps having objects, inventories with items, etc...
  */
 class Container {
-	public:
-		virtual void add(Contained* child);
-		virtual void remove(Contained* child);
+   public:
+      virtual void add(Contained* child);
+      virtual void remove(Contained* child);
 
-		virtual ChildrenIterator getChildBegin();
-		virtual ChildrenIterator getChildEnd();
+      virtual ChildrenIterator getChildBegin();
+      virtual ChildrenIterator getChildEnd();
 
-	protected:
-		ChildrenVector children_;
+   protected:
+      ChildrenVector children_;
 };
 
 /**
@@ -33,13 +33,13 @@ class Container {
  * things. Useabble for objects in maps, items in inventories, etc...
  */
 class Contained {
-	private:
-		Container* parent_;
+   private:
+      Container* parent_;
 
-	public:
-		Contained(): parent_(NULL){}
-		virtual void setParent(Container* parent);
-		Container* getParent();
+   public:
+      Contained(): parent_(NULL){}
+      virtual void setParent(Container* parent);
+      Container* getParent();
 };
 
 #endif /* COLLADACPP_CONTAINER_HPP_ */

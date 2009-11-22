@@ -8,7 +8,9 @@
 #include "RotationGL.hpp"
 #include "Renderable.hpp"
 #include "Camera.hpp"
+#include "Triangles.hpp"
 #include "ViewWindow.hpp"
+#include "Geometry.hpp"
 
 #include "console.h"
 
@@ -17,10 +19,12 @@
 
 #include <iostream>
 
-/*void ColladaRendererGL::render(ColladaObject* colladaObject) {
+void ColladaRendererGL::render(ColladaObject* colladaObject) {
    DEBUG_H("ColladaRendererGL::render(ColladaObject* colladaObject)");
-   colladaObject->render();
-}*/
+   WARNING("Tried to render raw ColladaObject '%s'", colladaObject->getId().c_str());
+   //colladaObject->render();
+   
+}
 
 void ColladaRendererGL::render(Collada* collada) {
    DEBUG_H("ColladaRendererGL::render(Collada* collada)");
@@ -43,9 +47,6 @@ void ColladaRendererGL::render(VisualScene* vs) {
 
 void ColladaRendererGL::render(ColladaNode* node) {
    DEBUG_H("ColladaRendererGL::render(ColladaNode* node)");
-   float x = node->getX();
-   float y = node->getY();
-   float z = node->getZ();
 
    glPushMatrix();
    
@@ -57,6 +58,11 @@ void ColladaRendererGL::render(ColladaNode* node) {
    node->Scale::render();
 
    // TODO: Render geometry
+   InstanceIterator ii = node->getFirstInstance();
+   while(ii != node->getEndInstance()) {
+      (*ii)->render();
+      ii++;
+   }
 
    // Draw debug axis...
    glBegin(GL_LINES);
@@ -104,20 +110,19 @@ void ColladaRendererGL::render(Renderable* renderable) {
  * Positions the camera for OpenGL.
  */
 void ColladaRendererGL::render(Camera* camera) {
-	float cx = 0.0f;
-	float cy = 0.0f;
-	float cz = 0.0f;
+   float cx = 0.0f;
+   float cy = 0.0f;
+   float cz = 0.0f;
 
-	#warning ['TODO']: Is this expensive?
-	//shared_ptr<Position> target = target_.lock();
-	shared_ptr<Position> target = camera->getTarget();
-	if(target) {
-		cx = target->getX();
-		cy = target->getY();
-		cz = target->getZ();
-	}
+   //shared_ptr<Position> target = target_.lock(); // Is this expensive?
+   shared_ptr<Position> target = camera->getTarget();
+   if(target) {
+      cx = target->getX();
+      cy = target->getY();
+      cz = target->getZ();
+   }
 
-	gluLookAt( camera->getX()+cx, camera->getY()+cy, camera->getZ()+cz, cx, cy, cz, 0.0f, 10.0f, 0.0f );
+   gluLookAt( camera->getX()+cx, camera->getY()+cy, camera->getZ()+cz, cx, cy, cz, 0.0f, 10.0f, 0.0f );
 }
 
 void ColladaRendererGL::render(Grid* grid) {
@@ -159,4 +164,34 @@ void ColladaRendererGL::render(Grid* grid) {
       }
    }
    glEnd();
+}
+
+void ColladaRendererGL::render(Geometry* geometry) {
+   DEBUG_H("void ColladaRendererGL::render(Geometry* '%s')", geometry->getId().c_str());
+   GeoPrimIterator iter = geometry->getFirstPrimitive();
+   while(iter != geometry->getEndPrimitive()) {
+      (*iter)->render();
+      iter++;
+   }
+}
+
+void ColladaRendererGL::render(Triangles* triangles) {
+   DEBUG_H("ColladaRendererGL::render(Triangles* triangles)");
+   glBegin(GL_TRIANGLES);
+      triangles->GeometricPrimitive::render();
+   glEnd();
+}
+
+void ColladaRendererGL::render(GeometricPrimitive* geometry) {
+   DEBUG_H("ColladaRendererGL::render(GeometricPrimitive* geometry)");
+
+   PrimIterator iter = geometry->getFirstPrimitive();
+   int inputCount = geometry->getInputCount();
+   while(iter != geometry->getEndPrimitive()) {
+      int primNum = geometry->getVertexNum(*iter);
+      DEBUG_H("%d %d %d", *iter, primNum, inputCount);
+      //float x = geometry->getX(primNum);
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      iter+=inputCount;
+   }
 }

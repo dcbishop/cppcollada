@@ -31,7 +31,8 @@ ViewWindow::ViewWindow(int width, int height) {
    }
    position_ = shared_ptr<Position>(new Position);
    camera_ = shared_ptr<Camera>(new Camera);
-
+   camera_->setZoom(10.0f);
+   
    position_->setX(0.0f);
    position_->setY(-2.0f);
    position_->setY(-20.0f);

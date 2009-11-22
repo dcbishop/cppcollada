@@ -14,21 +14,21 @@ using namespace std;
  * @param tag
  */
 Camera::Camera() {
-	//setTag(tag);
+   //setTag(tag);
 
-	//target_ = NULL;
+   //target_ = NULL;
 
-	/*zoom_.setValue(2.5f);
-	zoom_.setThreshold(ZOOM_THRESHOLD);
-	zoom_.setRate(ZOOM_SPEED);*/
+   /*zoom_.setValue(2.5f);
+   zoom_.setThreshold(ZOOM_THRESHOLD);
+   zoom_.setRate(ZOOM_SPEED);*/
 
-	zoom_ = 2.5f;
+   zoom_ = 2.5f;
 
-	setRotX(-90.0f);
-	setRotY(45.0f);
+   setRotX(-90.0f);
+   setRotY(45.0f);
 
-	//fov_.setValue(45.0f);
-	fov_ = 45.0f;
+   //fov_.setValue(45.0f);
+   fov_ = 45.0f;
 }
 
 #warning ['TODO']: Use this or kill it...
@@ -39,11 +39,11 @@ Camera::~Camera() {
  * Sets the Object that the camera tracks.
  */
 void Camera::setTarget(weak_ptr<Position> object) {
-	target_ = object;
+   target_ = object;
 }
 
 shared_ptr<Position> Camera::getTarget() {
-	return target_.lock();
+   return target_.lock();
 }
 
 
@@ -51,36 +51,36 @@ shared_ptr<Position> Camera::getTarget() {
  * updates the camera's position around object
  */
 void Camera::update(const int time) {
-	/* http://en.wikipedia.org/wiki/Spherical_coordinates */
+   /* http://en.wikipedia.org/wiki/Spherical_coordinates */
 
-	//zoom_.update(time);
-	//fov_.update(time);
+   //zoom_.update(time);
+   //fov_.update(time);
 
-	//Object::update(time);
+   //Object::update(time);
 }
 
 const float Camera::getX() {
-	float theta = getRotX();
-	float phi = getRotY();
-	return getZoom() *
-		(cos(theta*(PI/180))) *
-		(sin(phi*(PI/180)));
-	
+   float theta = getRotX();
+   float phi = getRotY();
+   return getZoom() *
+      (cos(theta*(PI/180))) *
+      (sin(phi*(PI/180)));
+   
 }
 
 const float Camera::getY() {
-	float theta = getRotX();
-	float phi = getRotY();
-	return getZoom() *
-		(cos(phi*(PI/180)));
+   float theta = getRotX();
+   float phi = getRotY();
+   return getZoom() *
+      (cos(phi*(PI/180)));
 }
 
 const float Camera::getZ() {
-	float theta = getRotX();
-	float phi = getRotY();
-	return getZoom() *
-		(sin(theta*(PI/180))) *
-		(sin(phi*(PI/180)));
+   float theta = getRotX();
+   float phi = getRotY();
+   return getZoom() *
+      (sin(theta*(PI/180))) *
+      (sin(phi*(PI/180)));
 }
 
 /**
@@ -88,15 +88,15 @@ const float Camera::getZ() {
  * @return The zoom value as it actually is, not target value the camera is moving to.
  */
 float Camera::getZoom() {
-	//return zoom_.getValueCurrent();
-	return zoom_;
+   //return zoom_.getValueCurrent();
+   return zoom_;
 }
 
 /**
  * @return The zoom value that the camera it moving to.
  */
 float Camera::getZoomTarget() {
-	return /*zoom_.getValueTarget();*/ zoom_;
+   return /*zoom_.getValueTarget();*/ zoom_;
 }
 
 /**
@@ -104,8 +104,8 @@ float Camera::getZoomTarget() {
  * @return The current FOV (not the target FOV).
  */
 float Camera::getFov() {
-	//return fov_.getValueCurrent();
-	return fov_;
+   //return fov_.getValueCurrent();
+   return fov_;
 }
 
 /**
@@ -113,8 +113,8 @@ float Camera::getFov() {
  * @param fov field of view
  */
 void Camera::setFov(const float fov) {
-	//fov_.setValue(fov);
-	fov_ = fov;
+   //fov_.setValue(fov);
+   fov_ = fov;
 }
 
 /**
@@ -122,17 +122,17 @@ void Camera::setFov(const float fov) {
  * @param zoom Distance from the target in meters.
  */
 void Camera::setZoom(const float zoom) {
-	/* Ensure the camera zoom is sane */
-	if(zoom < ZOOM_MIN) {
-		zoom_ = ZOOM_MIN;
-		//zoom_.setValue(ZOOM_MIN);
-	} else if(zoom > ZOOM_MAX) {
-		zoom_ = ZOOM_MAX;
-		//zoom_.setValue(ZOOM_MAX);
-	} else {
-		zoom_ = zoom;
-		//zoom_.setValue(zoom);
-	}
+   /* Ensure the camera zoom is sane */
+   if(zoom < ZOOM_MIN) {
+      zoom_ = ZOOM_MIN;
+      //zoom_.setValue(ZOOM_MIN);
+   } else if(zoom > ZOOM_MAX) {
+      zoom_ = ZOOM_MAX;
+      //zoom_.setValue(ZOOM_MAX);
+   } else {
+      zoom_ = zoom;
+      //zoom_.setValue(zoom);
+   }
 }
 
 /**
@@ -140,8 +140,8 @@ void Camera::setZoom(const float zoom) {
  * @param rx
  */
 void Camera::setRotX(const float rx) {
-	//Object::setRotX(rx);
-	rx_ = rx;
+   //Object::setRotX(rx);
+   rx_ = rx;
 }
 
 /**
@@ -149,15 +149,15 @@ void Camera::setRotX(const float rx) {
  * @param ry
  */
 void Camera::setRotY(const float ry) {
-	/* Stop flipping over the top  */
-	if(ry < Y_MIN) {
-		ry_ = Y_MIN;
-		//Object::setRotY(Y_MIN);
-	} else if(ry > Y_MAX) {
-		ry_ = Y_MAX;
-		//Object::setRotY(Y_MAX);
-	} else {
-		ry_ = ry;
-		//Object::setRotY(ry);
-	}
+   /* Stop flipping over the top  */
+   if(ry < Y_MIN) {
+      ry_ = Y_MIN;
+      //Object::setRotY(Y_MIN);
+   } else if(ry > Y_MAX) {
+      ry_ = Y_MAX;
+      //Object::setRotY(Y_MAX);
+   } else {
+      ry_ = ry;
+      //Object::setRotY(ry);
+   }
 }

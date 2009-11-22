@@ -192,7 +192,7 @@ shared_ptr<ColladaObject> ColladaDoc::getColladaObjectById(string id) {
 }
 
 bool ColladaDoc::isString_(const XMLCh* tag1, string tag2) {
-   DEBUG_H("Entering function...");
+   DEBUG_V("Entering function...");
    XMLCh* tag2_c = XMLString::transcode(tag2.c_str());
 
    int result = XMLString::compareIString(tag1, tag2_c);
@@ -233,6 +233,10 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(DOMElement* element) {
       DEBUG_H("Load source");
       shared_ptr<Source> source(loadSource(element));
       colladaObject = source;
+   } else if(isString_(tagName, "vertices")) {
+      DEBUG_H("Load vertices");
+      shared_ptr<Vertices> vertices(loadVertices(element));
+      colladaObject = vertices;
    } else {
       WARNING("Tried to load unsupported object'%s'", tagName_c);
    }
@@ -300,7 +304,9 @@ shared_ptr<Mesh> ColladaDoc::loadMesh(DOMElement* element) {
 
    DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
-   DEBUG_M("Children: %i", length);
+
+   shared_ptr<Mesh> mesh(new Mesh);
+
    for(int i = 0; i < length; i++) {
       DOMNode* currentNode = children->item(i);
       if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
@@ -315,8 +321,8 @@ shared_ptr<Mesh> ColladaDoc::loadMesh(DOMElement* element) {
          } else if(isString_(tagName, "polylist")) {
             WARNING("polylist not yet supported.");
          } else if(isString_(tagName, "triangles")) {
-            WARNING("triangles not yet supported.");
             shared_ptr<Triangles> triangles = loadTriangles(currentElement);
+            mesh->addPrimitive(triangles);
          } else if(isString_(tagName, "trifans")) {
             WARNING("trifans not yet supported.");
          } else if(isString_(tagName, "tristrips")) {
@@ -325,17 +331,20 @@ shared_ptr<Mesh> ColladaDoc::loadMesh(DOMElement* element) {
       }
    }
 
-   return shared_ptr<Mesh>();
+   return mesh;
 }
 
 shared_ptr<Triangles> ColladaDoc::loadTriangles(DOMElement* element) {
    DEBUG_M("Entering function...");
-   WARNING("STUB FUNCTION!");
 
    shared_ptr<Triangles> triangles(new Triangles);
 
    string count = getAttribute(element, "count");
    string material = getAttribute(element, "material");
+
+   triangles->setCount(atoi(count.c_str()));
+
+   int numInputs = 0;
 
    DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
@@ -347,6 +356,7 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(DOMElement* element) {
          const XMLCh* tagName = currentElement->getTagName();
 
          if(isString_(tagName, "input")) {
+            numInputs++;
             shared_ptr<Input> input = loadInput(currentElement);
             string semantic = getAttribute(currentElement, "semantic");
 
@@ -362,7 +372,8 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(DOMElement* element) {
       }
    }
 
-   return shared_ptr<Triangles>();
+   triangles->setInputCount(numInputs);
+   return triangles;
 }
 
 shared_ptr<vector<int>> ColladaDoc::loadPrimitives(DOMElement* element) {
@@ -398,6 +409,9 @@ shared_ptr<Input> ColladaDoc::loadInput(DOMElement* element) {
    shared_ptr<ColladaObject> sourceObj = getColladaObjectByUrl(url);
    shared_ptr<Source> source(static_pointer_cast<Source, ColladaObject>(sourceObj));
    input->setSource(source);
+   
+   loadId(element, input.get());
+   loadName(element, input.get());
 
    return input;
 }
@@ -407,6 +421,9 @@ shared_ptr<Source> ColladaDoc::loadSource(DOMElement* element) {
    DEBUG_M("Entering function...");
 
    shared_ptr<Source> source(new Source);
+
+   loadId(element, source.get());
+   loadName(element, source.get());
 
    DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
@@ -420,7 +437,8 @@ shared_ptr<Source> ColladaDoc::loadSource(DOMElement* element) {
          if(isString_(tagName, "float_array")) {
             const XMLCh* data_x = currentElement->getTextContent();
             char* data_c = XMLString::transcode(data_x);
-            source->setFloats(getFloats(data_c));
+            shared_ptr<vector<float>> floats(getFloats(data_c));
+            source->setFloats(floats);
             XMLString::release(&data_c);
          } else if (isString_(tagName, "technique_common")) {
             loadSourceTechnique(currentElement, source);
@@ -462,7 +480,6 @@ void ColladaDoc::loadSourceTechnique(DOMElement* element, shared_ptr<Source> sou
    int params = 0;
    DOMNodeList* children = node->getChildNodes();
    int length = children->getLength();
-   DEBUG_M("Children: %i", length);
    for(int i = 0; i < length; i++) {
       DOMNode* currentNode = children->item(i);
       if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
@@ -495,7 +512,6 @@ void ColladaDoc::loadSourceTechnique(DOMElement* element, shared_ptr<Source> sou
 
 shared_ptr<Vertices> ColladaDoc::loadVertices(DOMElement* element) {
    DEBUG_M("Entering function...");
-   WARNING("STUB FUNCTION!");
 
    XMLCh* tag = XMLString::transcode("input");
    DOMNodeList* elements = xmlDoc_->getElementsByTagName(tag);
@@ -506,12 +522,29 @@ shared_ptr<Vertices> ColladaDoc::loadVertices(DOMElement* element) {
       return shared_ptr<Vertices>();
    }
 
-   if(elements->getLength() > 1) {
-      ERROR("Multiple <input> node's found in file...");
-      return shared_ptr<Vertices>();
+   int length = elements->getLength();
+   if(length > 1) {
+      WARNING("Multiple <input> node's found in file...");
+      //return shared_ptr<Vertices>();
    }
 
-   return shared_ptr<Vertices>();
+   shared_ptr<Vertices> vertices(new Vertices);
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = elements->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+
+         string semantic = getAttribute(currentElement, "semantic");
+         string url = getAttribute(currentElement, "source");
+         if(semantic.compare("POSITION") == 0) {
+            shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+            shared_ptr<Source> src(dynamic_pointer_cast<Source, ColladaObject>(colladaObject));
+            vertices->setPosition(src);
+         }
+      }
+   }
+
+   return vertices;
 }
 
 
@@ -529,7 +562,7 @@ shared_ptr<Vertices> ColladaDoc::loadVertices(DOMElement* element) {
  * @return The atribute.
  */
 string ColladaDoc::getAttribute(DOMElement* element, string attribute) {
-   DEBUG_M("Entering function... '%s'", attribute.c_str());
+   DEBUG_V("Entering function... '%s'", attribute.c_str());
    XMLCh* attrx = XMLString::transcode(attribute.c_str());
    char *value_c = XMLString::transcode(element->getAttribute(attrx));
    string value_s = value_c;
@@ -762,8 +795,8 @@ void ColladaDoc::loadInstances(DOMElement* element, ColladaNode* node) {
       if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
          DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
          shared_ptr<ColladaObject> instance = loadInstance(currentElement, node);
-         if(instance != NULL) {
-            //TODO: node->addInstance(instance); or whatever...
+         if(instance) {
+            node->addInstance(instance);
          }
       }
    }

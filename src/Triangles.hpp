@@ -4,7 +4,7 @@
 #include "Renderable.hpp"
 #include "GeometricPrimitive.hpp"
 
-class Triangles : public GeometricPrimitive, public Renderable {
+class Triangles : public GeometricPrimitive {
    public:
       COLLADA_RENDER_FUNCTION
 

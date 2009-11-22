@@ -3,7 +3,7 @@
 
 #include "Geometry.hpp"
 
-class Mesh : public Geometry, public Renderable {
+class Mesh : public Geometry {
    public:
       COLLADA_RENDER_FUNCTION
 };

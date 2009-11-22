@@ -22,37 +22,36 @@ const float ZOOM_THRESHOLD = 0.001f;
  * A camera.
  */
 #warning ['TODO']: Quicky dummy class, orbital camera only. Set from node?
-class Camera : public Position, public Renderable /*public Object*/ {
-	public:
-		Camera();
-		~Camera();
-		void update(const int time);
-		void setTarget(weak_ptr<Position> object);
-		shared_ptr<Position> getTarget();
-		float getFov();
-		void setZoom(const float zoom);
-		float getZoom();
-		float getZoomTarget();
+class Camera : public Position, public Renderable {
+   public:
+      Camera();
+      ~Camera();
+      void update(const int time);
+      void setTarget(weak_ptr<Position> object);
+      shared_ptr<Position> getTarget();
+      float getFov();
+      void setZoom(const float zoom);
+      float getZoom();
+      float getZoomTarget();
 
-		void setRotX(const float rx);
-		void setRotY(const float ry);
-		float getRotX() {return rx_;}
-		float getRotY() {return ry_;}
+      void setRotX(const float rx);
+      void setRotY(const float ry);
+      float getRotX() {return rx_;}
+      float getRotY() {return ry_;}
 
-		void setFov(const float fov);
-		const float getX();
-		const float getY();
-		const float getZ();
-		COLLADA_RENDER_FUNCTION
+      void setFov(const float fov);
+      const float getX();
+      const float getY();
+      const float getZ();
 
-	private:
-		weak_ptr<Position> target_;
-		//DynamicFloat fov_;
-		//DynamicFloat zoom_;
-		float fov_;
-		float zoom_;
-		float rx_;
-		float ry_;
+      COLLADA_RENDER_FUNCTION
+
+   private:
+      weak_ptr<Position> target_;
+      float fov_;
+      float zoom_;
+      float rx_;
+      float ry_;
 };
 
 #endif /* TX_CAMERA_HPP */

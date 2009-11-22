@@ -1,9 +1,9 @@
 #include "Scale.hpp"
 
 void Scale::setScaleXYZ(const float sx, const float sy, const float sz) {
-	sx_ = sx;
-	sy_ = sy;
-	sz_ = sz;
+   sx_ = sx;
+   sy_ = sy;
+   sz_ = sz;
 }
 
 const float Scale::getScaleX() {

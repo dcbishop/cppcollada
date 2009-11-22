@@ -12,12 +12,15 @@ class RotationGL;
 class Scale;
 class Camera;
 class Grid;
+class Triangles;
+class GeometricPrimitive;
+class Geometry;
 
 class ColladaRenderer {
    public:
       virtual void render(Renderable* renderable) = 0;
       virtual void render(Collada* collada) = 0;
-      //virtual void render(ColladaObject* colladaObject) = 0;
+      virtual void render(ColladaObject* colladaObject) = 0;
       virtual void render(Scene* scene) = 0;
       virtual void render(VisualScene* vs) = 0;
       virtual void render(ColladaNode* node) = 0;
@@ -26,6 +29,9 @@ class ColladaRenderer {
       virtual void render(Scale* scale) = 0;
       virtual void render(Camera* camera) = 0;
       virtual void render(Grid* grid) = 0;
+      virtual void render(Geometry* geometry) = 0;
+      virtual void render(GeometricPrimitive* prim) = 0;
+      virtual void render(Triangles* triangles) = 0;
 };
 
 #endif /* COLLADACPP_COLLADARENDERER_HPP_ */
