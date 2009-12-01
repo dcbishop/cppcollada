@@ -8,10 +8,10 @@ using namespace std;
  * Functions for dealing with Collada URLs
  */
 namespace ColladaUrl {
-   string getId(string url);
-   string getStrippedUrl(string url);
-   bool isInternal(string url);
-   string getFilename(string url);
+   const string getId(const string& url);
+   const string getStrippedUrl(const string& url);
+   const bool isInternal(const string& url);
+   const string getFilename(const string& url);
 };
 
 #endif /* COLLADACPP_COLLADAURL_HPP_ */

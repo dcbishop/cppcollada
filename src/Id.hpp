@@ -9,8 +9,8 @@ using namespace std;
  */
 class Id {
    public:
-      const string getId();
-      void setId(string id);
+      const string& getId() const;
+      void setId(const string& id);
 
    private:
       string id_;

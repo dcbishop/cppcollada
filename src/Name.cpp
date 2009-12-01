@@ -4,7 +4,7 @@
  * Gets the name of the object.
  * @return The name.
  */
-const string Name::getName() {
+const string& Name::getName() const {
    return name_;
 }
 
@@ -12,6 +12,6 @@ const string Name::getName() {
  * Sets the name of the object.
  * @param name The name.
  */
-void Name::setName(string name) {
+void Name::setName(const string& name) {
    name_ = name;
 }

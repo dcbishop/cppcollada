@@ -27,7 +27,8 @@ shared_ptr<ColladaDoc> ColladaDocManager::getColladaDoc(string url) {
  * @return the loaded object or NULL.
  */
 shared_ptr<ColladaObject> ColladaDocManager::getColladaObjectByUrl(string url) {
-   shared_ptr<ColladaDoc> colladaDoc(getColladaDoc(ColladaUrl::getStrippedUrl(url)));
+   string strippedUrl = ColladaUrl::getStrippedUrl(url);
+   shared_ptr<ColladaDoc> colladaDoc(getColladaDoc(strippedUrl));
    if(!colladaDoc) {
       return shared_ptr<ColladaObject>();
    }

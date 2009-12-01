@@ -20,6 +20,8 @@
 #include "Vertices.hpp"
 #include "Triangles.hpp"
 #include "Source.hpp"
+#include "Material.hpp"
+#include "Phong.hpp"
 
 #include "console.h"
 
@@ -33,7 +35,7 @@ ColladaDoc::ColladaDoc(ColladaDocManager* manager, string url) {
 
 ColladaDoc::~ColladaDoc() {
    // TODO: Delete xmlDoc_ here?
-   DEBUG_M("~ColladaDoc()");
+      DEBUG_M("~ColladaDoc()");
    delete parser_;
 }
 
@@ -41,7 +43,7 @@ ColladaDoc::~ColladaDoc() {
  * Loads a COLLADA document from a URL.
  * @param url The URL of the document to load.
  */
-DOMDocument* ColladaDoc::loadColladaDoc(string url) {
+DOMDocument* ColladaDoc::loadColladaDoc(const string& url) {
    DEBUG_M("Entering function...");
    #warning ['TODO']: Process other URL formats...
 
@@ -62,7 +64,7 @@ DOMDocument* ColladaDoc::loadColladaDoc(string url) {
  * Loads a collada document from a local file.
  * @param filename The filename of the document to load.
  */
-DOMDocument* ColladaDoc::loadColladaDocFile(string filename) {
+DOMDocument* ColladaDoc::loadColladaDocFile(const string& filename) {
    DEBUG_M("loadColladaDocFile(%s)", filename.c_str());
    try {
       XMLPlatformUtils::Initialize();
@@ -168,10 +170,10 @@ DOMElement* ColladaDoc::getElementById(string id) {
 /**
  * 
  */
-DOMNodeList* ColladaDoc::getElementsByTagName(string tag) {
+DOMNodeList* ColladaDoc::getElementsByTagName(DOMElement* element, string tag) {
    DEBUG_M("Entering function...");
    XMLCh* xtag = XMLString::transcode(tag.c_str());
-   return xmlDoc_->getElementsByTagName(xtag);
+   return element->getElementsByTagName(xtag);
    XMLString::release(&xtag);
 }
 
@@ -237,8 +239,16 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(DOMElement* element) {
       DEBUG_H("Load vertices");
       shared_ptr<Vertices> vertices(loadVertices(element));
       colladaObject = vertices;
+   } else if(isString_(tagName, "material")) {
+      DEBUG_H("Load Material");
+      shared_ptr<Material> material(loadMaterial(element));
+      colladaObject = material;
+   } else if(isString_(tagName, "effect")) {
+      DEBUG_H("Load effect");
+      shared_ptr<Effect> effect(loadEffect(element));
+      colladaObject = effect;
    } else {
-      WARNING("Tried to load unsupported object'%s'", tagName_c);
+      WARNING("Tried to load unsupported object '%s'.", tagName_c);
    }
 
    DEBUG_H("Loading: '%s'", tagName_c);
@@ -340,8 +350,6 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(DOMElement* element) {
    shared_ptr<Triangles> triangles(new Triangles);
 
    string count = getAttribute(element, "count");
-   string material = getAttribute(element, "material");
-
    triangles->setCount(atoi(count.c_str()));
 
    int numInputs = 0;
@@ -371,8 +379,15 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(DOMElement* element) {
          }
       }
    }
-
    triangles->setInputCount(numInputs);
+
+   string materialUrl = getAttribute(element, "material");
+   if(materialUrl.length() > 0) {
+      shared_ptr<ColladaObject> colladaObject(getColladaObjectById(materialUrl));
+      //shared_ptr<Material> material(dynamic_pointer_cast<Material>(colladaObject));
+      //triangles->setMaterial(material);
+   }
+
    return triangles;
 }
 
@@ -395,6 +410,104 @@ shared_ptr<vector<int>> ColladaDoc::loadPrimitives(DOMElement* element) {
    }
 
    return primitives;
+}
+
+shared_ptr<Material> ColladaDoc::loadMaterial(DOMElement* element) {
+   DEBUG_M("Entering function...");
+
+   DOMElement* instanceEffect = getElementByTagName(element, "instance_effect");
+   if(!instanceEffect) {
+      WARNING("No instance effect in material!");
+      return shared_ptr<Material>();
+   }
+
+   shared_ptr<Material> material(new Material());
+   string url = getAttribute(instanceEffect, "url");
+   shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+   if(colladaObject) {
+      shared_ptr<Effect> effect = dynamic_pointer_cast<Effect>(colladaObject);
+      material->setEffect(effect);
+   }
+
+   return material;
+}
+
+void dumpElement(DOMElement* element) {
+   const XMLCh* tag_x = element->getTagName();
+   char* tag_c = XMLString::transcode(tag_x);
+   DEBUG_M("Element: '%s'", tag_c);
+   XMLString::release(&tag_c);
+}
+
+shared_ptr<Effect> ColladaDoc::loadEffect(DOMElement* element) {
+   DEBUG_M("Entering function...");
+dumpElement(element);
+   DOMElement* profileCommon = getElementByTagName(element, "profile_COMMON");
+   if(!profileCommon) {
+      WARNING("No profile_COMMON in effect.");
+      return shared_ptr<Effect>();
+   }
+
+   DOMElement* technique = getElementByTagName(element, "technique");
+   if(!technique) {
+      WARNING("No technique in effect.");
+      return shared_ptr<Effect>();
+   }
+
+   #warning ['TODO']: Handle other type (blinn).
+   DOMElement* phongElement = getElementByTagName(element, "phong");
+   if(!phongElement) {
+      WARNING("No phong in effect.");
+      return shared_ptr<Effect>();
+   }
+
+   shared_ptr<Phong> phong(new Phong);
+   shared_ptr<Effect> effect(phong);
+
+   // loadPhong
+   DOMNodeList* children = phongElement->getChildNodes();
+   int length = children->getLength();
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         const XMLCh* tagName = currentElement->getTagName();
+
+         DOMElement* data = getElementByTagName(currentElement, "color");
+         if(!data) {
+            data = getElementByTagName(currentElement, "float");
+         }
+         #warning ['TODO']: The above float retrevial fails...
+
+         dumpElement(currentElement);
+
+         const char* data_c = XMLString::transcode(data->getTextContent());
+         shared_ptr<vector<float>> floats = getFloats(data_c);
+
+         if(isString_(tagName, "emission")) {
+            phong->setEmission(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+         } else if(isString_(tagName, "diffuse")) {
+            phong->setDiffuse(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+         } else if(isString_(tagName, "ambient")) {
+            phong->setAmbient(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+         } /*else if(isString_(tagName, "specular")) {
+            phong->setSpecular(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+         } else if(isString_(tagName, "shininess")) {
+            phong->setShininess(floats->at(0));
+         } else if(isString_(tagName, "reflective")) {
+            phong->setReflective(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+         } else if(isString_(tagName, "reflectivity")) {
+            phong->setReflectivity(floats->at(0));
+         } else if(isString_(tagName, "transparent")) {
+            phong->setTransparent(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+         } else if(isString_(tagName, "transparency")) {
+            phong->setTransparency(floats->at(0));
+         }*/
+      }
+   }
+
+   return effect;
 }
 
 shared_ptr<Input> ColladaDoc::loadInput(DOMElement* element) {
@@ -513,8 +626,8 @@ void ColladaDoc::loadSourceTechnique(DOMElement* element, shared_ptr<Source> sou
 shared_ptr<Vertices> ColladaDoc::loadVertices(DOMElement* element) {
    DEBUG_M("Entering function...");
 
-   XMLCh* tag = XMLString::transcode("input");
-   DOMNodeList* elements = xmlDoc_->getElementsByTagName(tag);
+   /*XMLCh* tag = XMLString::transcode("input");
+   DOMNodeList* elements = element->getElementsByTagName(tag);
    XMLString::release(&tag);
 
    if(!elements) {
@@ -526,8 +639,14 @@ shared_ptr<Vertices> ColladaDoc::loadVertices(DOMElement* element) {
    if(length > 1) {
       WARNING("Multiple <input> node's found in file...");
       //return shared_ptr<Vertices>();
+   }*/
+   
+   DOMNodeList* elements = getElementsByTagName(element, "input");
+   if(!elements) {
+      return shared_ptr<Vertices>();
    }
 
+   int length = elements->getLength();
    shared_ptr<Vertices> vertices(new Vertices);
    for(int i = 0; i < length; i++) {
       DOMNode* currentNode = elements->item(i);
@@ -561,7 +680,7 @@ shared_ptr<Vertices> ColladaDoc::loadVertices(DOMElement* element) {
  * @param attribute The name of the attribute.
  * @return The atribute.
  */
-string ColladaDoc::getAttribute(DOMElement* element, string attribute) {
+string ColladaDoc::getAttribute(const DOMElement* element, string attribute) {
    DEBUG_V("Entering function... '%s'", attribute.c_str());
    XMLCh* attrx = XMLString::transcode(attribute.c_str());
    char *value_c = XMLString::transcode(element->getAttribute(attrx));
@@ -576,7 +695,7 @@ string ColladaDoc::getAttribute(DOMElement* element, string attribute) {
  * @param element The element containing the objects ID.
  * @param id The object to apply the ID to.
  */
-void ColladaDoc::loadId(DOMElement* element, Id* id) {
+void ColladaDoc::loadId(const DOMElement* element, Id* id) {
    DEBUG_M("Entering function...");
    id->setId(getAttribute(element, "id"));
 }
@@ -586,7 +705,7 @@ void ColladaDoc::loadId(DOMElement* element, Id* id) {
  * @param element The element containting the objects name.
  * @param name The object to apply the name to.
  */
-void ColladaDoc::loadName(DOMElement* element, Name* name) {
+void ColladaDoc::loadName(const DOMElement* element, Name* name) {
    DEBUG_M("Entering function...");
    name->setName(getAttribute(element, "name"));
 }
@@ -648,24 +767,8 @@ shared_ptr<vector<float>> ColladaDoc::getFloats(string text) {
 void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
    DEBUG_M("Entering function...");
 
-   XMLCh* tag = XMLString::transcode("translate");
-   DOMNodeList* elements = element->getElementsByTagName(tag);
-   XMLString::release(&tag);
-
-   // No translation on node...
-   if(!elements) {
-      return;
-   }
-
-   // Multiple translations on node...
-   if(elements->getLength() > 1) {
-      cerr << "ERROR: Multiple <translate>'s found in node..." << endl;
-      return;
-   }
-
-   DOMNode* node = elements->item(0);
+   DOMElement* node = getElementByTagName(element, "translate");
    if(!node) {
-      cerr << "Weird. Could not get translation from element list..." << endl;
       return;
    }
 
@@ -690,24 +793,8 @@ void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
 void ColladaDoc::loadScale(DOMElement* element, Scale* scale) {
    DEBUG_M("Entering function...");
 
-   XMLCh* tag = XMLString::transcode("scale");
-   DOMNodeList* elements = element->getElementsByTagName(tag);
-   XMLString::release(&tag);
-
-   // No scale on node...
-   if(!elements) {
-      return;
-   }
-
-   // Multiple scale on node...
-   if(elements->getLength() > 1) {
-      cerr << "ERROR: Multiple <scale>'s found in node..." << endl;
-      return;
-   }
-
-   DOMNode* node = elements->item(0);
+   DOMElement* node = getElementByTagName(element, "scale");
    if(!node) {
-      cerr << "Weird. Could not get scale from element list..." << endl;
       return;
    }
 
@@ -849,6 +936,27 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(DOMElement* element, ColladaN
 // instance_light x
 // instance_node x
 
+DOMElement* ColladaDoc::getElementByTagName(DOMElement* element, string tag) {
+   DOMNodeList* elements = getElementsByTagName(element, tag);
+   if(!elements) {
+      ERROR("No node with tag '%s' found...", tag.c_str());
+      return NULL;
+   }
+   
+   if(elements->getLength() > 1) {
+      ERROR("Multiple node's found when expecting 1...");
+      return NULL;
+   }
+
+   DOMNode* node = elements->item(0);
+   if(!node) {
+      ERROR("Weird. Could not get node from nodelist...");
+      return NULL;
+   }
+
+   return dynamic_cast<xercesc::DOMElement*>(elements->item(0));
+}
+
 /**
  * Gets the main Scene of the Collada file.
  */
@@ -858,27 +966,8 @@ shared_ptr<Scene> ColladaDoc::getScene() {
    if(scene_) {
       return scene_;
    }
-   // TODO: Check for an already loaded Scene!
 
-   XMLCh* tag = XMLString::transcode("scene");
-   DOMNodeList* elements = xmlDoc_->getElementsByTagName(tag);
-   XMLString::release(&tag);
-
-   if(!elements) {
-      ERROR("No <scene> node found in file...");
-      return shared_ptr<Scene>();
-   }
-   
-   if(elements->getLength() > 1) {
-      ERROR("Multiple <scene> node's found in file...");
-      return shared_ptr<Scene>();
-   }
-
-   DOMNode* node = elements->item(0);
-   if(!node) {
-      ERROR("Weird. Could not get node from <scene> list...");
-      return shared_ptr<Scene>();
-   }
+   DOMElement* node = getElementByTagName(xmlDoc_->getDocumentElement(), "scene");
 
    #warning ['TODO']: Keep a copy of the scene for quick retrevial...
 

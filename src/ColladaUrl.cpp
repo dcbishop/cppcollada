@@ -7,7 +7,7 @@
  * @param url The URL to test.
  * @return true if url is local.
  */
-bool ColladaUrl::isInternal(string url) {
+const bool ColladaUrl::isInternal(const string& url) {
    if(url.rfind("#") == 0) {
       return true;
    }
@@ -19,7 +19,7 @@ bool ColladaUrl::isInternal(string url) {
  * @param url The URL.
  * @return the id (the bit after the #).
  */
-string ColladaUrl::getId(string url) {
+const string ColladaUrl::getId(const string& url) {
    int hashPos = url.rfind("#");
    if(hashPos < 0) {
       return "";
@@ -32,7 +32,7 @@ string ColladaUrl::getId(string url) {
  * @param url The url to return.
  * @return The url without the id.
  */
-string ColladaUrl::getStrippedUrl(string url) {
+const string ColladaUrl::getStrippedUrl(const string& url) {
    int hashPos = url.rfind("#");
    if(hashPos < 0) {
       return url;
@@ -44,7 +44,7 @@ string ColladaUrl::getStrippedUrl(string url) {
 /**
  * Gets the filaname from the url.
  */
-string ColladaUrl::getFilename(string url) {
+const string ColladaUrl::getFilename(const string& url) {
    string filePrefix = "file://";
 
    int filePos = url.find(filePrefix);

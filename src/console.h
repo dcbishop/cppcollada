@@ -10,7 +10,7 @@
 #define DEBUG_ALWAYS -10
 
 #ifndef DEBUG_LEVEL
-#define DEBUG_LEVEL DEBUG_VERY_HIGH
+#define DEBUG_LEVEL DEBUG_MEDIUM
 #endif
 
 #define USE_COLOUR

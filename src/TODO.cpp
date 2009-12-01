@@ -14,14 +14,18 @@
 
 #include "SmartPointers.hpp"
 
+//#include "NetworkedSensor.hpp"
+
 #include "console.h"
+#include "RotationGL.hpp"
 
 using namespace std;
 using namespace xercesc;
 
 int main(int argc, char* args[]) {
    //DEBUG_A("Starting...");
-   string filename = "/home/hegemon/tmp/monkeyhead.dae";
+   //string filename = "/home/hegemon/tmp/monkeyhead.dae";
+   string filename = "/home/hegemon/tmp/materialtest.dae";
 
    DEBUG_A("Spawning ColladaManager...");
    ColladaManager cm;
@@ -36,5 +40,15 @@ int main(int argc, char* args[]) {
    vw.setCollada(collada);
    vw.setTitle(filename);
    //DEBUG_A("Entering main loop...");
+   
+   /*shared_ptr<RotationGL> rotation(new RotationGL);
+   collada->debugRotationHack = rotation;
+   
+   NetworkedSensor ns;
+   ns.setOrientationTarget(rotation);
+   ns.start();*/
+   //int a;
+   //cin >> a;
+   
    vw.mainLoop();
 }

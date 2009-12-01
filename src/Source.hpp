@@ -20,15 +20,15 @@ class Source: public ColladaObject {
          }
          
       }
-      void setXOff(int xOffset) { xOffset_ = xOffset; }
-      void setYOff(int yOffset) { yOffset_ = yOffset; }
-      void setZOff(int zOffset) { zOffset_ = zOffset; }
-      void setStride(int stride) { stride_ = stride; }
-      int getStride() { return stride_; }
+      inline void setXOff(const int& xOffset) { xOffset_ = xOffset; }
+      inline void setYOff(const int& yOffset) { yOffset_ = yOffset; }
+      inline void setZOff(const int& zOffset) { zOffset_ = zOffset; }
+      inline void setStride(const int& stride) { stride_ = stride; }
+      inline int& getStride() { return stride_; }
 
-      virtual float getXPos(int num) { return floats_->at(xOffset_ + (num * getStride())); }
-      virtual float getYPos(int num) { return floats_->at(yOffset_ + (num * getStride())); }
-      virtual float getZPos(int num) { return floats_->at(zOffset_ + (num * getStride())); }
+      inline virtual float getXPos(const int num) { return floats_->at(xOffset_ + (num * getStride())); }
+      inline virtual float getYPos(const int num) { return floats_->at(yOffset_ + (num * getStride())); }
+      inline virtual float getZPos(const int num) { return floats_->at(zOffset_ + (num * getStride())); }
 
    private:
       shared_ptr<vector<float>> floats_;

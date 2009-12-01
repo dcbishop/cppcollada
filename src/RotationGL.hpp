@@ -5,8 +5,9 @@
 
 class RotationGL : public Rotation {
    public:
-      void setRotationGL(int number, float x, float y, float z, float angle);
-      void getRotationGL(int number, float &x, float &y, float &z, float &angle);
+      RotationGL();
+      void setRotationGL(const int& number, const float& x, const float& y, const float& z, const float& angle);
+      void getRotationGL(const int& number, float &x, float &y, float &z, float &angle);
       COLLADA_RENDER_FUNCTION
 
    private:

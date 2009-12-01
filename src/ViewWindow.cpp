@@ -16,6 +16,7 @@ using namespace std;
 #include "ColladaRendererGL.hpp"
 
 ViewWindow::ViewWindow(int width, int height) {
+   DEBUG_M("ViewWindow spawning...");
    width_ = width;
    height_ = height;
 
@@ -39,6 +40,7 @@ ViewWindow::ViewWindow(int width, int height) {
    
    grid_ = shared_ptr<Grid>(new Grid);
    cam_move_ = false;
+   finished_ = false;
 }
 
 void ViewWindow::setCollada(shared_ptr<Collada> collada) {
@@ -185,6 +187,8 @@ void ViewWindow::mainLoop() {
       checkEvents_();
       draw_();
    }
+   
+   DEBUG_M("Finished...");
 }
 
 /**

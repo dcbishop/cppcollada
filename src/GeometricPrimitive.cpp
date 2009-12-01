@@ -5,31 +5,28 @@
 /**
  * Gets the vertex number from the list of primitives.
  */
-int GeometricPrimitive::getVertexNum(int num) {
+int GeometricPrimitive::getVertexNum(const int& num) const {
    int vertexOffset = vertex_->getOffset();
    int vertexNum = vertexOffset + (num * (vertexOffset+1));
    return primitives_->at(vertexNum);
 }
 
-PrimIterator GeometricPrimitive::getFirstPrimitive() {
+PrimIterator GeometricPrimitive::getFirstPrimitive() const {
    return primitives_->begin();
 }
 
-PrimIterator GeometricPrimitive::getEndPrimitive() {
+PrimIterator GeometricPrimitive::getEndPrimitive() const {
    return primitives_->end();
 }
 
-float GeometricPrimitive::getX(int num) {
-   DEBUG_H("getX(%d)", num);
+float GeometricPrimitive::getX(const int& num) const {
    return vertex_->getX(num);
 }
 
-float GeometricPrimitive::getY(int num) {
-   DEBUG_H("getY(%d)", num);
+float GeometricPrimitive::getY(const int& num) const {
    return vertex_->getY(num);
 }
 
-float GeometricPrimitive::getZ(int num) {
-   DEBUG_H("getZ(%d)", num);
+float GeometricPrimitive::getZ(const int& num) const {
    return vertex_->getZ(num);
 }

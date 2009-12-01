@@ -3,11 +3,11 @@
 
 class ColladaCamera : public ColladaObject {
    public:
-      float getFov();
-      void setFov(float fov);
+      float& getFov();
+      void setFov(const float& fov);
       
-      float getNear();
-      void setNear(float near);
+      float& getNear();
+      void setNear(const float& near);
 
    private:
       float fov_;
@@ -15,19 +15,19 @@ class ColladaCamera : public ColladaObject {
       float far_;
 };
 
-float ColladaCamera::getFov() {
+float& ColladaCamera::getFov() {
    return fov_;
 }
 
-void ColladaCamera::setFov(float fov) {
+void ColladaCamera::setFov(const float& fov) {
    fov_ = fov;
 }
 
-float ColladaCamera::getNear() {
+float& ColladaCamera::getNear() {
    return near_;
 }
 
-void ColladaCamera::setNear(float near) {
+void ColladaCamera::setNear(const float& near) {
    near_ = near;
 }
 

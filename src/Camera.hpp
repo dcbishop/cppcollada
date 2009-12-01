@@ -26,20 +26,20 @@ class Camera : public Position, public Renderable {
    public:
       Camera();
       ~Camera();
-      void update(const int time);
+      void update(const int& time);
       void setTarget(weak_ptr<Position> object);
       shared_ptr<Position> getTarget();
       float getFov();
-      void setZoom(const float zoom);
+      void setZoom(const float& zoom);
       float getZoom();
       float getZoomTarget();
 
-      void setRotX(const float rx);
-      void setRotY(const float ry);
+      void setRotX(const float& rx);
+      void setRotY(const float& ry);
       float getRotX() {return rx_;}
       float getRotY() {return ry_;}
 
-      void setFov(const float fov);
+      void setFov(const float& fov);
       const float getX();
       const float getY();
       const float getZ();

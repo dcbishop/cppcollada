@@ -6,6 +6,7 @@ using namespace std;
 
 #include "SmartPointers.hpp"
 #include "Renderable.hpp"
+#include "Rotation.hpp"
 
 class Scene;
 
@@ -16,6 +17,7 @@ class Collada : public Renderable {
       void setScene(shared_ptr<Scene> scene);
       shared_ptr<Scene> getScene();
       COLLADA_RENDER_FUNCTION
+      shared_ptr<Rotation> debugRotationHack; // TODO: remove me, for testing...
 
    private:
       shared_ptr<Scene> scene_;

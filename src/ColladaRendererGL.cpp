@@ -26,14 +26,50 @@ void ColladaRendererGL::render(ColladaObject* colladaObject) {
    
 }
 
+void ColladaRendererGL::fixAxis_(const Collada* collada) {
+   static const int Z_UP = 0;
+   static const int X_UP = 1;
+   static const int Y_UP = 2;
+
+   #warning ['TODO']: Store and query axis!
+   int upAxis = Z_UP;
+
+   if(upAxis == Z_UP) {
+      //This seems to work for Z-Axis up
+      glRotatef(90.f, -1.0f, 0.0f, 0.0f);
+      glScalef(-1.0f, -1.0f, 1.0f);
+   } else if(upAxis == Y_UP) {
+      
+   } else {
+      
+   }
+
+}
+
+void ColladaRendererGL::debugRotationHack(Collada* collada) {
+   shared_ptr<Rotation> rotation;
+   rotation = collada->debugRotationHack;
+   if(rotation) {
+      rotation->render();
+   }
+}
+
 void ColladaRendererGL::render(Collada* collada) {
    DEBUG_H("ColladaRendererGL::render(Collada* collada)");
+
+
+   glPushMatrix();
+   debugRotationHack(collada); // For testing something...
+   fixAxis_(collada);
    collada->getScene()->render();
+   glPopMatrix();
 }
 
 void ColladaRendererGL::render(Scene* scene) {
    DEBUG_H("ColladaRendererGL::render(Scene* scene)");
-   scene->getVisualScene()->render();
+   if(scene->getVisualScene()) {
+      scene->getVisualScene()->render();
+   }
 }
 
 void ColladaRendererGL::render(VisualScene* vs) {
@@ -64,6 +100,12 @@ void ColladaRendererGL::render(ColladaNode* node) {
       ii++;
    }
 
+   renderAxis_(); // DEBUG
+
+   glPopMatrix();
+}
+
+void ColladaRendererGL::renderAxis_() {
    // Draw debug axis...
    glBegin(GL_LINES);
       glColor3f(1.0f, 0.0f, 0.0f);
@@ -78,7 +120,6 @@ void ColladaRendererGL::render(ColladaNode* node) {
       glVertex3f(0.0, 0.0, 0.0);
       glVertex3f(0.0, 0.0, 1.0);
    glEnd();
-   glPopMatrix();
 }
 
 void ColladaRendererGL::render(Position* position) {
@@ -177,20 +218,21 @@ void ColladaRendererGL::render(Geometry* geometry) {
 
 void ColladaRendererGL::render(Triangles* triangles) {
    DEBUG_H("ColladaRendererGL::render(Triangles* triangles)");
+   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
    glBegin(GL_TRIANGLES);
       triangles->GeometricPrimitive::render();
    glEnd();
 }
 
-void ColladaRendererGL::render(GeometricPrimitive* geometry) {
+void ColladaRendererGL::render(const GeometricPrimitive* geometry) {
    DEBUG_H("ColladaRendererGL::render(GeometricPrimitive* geometry)");
 
    static int what;
    if(!what) {
-      WARNING("Inefficient primitive rendering!, convert to vertex buffer object first!");
+      WARNING("Inefficient primitive rendering!, TODO: convert to vertex buffer object first!");
       what = 1;
-   } 
-
+   }
+   
    PrimIterator iter = geometry->getFirstPrimitive();
    int inputCount = geometry->getInputCount();
    while(iter != geometry->getEndPrimitive()) {

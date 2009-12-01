@@ -9,8 +9,8 @@ using namespace std;
  */
 class Name {
    public:
-      const string getName();
-      void setName(string name);
+      const string& getName() const;
+      void setName(const string& name);
 
    private:
       string name_;

@@ -4,12 +4,11 @@
 #include "Renderable.hpp"
 #include "GeometricPrimitive.hpp"
 
+class Material;
+
 class Triangles : public GeometricPrimitive {
    public:
       COLLADA_RENDER_FUNCTION
-
-   private:
-
 };
 
 #endif /* COLLADACPP_TRIANGLES_HPP_ */

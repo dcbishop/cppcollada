@@ -12,7 +12,8 @@ debug_flag = ARGUMENTS.get('debug', 0)
 env.Tool('colourful', toolpath=['scons-tools'])
 #env.AppendUnique(LIBS=['m', 'IL', 'mxml', 'rcbc', 'luabind'])
 #env.Tool('qt')
-env.AppendUnique(LIBS=['xerces-c', 'GL', 'GLU'])
+env.AppendUnique(LIBS=['xerces-c', 'GL', 'GLU'])#, 'boost_thread', 'libboost_system'])
+env.AppendUnique(CCFLAGS=['-llibboost_system', '-llibboost_thread'])
 
 #if int(win32):
 #	env.Tool('crossmingw', toolpath = ['scons-tools'])
@@ -48,7 +49,7 @@ if int(debug_flag):
 
 env.Append(CCFLAGS = ['-Wall'])
 
-# For shared_ptr, other wise try  -D_TR1PTR or -D_BOOSTPTR (might need to add boost includes though)
+# For shared_ptr, other wise try  -D_TR1PTR or -D_BOOSTPTR
 env.Append(CCFLAGS = ['-std=c++0x'])
 
 objects = env.Object(sources)

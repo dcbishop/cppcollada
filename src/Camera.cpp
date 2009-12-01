@@ -50,7 +50,7 @@ shared_ptr<Position> Camera::getTarget() {
 /**
  * updates the camera's position around object
  */
-void Camera::update(const int time) {
+void Camera::update(const int& time) {
    /* http://en.wikipedia.org/wiki/Spherical_coordinates */
 
    //zoom_.update(time);
@@ -112,7 +112,7 @@ float Camera::getFov() {
  * Sets the target field of view.
  * @param fov field of view
  */
-void Camera::setFov(const float fov) {
+void Camera::setFov(const float& fov) {
    //fov_.setValue(fov);
    fov_ = fov;
 }
@@ -121,7 +121,7 @@ void Camera::setFov(const float fov) {
  * Sets the camera zoom (distance from target Object)
  * @param zoom Distance from the target in meters.
  */
-void Camera::setZoom(const float zoom) {
+void Camera::setZoom(const float& zoom) {
    /* Ensure the camera zoom is sane */
    if(zoom < ZOOM_MIN) {
       zoom_ = ZOOM_MIN;
@@ -139,7 +139,7 @@ void Camera::setZoom(const float zoom) {
  * Sets the camera rotation around the target.
  * @param rx
  */
-void Camera::setRotX(const float rx) {
+void Camera::setRotX(const float& rx) {
    //Object::setRotX(rx);
    rx_ = rx;
 }
@@ -148,7 +148,7 @@ void Camera::setRotX(const float rx) {
  * Sets the camera rotation above the target.
  * @param ry
  */
-void Camera::setRotY(const float ry) {
+void Camera::setRotY(const float& ry) {
    /* Stop flipping over the top  */
    if(ry < Y_MIN) {
       ry_ = Y_MIN;

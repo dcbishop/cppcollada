@@ -36,6 +36,8 @@ class Vertices;
 class Triangles;
 class Input;
 class Source;
+class Material;
+class Effect;
 
 #include "SmartPointers.hpp"
 
@@ -47,18 +49,18 @@ class ColladaDoc {
    public:
       ColladaDoc(ColladaDocManager* manager, string url);
       ~ColladaDoc();
-      DOMDocument* loadColladaDoc(string url);
-      DOMDocument* loadColladaDocFile(string filename);
-      DOMNodeList* getElementsByTagName(string tag);
+      DOMDocument* loadColladaDoc(const string& url);
+      DOMDocument* loadColladaDocFile(const string& filename);
+      DOMNodeList* getElementsByTagName(DOMElement* element, string tag);
       DOMElement* getElementById(string id);
       shared_ptr<ColladaObject> getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
       shared_ptr<vector<float>> getFloats(string text);
       shared_ptr<ColladaObject> loadColladaObject(DOMElement* element);
-      string getAttribute(DOMElement* element, string attribute);
-      void loadId(DOMElement* element, Id* id);
-      void loadName(DOMElement* element, Name* name);
+      string getAttribute(const DOMElement* element, string attribute);
+      void loadId(const DOMElement* element, Id* id);
+      void loadName(const DOMElement* element, Name* name);
       shared_ptr<VisualScene> loadVisualScene(DOMElement* element);
       shared_ptr<ColladaNode> loadColladaNode(DOMElement* element);
       shared_ptr<Geometry> loadGeometry(DOMElement* element);
@@ -74,8 +76,9 @@ class ColladaDoc {
       shared_ptr<Vertices> loadVertices(DOMElement* element);
       shared_ptr<Triangles> loadTriangles(DOMElement* element);
       shared_ptr<Source> loadSource(DOMElement* element);
+      shared_ptr<Material> loadMaterial(DOMElement* element);
       void loadSourceTechnique(DOMElement* element, shared_ptr<Source> source);
-
+      DOMElement* getElementByTagName(DOMElement* element, string tag);
       shared_ptr<Collada> getCollada();
       shared_ptr<Scene> getScene();
       bool isUrlLocal(string url);
@@ -84,6 +87,8 @@ class ColladaDoc {
       shared_ptr<ColladaObject> getColladaObjectByUrl(string url);
       shared_ptr<Input> loadInput(DOMElement* element);
       shared_ptr<vector<int>> loadPrimitives(DOMElement* element);
+      shared_ptr<Effect> loadEffect(DOMElement* element);
+
 
    private:
       void buildIdMap_();

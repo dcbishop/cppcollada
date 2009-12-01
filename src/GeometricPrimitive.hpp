@@ -14,20 +14,21 @@ class GeometricPrimitive : public Renderable {
       void setVertex(shared_ptr<Input> input) { vertex_ = input; }
       void setNormal(shared_ptr<Input> input) { normal_ = input; }
       void setPrimitives(shared_ptr<PrimVector> primitives) { primitives_ = primitives; }
-      void setInputCount(int count) { inputCount_ = count; }
-      int getInputCount() { return inputCount_; }
+      void setInputCount(const int& count) { inputCount_ = count; }
+      int getInputCount() const { return inputCount_; }
 
-      int getVertexNum(int num);
+      int getVertexNum(const int& num) const;
 
-      float getX(int num);
-      float getY(int num);
-      float getZ(int num);
+      float getX(const int& num) const;
+      float getY(const int& num) const;
+      float getZ(const int& num) const;
       
-      void setCount(int count) { count_ = count; }
+      inline void setCount(const int& count) { count_ = count; }
       int getCount() { return count_; }
+      void setMaterial(string material) { material_ = material; }
 
-      PrimIterator getFirstPrimitive();
-      PrimIterator getEndPrimitive();
+      PrimIterator getFirstPrimitive() const;
+      PrimIterator getEndPrimitive() const;
       COLLADA_RENDER_FUNCTION
 
    private:
@@ -36,6 +37,7 @@ class GeometricPrimitive : public Renderable {
       shared_ptr<PrimVector> primitives_;
       int count_;
       int inputCount_;
+      string material_;
 };
 
 #endif /* COLLADACPP_GEOMETRICPRIMITIVE_HPP_ */
