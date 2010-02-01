@@ -36,9 +36,10 @@ int main(int argc, char* args[]) {
 
    //DEBUG_A("Spawning window...");
    ViewWindow vw(800, 600);
-   //DEBUG_A("Setting up window...");
    vw.setCollada(collada);
    vw.setTitle(filename);
+   vw.mainLoop();
+   
    //DEBUG_A("Entering main loop...");
    
    /*shared_ptr<RotationGL> rotation(new RotationGL);
@@ -50,5 +51,5 @@ int main(int argc, char* args[]) {
    //int a;
    //cin >> a;
    
-   vw.mainLoop();
+
 }

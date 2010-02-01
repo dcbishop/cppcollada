@@ -38,6 +38,7 @@ class Input;
 class Source;
 class Material;
 class Effect;
+class InstanceGeometry;
 
 #include "SmartPointers.hpp"
 
@@ -71,6 +72,7 @@ class ColladaDoc {
       void loadInstances(const DOMElement* element, ColladaNode* node);
       shared_ptr<ColladaLight> loadColladaLight(const DOMElement* element);
       shared_ptr<ColladaObject> loadInstance(const DOMElement* element, ColladaNode* node);
+      shared_ptr<InstanceGeometry> loadInstanceGeometry(const DOMElement* element);
       shared_ptr<ColladaCamera> loadColladaCamera(const DOMElement* element);
       shared_ptr<Mesh> loadMesh(const DOMElement* element);
       shared_ptr<Vertices> loadVertices(const DOMElement* element);

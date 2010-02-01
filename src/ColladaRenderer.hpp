@@ -15,6 +15,7 @@ class Grid;
 class Triangles;
 class GeometricPrimitive;
 class Geometry;
+class InstanceGeometry;
 
 class ColladaRenderer {
    public:
@@ -30,6 +31,7 @@ class ColladaRenderer {
       virtual void render(Camera* camera) = 0;
       virtual void render(Grid* grid) = 0;
       virtual void render(Geometry* geometry) = 0;
+      virtual void render(InstanceGeometry* ig) = 0;
       virtual void render(GeometricPrimitive* prim) = 0;
       virtual void render(Triangles* triangles) = 0;
 };

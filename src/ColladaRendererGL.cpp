@@ -11,6 +11,7 @@
 #include "Triangles.hpp"
 #include "ViewWindow.hpp"
 #include "Geometry.hpp"
+#include "InstanceGeometry.hpp"
 
 #include "console.h"
 
@@ -205,6 +206,10 @@ void ColladaRendererGL::render(Grid* grid) {
       }
    }
    glEnd();
+}
+
+void ColladaRendererGL::render(InstanceGeometry* ig) {
+   ig->getGeometry()->render();
 }
 
 void ColladaRendererGL::render(Geometry* geometry) {

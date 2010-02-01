@@ -22,6 +22,7 @@
 #include "Source.hpp"
 #include "Material.hpp"
 #include "Phong.hpp"
+#include "InstanceGeometry.hpp"
 
 #include "console.h"
 
@@ -37,6 +38,7 @@ ColladaDoc::~ColladaDoc() {
    // TODO: Delete xmlDoc_ here?
       DEBUG_M("~ColladaDoc()");
    delete parser_;
+   XMLPlatformUtils::Terminate();
 }
 
 /**
@@ -173,8 +175,9 @@ DOMElement* ColladaDoc::getElementById(string id) {
 DOMNodeList* ColladaDoc::getElementsByTagName(const DOMElement* element, string tag) {
    DEBUG_M("Entering function...");
    XMLCh* xtag = XMLString::transcode(tag.c_str());
-   return element->getElementsByTagName(xtag);
+   DOMNodeList* nl = element->getElementsByTagName(xtag);
    XMLString::release(&xtag);
+   return nl;
 }
 
 shared_ptr<ColladaObject> ColladaDoc::getColladaObjectById(string id) {
@@ -212,7 +215,7 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(const DOMElement* elemen
    const XMLCh* tagName = element->getTagName();
    shared_ptr<ColladaObject> colladaObject;
 
-   const char* tagName_c = XMLString::transcode(tagName);
+   char* tagName_c = XMLString::transcode(tagName);
    if(isString_(tagName, "visual_scene")) {
       shared_ptr<VisualScene> visualScene(loadVisualScene(element));
       colladaObject = visualScene;
@@ -253,6 +256,7 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(const DOMElement* elemen
 
    DEBUG_H("Loading: '%s'", tagName_c);
 
+   XMLString::release(&tagName_c);
    if(colladaObject != NULL) {
       loadId(element, colladaObject.get());
       loadName(element, colladaObject.get());
@@ -409,6 +413,7 @@ shared_ptr<vector<int>> ColladaDoc::loadPrimitives(const DOMElement* element) {
       token = strtok(NULL, " ");
    }
 
+   XMLString::release(&data_c);
    return primitives;
 }
 
@@ -482,8 +487,10 @@ dumpElement(element);
 
          dumpElement(currentElement);
 
-         const char* data_c = XMLString::transcode(data->getTextContent());
+         const XMLCh* data_x = data->getTextContent();
+         char* data_c = XMLString::transcode(data_x);
          shared_ptr<vector<float>> floats = getFloats(data_c);
+         XMLString::release(&data_c);
 
          if(isString_(tagName, "emission")) {
             phong->setEmission(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
@@ -708,6 +715,7 @@ void ColladaDoc::loadId(const DOMElement* element, Id* id) {
 void ColladaDoc::loadName(const DOMElement* element, Name* name) {
    DEBUG_M("Entering function...");
    name->setName(getAttribute(element, "name"));
+   DEBUG_M("Exiting function...");
 }
 
 /**
@@ -756,6 +764,7 @@ shared_ptr<vector<float>> ColladaDoc::getFloats(string text) {
       i++;
       token = strtok(NULL, " ");
    }
+   DEBUG_M("Exiting function...");
    return floats;
 }
 
@@ -889,11 +898,25 @@ void ColladaDoc::loadInstances(const DOMElement* element, ColladaNode* node) {
    }
 }
 
+
+shared_ptr<InstanceGeometry> ColladaDoc::loadInstanceGeometry(const DOMElement* element) {
+      DEBUG_M("Entering function...");
+      shared_ptr<InstanceGeometry> ig(new InstanceGeometry);
+
+      // Get the real geometry node
+      string url = getAttribute(element, "url");
+      shared_ptr<ColladaObject> colladaObject = getColladaObjectByUrl(url);
+      shared_ptr<Geometry> geometry(static_pointer_cast<Geometry, ColladaObject>(colladaObject));
+      ig->setGeometry(geometry);
+     
+      #warning ['TODO']: Bind materials!
+      return ig;
+}
+
 shared_ptr<ColladaObject> ColladaDoc::loadInstance(const DOMElement* element, ColladaNode* node) {
    DEBUG_M("Entering function...");
 
-   //const XMLCh* tagName = element->getTagName();
-   //XMLCh* geometry_tag = XMLString::transcode("instance_geometry");
+   string instance_geometry_s = "instance_geometry";
    //XMLCh* light_tag = XMLString::transcode("instance_light");
    string url = getAttribute(element, "url");
 
@@ -901,6 +924,9 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(const DOMElement* element, Co
    if(url.length() == 0) {
       return shared_ptr<ColladaObject>();
    }
+
+   const XMLCh* tagName = element->getTagName();
+   XMLCh* geometry_tag = XMLString::transcode(instance_geometry_s.c_str());
 
    #warning ['TODO']: Add translate, camera, node, scale, etc... 
    /*if(XMLString::compareIString(tagName, geometry_tag) == 0) {
@@ -913,9 +939,29 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(const DOMElement* element, Co
       colladaObject = getColladaObjectByUrl(url);
    }*/
 
+   //shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+   shared_ptr<ColladaObject> colladaObject;
+
+   if(XMLString::compareIString(tagName, geometry_tag) == 0) {
+      //shared_ptr<ColladaObject> colladaObject = instanceGeometry;
+      //shared_ptr<ColladaObject> colladaObject(dynamic_pointer_cast<ColladaObject, InstanceGeometry>(instanceGeometry));
+      //shared_ptr<ColladaObject> colladaObject = loadInstanceGeometry(element);
+      shared_ptr<InstanceGeometry> instanceGeometry = loadInstanceGeometry(element);
+      //shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+      colladaObject = instanceGeometry;
+      
+      //XMLString::release(&geometry_tag);
+      //return instanceGeometry;
+   } else {
+      shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+      //XMLString::release(&geometry_tag);
+      //return colladaObject;
+   }
+   XMLString::release(&geometry_tag);
+   return colladaObject;
    // TODO: Handle instance_geometry's bind_material (instance_controller)
 
-   shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+   
 
    /*char* testtag = XMLString::transcode(tagName);
    DEBUG_H("%s", testtag);*/
@@ -927,7 +973,7 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(const DOMElement* element, Co
    //loadId(element, colladaObject);
    //loadName(element, colladaObject);
 
-   return colladaObject;
+   //return colladaObject;
 }
 
 // instance_camera x
