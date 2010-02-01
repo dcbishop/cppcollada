@@ -24,10 +24,10 @@ class GeometricPrimitive : public Renderable {
       float getZ(const int& num) const;
       
       inline void setCount(const int& count) { count_ = count; }
-      int getCount() { return count_; }
+      int getCount() const { return count_; }
       void setMaterial(string material) { material_ = material; }
 
-      PrimIterator getFirstPrimitive() const;
+      PrimIterator getFirstPrimitive() const; //should these be const?
       PrimIterator getEndPrimitive() const;
       COLLADA_RENDER_FUNCTION
 

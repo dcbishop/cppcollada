@@ -10,7 +10,7 @@
  * @param url No remote urls, only 'file://somedir/file.dae' or '/somedir/file.dae'.
  * @return A Collada object.
  */
-shared_ptr<Collada> ColladaManager::getCollada(string url) {
+shared_ptr<Collada> ColladaManager::getCollada(const string& url) {
    // See if the collada is already loaded...
    ColladaMapIterator iter = colladas_.find(url);
    if(iter != colladas_.end()) {

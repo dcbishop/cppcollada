@@ -51,43 +51,43 @@ class ColladaDoc {
       ~ColladaDoc();
       DOMDocument* loadColladaDoc(const string& url);
       DOMDocument* loadColladaDocFile(const string& filename);
-      DOMNodeList* getElementsByTagName(DOMElement* element, string tag);
+      DOMNodeList* getElementsByTagName(const DOMElement* element, string tag);
       DOMElement* getElementById(string id);
       shared_ptr<ColladaObject> getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
       shared_ptr<vector<float>> getFloats(string text);
-      shared_ptr<ColladaObject> loadColladaObject(DOMElement* element);
+      shared_ptr<ColladaObject> loadColladaObject(const DOMElement* element);
       string getAttribute(const DOMElement* element, string attribute);
       void loadId(const DOMElement* element, Id* id);
       void loadName(const DOMElement* element, Name* name);
-      shared_ptr<VisualScene> loadVisualScene(DOMElement* element);
-      shared_ptr<ColladaNode> loadColladaNode(DOMElement* element);
-      shared_ptr<Geometry> loadGeometry(DOMElement* element);
-      void loadTranslation(DOMElement* element, Position* position);
-      void loadRotation(DOMElement* element, RotationGL* rotation, int number);
-      void loadRotations(DOMElement* element, RotationGL* rotation);
-      void loadScale(DOMElement* element, Scale* scale);
-      void loadInstances(DOMElement* element, ColladaNode* node);
-      shared_ptr<ColladaLight> loadColladaLight(DOMElement* element);
-      shared_ptr<ColladaObject> loadInstance(DOMElement* element, ColladaNode* node);
-      shared_ptr<ColladaCamera> loadColladaCamera(DOMElement* element);
-      shared_ptr<Mesh> loadMesh(DOMElement* element);
-      shared_ptr<Vertices> loadVertices(DOMElement* element);
-      shared_ptr<Triangles> loadTriangles(DOMElement* element);
-      shared_ptr<Source> loadSource(DOMElement* element);
-      shared_ptr<Material> loadMaterial(DOMElement* element);
-      void loadSourceTechnique(DOMElement* element, shared_ptr<Source> source);
-      DOMElement* getElementByTagName(DOMElement* element, string tag);
+      shared_ptr<VisualScene> loadVisualScene(const DOMElement* element);
+      shared_ptr<ColladaNode> loadColladaNode(const DOMElement* element);
+      shared_ptr<Geometry> loadGeometry(const DOMElement* element);
+      void loadTranslation(const DOMElement* element, Position* position);
+      void loadRotation(const DOMElement* element, RotationGL* rotation, int number);
+      void loadRotations(const DOMElement* element, RotationGL* rotation);
+      void loadScale(const DOMElement* element, Scale* scale);
+      void loadInstances(const DOMElement* element, ColladaNode* node);
+      shared_ptr<ColladaLight> loadColladaLight(const DOMElement* element);
+      shared_ptr<ColladaObject> loadInstance(const DOMElement* element, ColladaNode* node);
+      shared_ptr<ColladaCamera> loadColladaCamera(const DOMElement* element);
+      shared_ptr<Mesh> loadMesh(const DOMElement* element);
+      shared_ptr<Vertices> loadVertices(const DOMElement* element);
+      shared_ptr<Triangles> loadTriangles(const DOMElement* element);
+      shared_ptr<Source> loadSource(const DOMElement* element);
+      shared_ptr<Material> loadMaterial(const DOMElement* element);
+      void loadSourceTechnique(const DOMElement* element, shared_ptr<Source> source);
+      DOMElement* getElementByTagName(const DOMElement* element, string tag);
       shared_ptr<Collada> getCollada();
       shared_ptr<Scene> getScene();
       bool isUrlLocal(string url);
       string getUrlId(string url);
       shared_ptr<VisualScene> getVisualScene(string url);
       shared_ptr<ColladaObject> getColladaObjectByUrl(string url);
-      shared_ptr<Input> loadInput(DOMElement* element);
-      shared_ptr<vector<int>> loadPrimitives(DOMElement* element);
-      shared_ptr<Effect> loadEffect(DOMElement* element);
+      shared_ptr<Input> loadInput(const DOMElement* element);
+      shared_ptr<vector<int>> loadPrimitives(const DOMElement* element);
+      shared_ptr<Effect> loadEffect(const DOMElement* element);
 
 
    private:

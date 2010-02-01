@@ -12,10 +12,10 @@ class ColorRGBA {
       void setColor(const shared_ptr<ColorRGBA> color) { red_ = color->getRed(); green_ = color->getGreen(); blue_ = color->getBlue(); alpha_ = color->getAlpha(); }
       void setColor(const float& red, const float& green, const float& blue, const float& alpha) { red_ = red; green_ = green; blue_ = blue; alpha_ = alpha; }
       void setColor(const float& red, const float& green, const float& blue) { setColor(red, green, blue, 1.0f); }
-      float getRed() { return red_; }
-      float getGreen() { return green_; }
-      float getBlue() { return blue_; }
-      float getAlpha() { return alpha_; }
+      float getRed() const { return red_; }
+      float getGreen() const { return green_; }
+      float getBlue() const { return blue_; }
+      float getAlpha() const { return alpha_; }
 
    private:
       float red_;

@@ -59,7 +59,7 @@ void Camera::update(const int& time) {
    //Object::update(time);
 }
 
-const float Camera::getX() {
+const float Camera::getX() const {
    float theta = getRotX();
    float phi = getRotY();
    return getZoom() *
@@ -68,14 +68,14 @@ const float Camera::getX() {
    
 }
 
-const float Camera::getY() {
+const float Camera::getY() const {
    float theta = getRotX();
    float phi = getRotY();
    return getZoom() *
       (cos(phi*(PI/180)));
 }
 
-const float Camera::getZ() {
+const float Camera::getZ() const {
    float theta = getRotX();
    float phi = getRotY();
    return getZoom() *
@@ -87,7 +87,7 @@ const float Camera::getZ() {
  * Gets the current zoom value
  * @return The zoom value as it actually is, not target value the camera is moving to.
  */
-float Camera::getZoom() {
+float Camera::getZoom() const {
    //return zoom_.getValueCurrent();
    return zoom_;
 }
@@ -95,7 +95,7 @@ float Camera::getZoom() {
 /**
  * @return The zoom value that the camera it moving to.
  */
-float Camera::getZoomTarget() {
+float Camera::getZoomTarget() const {
    return /*zoom_.getValueTarget();*/ zoom_;
 }
 
@@ -103,7 +103,7 @@ float Camera::getZoomTarget() {
  * Gets the current field of view.
  * @return The current FOV (not the target FOV).
  */
-float Camera::getFov() {
+float Camera::getFov() const {
    //return fov_.getValueCurrent();
    return fov_;
 }

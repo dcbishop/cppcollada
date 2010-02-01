@@ -3,10 +3,10 @@
 
 class ColladaCamera : public ColladaObject {
    public:
-      float& getFov();
+      float getFov() const;
       void setFov(const float& fov);
       
-      float& getNear();
+      float getNear() const;
       void setNear(const float& near);
 
    private:
@@ -15,7 +15,7 @@ class ColladaCamera : public ColladaObject {
       float far_;
 };
 
-float& ColladaCamera::getFov() {
+float ColladaCamera::getFov() const {
    return fov_;
 }
 
@@ -23,7 +23,7 @@ void ColladaCamera::setFov(const float& fov) {
    fov_ = fov;
 }
 
-float& ColladaCamera::getNear() {
+float ColladaCamera::getNear() const {
    return near_;
 }
 

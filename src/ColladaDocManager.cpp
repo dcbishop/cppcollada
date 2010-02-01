@@ -8,7 +8,7 @@
  * Loads it if necessary.
  * @param url The URL to load...
  */
-shared_ptr<ColladaDoc> ColladaDocManager::getColladaDoc(string url) {
+shared_ptr<ColladaDoc> ColladaDocManager::getColladaDoc(const string& url) {
    // See if we have already loaded it...
    ColladaDocMapIterator iter = colladaDocs_.find(url);
    if(iter != colladaDocs_.end()) {
@@ -26,7 +26,7 @@ shared_ptr<ColladaDoc> ColladaDocManager::getColladaDoc(string url) {
  * @param url The URL.
  * @return the loaded object or NULL.
  */
-shared_ptr<ColladaObject> ColladaDocManager::getColladaObjectByUrl(string url) {
+shared_ptr<ColladaObject> ColladaDocManager::getColladaObjectByUrl(const string& url) {
    string strippedUrl = ColladaUrl::getStrippedUrl(url);
    shared_ptr<ColladaDoc> colladaDoc(getColladaDoc(strippedUrl));
    if(!colladaDoc) {

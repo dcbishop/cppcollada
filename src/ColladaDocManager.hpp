@@ -28,9 +28,9 @@ typedef pair<string, shared_ptr<ColladaDoc>> ColladaDocMapPair;
  */
 class ColladaDocManager {
    public:
-      shared_ptr<ColladaDoc> getColladaDoc(string url);
+      shared_ptr<ColladaDoc> getColladaDoc(const string& url);
       void unloadColladaDocs();
-      shared_ptr<ColladaObject> getColladaObjectByUrl(string url);
+      shared_ptr<ColladaObject> getColladaObjectByUrl(const string& url);
 
    private:
       ColladaDocMap colladaDocs_;

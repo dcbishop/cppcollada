@@ -170,7 +170,7 @@ DOMElement* ColladaDoc::getElementById(string id) {
 /**
  * 
  */
-DOMNodeList* ColladaDoc::getElementsByTagName(DOMElement* element, string tag) {
+DOMNodeList* ColladaDoc::getElementsByTagName(const DOMElement* element, string tag) {
    DEBUG_M("Entering function...");
    XMLCh* xtag = XMLString::transcode(tag.c_str());
    return element->getElementsByTagName(xtag);
@@ -206,7 +206,7 @@ bool ColladaDoc::isString_(const XMLCh* tag1, string tag2) {
    return false;
 }
 
-shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(DOMElement* element) {
+shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    const XMLCh* tagName = element->getTagName();
@@ -262,19 +262,19 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(DOMElement* element) {
    
 }
 
-shared_ptr<ColladaLight> ColladaDoc::loadColladaLight(DOMElement* element) {
+shared_ptr<ColladaLight> ColladaDoc::loadColladaLight(const DOMElement* element) {
    DEBUG_M("Entering function...");
    WARNING("Stub function!");
    return shared_ptr<ColladaLight>();
 }
 
-shared_ptr<ColladaCamera> ColladaDoc::loadColladaCamera(DOMElement* element) {
+shared_ptr<ColladaCamera> ColladaDoc::loadColladaCamera(const DOMElement* element) {
    DEBUG_M("Entering function...");
    WARNING("Stub function!");
    return shared_ptr<ColladaCamera>();
 }
 
-shared_ptr<Geometry> ColladaDoc::loadGeometry(DOMElement* element) {
+shared_ptr<Geometry> ColladaDoc::loadGeometry(const DOMElement* element) {
    DEBUG_M("Entering function...");
    // convex_mesh
    // mesh
@@ -309,7 +309,7 @@ shared_ptr<Geometry> ColladaDoc::loadGeometry(DOMElement* element) {
    return shared_ptr<Geometry>();
 }
 
-shared_ptr<Mesh> ColladaDoc::loadMesh(DOMElement* element) {
+shared_ptr<Mesh> ColladaDoc::loadMesh(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    DOMNodeList* children = element->getChildNodes();
@@ -344,7 +344,7 @@ shared_ptr<Mesh> ColladaDoc::loadMesh(DOMElement* element) {
    return mesh;
 }
 
-shared_ptr<Triangles> ColladaDoc::loadTriangles(DOMElement* element) {
+shared_ptr<Triangles> ColladaDoc::loadTriangles(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    shared_ptr<Triangles> triangles(new Triangles);
@@ -391,7 +391,7 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(DOMElement* element) {
    return triangles;
 }
 
-shared_ptr<vector<int>> ColladaDoc::loadPrimitives(DOMElement* element) {
+shared_ptr<vector<int>> ColladaDoc::loadPrimitives(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    const XMLCh* data_x = element->getTextContent();
@@ -412,7 +412,7 @@ shared_ptr<vector<int>> ColladaDoc::loadPrimitives(DOMElement* element) {
    return primitives;
 }
 
-shared_ptr<Material> ColladaDoc::loadMaterial(DOMElement* element) {
+shared_ptr<Material> ColladaDoc::loadMaterial(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    DOMElement* instanceEffect = getElementByTagName(element, "instance_effect");
@@ -432,14 +432,14 @@ shared_ptr<Material> ColladaDoc::loadMaterial(DOMElement* element) {
    return material;
 }
 
-void dumpElement(DOMElement* element) {
+void dumpElement(const DOMElement* element) {
    const XMLCh* tag_x = element->getTagName();
    char* tag_c = XMLString::transcode(tag_x);
    DEBUG_M("Element: '%s'", tag_c);
    XMLString::release(&tag_c);
 }
 
-shared_ptr<Effect> ColladaDoc::loadEffect(DOMElement* element) {
+shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
    DEBUG_M("Entering function...");
 dumpElement(element);
    DOMElement* profileCommon = getElementByTagName(element, "profile_COMMON");
@@ -510,7 +510,7 @@ dumpElement(element);
    return effect;
 }
 
-shared_ptr<Input> ColladaDoc::loadInput(DOMElement* element) {
+shared_ptr<Input> ColladaDoc::loadInput(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    shared_ptr<Input> input(new Input);
@@ -530,7 +530,7 @@ shared_ptr<Input> ColladaDoc::loadInput(DOMElement* element) {
 }
 
 #warning ['TODO']: Load the accessor first, that should pull in the float_array or whatever...
-shared_ptr<Source> ColladaDoc::loadSource(DOMElement* element) {
+shared_ptr<Source> ColladaDoc::loadSource(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    shared_ptr<Source> source(new Source);
@@ -562,7 +562,7 @@ shared_ptr<Source> ColladaDoc::loadSource(DOMElement* element) {
    return source;
 }
 
-void ColladaDoc::loadSourceTechnique(DOMElement* element, shared_ptr<Source> source) {
+void ColladaDoc::loadSourceTechnique(const DOMElement* element, shared_ptr<Source> source) {
    DEBUG_M("Entering function...");
 
    XMLCh* tag = XMLString::transcode("accessor");
@@ -623,7 +623,7 @@ void ColladaDoc::loadSourceTechnique(DOMElement* element, shared_ptr<Source> sou
    }
 }
 
-shared_ptr<Vertices> ColladaDoc::loadVertices(DOMElement* element) {
+shared_ptr<Vertices> ColladaDoc::loadVertices(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    /*XMLCh* tag = XMLString::transcode("input");
@@ -715,7 +715,7 @@ void ColladaDoc::loadName(const DOMElement* element, Name* name) {
  * @param element The DOMElement.
  * @return A new VisualScene.
  */
-shared_ptr<VisualScene> ColladaDoc::loadVisualScene(DOMElement* element) {
+shared_ptr<VisualScene> ColladaDoc::loadVisualScene(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    shared_ptr<VisualScene> visualScene(new VisualScene());
@@ -764,7 +764,7 @@ shared_ptr<vector<float>> ColladaDoc::getFloats(string text) {
  * @param element The DOMElement.
  * @param position The object to apply the translation too.
  */
-void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
+void ColladaDoc::loadTranslation(const DOMElement* element, Position* position) {
    DEBUG_M("Entering function...");
 
    DOMElement* node = getElementByTagName(element, "translate");
@@ -790,7 +790,7 @@ void ColladaDoc::loadTranslation(DOMElement* element, Position* position) {
 /**
  * 
  */
-void ColladaDoc::loadScale(DOMElement* element, Scale* scale) {
+void ColladaDoc::loadScale(const DOMElement* element, Scale* scale) {
    DEBUG_M("Entering function...");
 
    DOMElement* node = getElementByTagName(element, "scale");
@@ -816,7 +816,7 @@ void ColladaDoc::loadScale(DOMElement* element, Scale* scale) {
  * @param element The DOMElement.
  * @param rotation The object to apply the rotation too.
  */
-void ColladaDoc::loadRotation(DOMElement* element, RotationGL* rotation, int number) {
+void ColladaDoc::loadRotation(const DOMElement* element, RotationGL* rotation, int number) {
    DEBUG_M("Entering function...");
    const XMLCh* data_x = element->getTextContent();
    char* data_c = XMLString::transcode(data_x);
@@ -833,7 +833,7 @@ void ColladaDoc::loadRotation(DOMElement* element, RotationGL* rotation, int num
  * @param element The DOMElement.
  * @param rotation The object to apply the rotations too.
  */
-void ColladaDoc::loadRotations(DOMElement* element, RotationGL* rotation) {
+void ColladaDoc::loadRotations(const DOMElement* element, RotationGL* rotation) {
    DEBUG_M("Entering function...");
 
    XMLCh* tag = XMLString::transcode("rotate");
@@ -860,7 +860,7 @@ void ColladaDoc::loadRotations(DOMElement* element, RotationGL* rotation) {
  * @param element The DOMElement.
  * @return A new ColladaNode.
  */
-shared_ptr<ColladaNode> ColladaDoc::loadColladaNode(DOMElement* element) {
+shared_ptr<ColladaNode> ColladaDoc::loadColladaNode(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    shared_ptr<ColladaNode> node(new ColladaNode());
@@ -872,7 +872,7 @@ shared_ptr<ColladaNode> ColladaDoc::loadColladaNode(DOMElement* element) {
    return node;
 }
 
-void ColladaDoc::loadInstances(DOMElement* element, ColladaNode* node) {
+void ColladaDoc::loadInstances(const DOMElement* element, ColladaNode* node) {
    DEBUG_M("Entering function...");
 
    DOMNodeList* children = element->getChildNodes();
@@ -889,7 +889,7 @@ void ColladaDoc::loadInstances(DOMElement* element, ColladaNode* node) {
    }
 }
 
-shared_ptr<ColladaObject> ColladaDoc::loadInstance(DOMElement* element, ColladaNode* node) {
+shared_ptr<ColladaObject> ColladaDoc::loadInstance(const DOMElement* element, ColladaNode* node) {
    DEBUG_M("Entering function...");
 
    //const XMLCh* tagName = element->getTagName();
@@ -936,7 +936,7 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(DOMElement* element, ColladaN
 // instance_light x
 // instance_node x
 
-DOMElement* ColladaDoc::getElementByTagName(DOMElement* element, string tag) {
+DOMElement* ColladaDoc::getElementByTagName(const DOMElement* element, string tag) {
    DOMNodeList* elements = getElementsByTagName(element, tag);
    if(!elements) {
       ERROR("No node with tag '%s' found...", tag.c_str());

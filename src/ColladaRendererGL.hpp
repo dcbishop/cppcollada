@@ -17,13 +17,13 @@ class ColladaRendererGL : public ColladaRenderer {
       virtual void render(Camera* camera);
       virtual void render(Grid* grid);
       virtual void render(Geometry* geometry);
-      virtual void render(const GeometricPrimitive* geometry);
+      virtual void render(GeometricPrimitive* geometry);
       virtual void render(Triangles* triangles);
 
    private:
       void fixAxis_(const Collada* collada);
       void renderAxis_();
-      void debugRotationHack(Collada* collada);
+      void debugRotationHack(const Collada* collada);
 
 };
 

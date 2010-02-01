@@ -28,7 +28,7 @@ typedef pair<string, shared_ptr<Collada>> ColladaMapPair;
 
 class ColladaManager {
    public:
-      shared_ptr<Collada> getCollada(string url);
+      shared_ptr<Collada> getCollada(const string& url);
       void scrub();
 
    private:

@@ -46,7 +46,7 @@ void ColladaRendererGL::fixAxis_(const Collada* collada) {
 
 }
 
-void ColladaRendererGL::debugRotationHack(Collada* collada) {
+void ColladaRendererGL::debugRotationHack(const Collada* collada) {
    shared_ptr<Rotation> rotation;
    rotation = collada->debugRotationHack;
    if(rotation) {
@@ -224,7 +224,7 @@ void ColladaRendererGL::render(Triangles* triangles) {
    glEnd();
 }
 
-void ColladaRendererGL::render(const GeometricPrimitive* geometry) {
+void ColladaRendererGL::render(GeometricPrimitive* geometry) {
    DEBUG_H("ColladaRendererGL::render(GeometricPrimitive* geometry)");
 
    static int what;

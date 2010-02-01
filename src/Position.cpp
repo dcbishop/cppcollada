@@ -39,7 +39,7 @@ void Position::setPosition(Position& position) {
  * @see getY()
  * @see getZ()
  */
-void Position::setXYZ(const float x, const float y, const float z) {
+void Position::setXYZ(const float &x, const float &y, const float &z) {
    Position::setX(x);
    Position::setY(y);
    Position::setZ(z);
@@ -56,7 +56,7 @@ void Position::setXYZ(const float x, const float y, const float z) {
  * @see getZ()
  * @return The X coordinate.
  */
-const float Position::getX() {
+const float Position::getX() const {
    return x_;
 }
 
@@ -71,7 +71,7 @@ const float Position::getX() {
  * @see getZ()
  * @return The Y coordinate.
  */
-const float Position::getY() {
+const float Position::getY() const {
    return y_;
 }
 
@@ -86,7 +86,7 @@ const float Position::getY() {
  * @see getZ()
  * @return The Z coordinate.
  */
-const float Position::getZ() {
+const float Position::getZ() const {
    return z_;
 }
 
@@ -101,7 +101,7 @@ const float Position::getZ() {
  * @see getZ()
  * @param x the X coordinate
  */
-void Position::setX(const float x) {
+void Position::setX(const float& x) {
    x_ = x;
 }
 
@@ -116,7 +116,7 @@ void Position::setX(const float x) {
  * @see getZ()
  * @param x the Y coordinate
  */
-void Position::setY(const float y) {
+void Position::setY(const float& y) {
    y_ = y;
 }
 
@@ -131,7 +131,7 @@ void Position::setY(const float y) {
  * @see getZ()
  * @param x the Z coordinate
  */
-void Position::setZ(const float z) {
+void Position::setZ(const float& z) {
    z_ = z;
 }
 

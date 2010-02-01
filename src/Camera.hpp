@@ -29,20 +29,21 @@ class Camera : public Position, public Renderable {
       void update(const int& time);
       void setTarget(weak_ptr<Position> object);
       shared_ptr<Position> getTarget();
-      float getFov();
+      float getFov() const;
+      void setFov(const float& fov);
+      float getZoom() const;
       void setZoom(const float& zoom);
-      float getZoom();
-      float getZoomTarget();
+      float getZoomTarget() const;
 
       void setRotX(const float& rx);
       void setRotY(const float& ry);
-      float getRotX() {return rx_;}
-      float getRotY() {return ry_;}
+      float getRotX() const {return rx_;}
+      float getRotY() const {return ry_;}
 
-      void setFov(const float& fov);
-      const float getX();
-      const float getY();
-      const float getZ();
+      
+      const float getX() const;
+      const float getY() const;
+      const float getZ() const;
 
       COLLADA_RENDER_FUNCTION
 

@@ -24,11 +24,11 @@ class Source: public ColladaObject {
       inline void setYOff(const int& yOffset) { yOffset_ = yOffset; }
       inline void setZOff(const int& zOffset) { zOffset_ = zOffset; }
       inline void setStride(const int& stride) { stride_ = stride; }
-      inline int& getStride() { return stride_; }
+      inline int getStride() const { return stride_; }
 
-      inline virtual float getXPos(const int num) { return floats_->at(xOffset_ + (num * getStride())); }
-      inline virtual float getYPos(const int num) { return floats_->at(yOffset_ + (num * getStride())); }
-      inline virtual float getZPos(const int num) { return floats_->at(zOffset_ + (num * getStride())); }
+      inline virtual float getXPos(const int& num) const { return floats_->at(xOffset_ + (num * getStride())); }
+      inline virtual float getYPos(const int& num) const { return floats_->at(yOffset_ + (num * getStride())); }
+      inline virtual float getZPos(const int& num) const { return floats_->at(zOffset_ + (num * getStride())); }
 
    private:
       shared_ptr<vector<float>> floats_;

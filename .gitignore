@@ -25,3 +25,5 @@ doc/*
 tmp/*
 colladatest
 build/*
+*.swp
+.*
