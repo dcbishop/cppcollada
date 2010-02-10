@@ -6,7 +6,10 @@
 
 class Material : public ColladaObject {
    public:
+      COLLADA_RENDER_FUNCTION
       void setEffect(shared_ptr<Effect> effect) { effect_ = effect; }
+      shared_ptr<Effect> getEffect() { return effect_; }
+
    private:
       shared_ptr<Effect> effect_;
 };

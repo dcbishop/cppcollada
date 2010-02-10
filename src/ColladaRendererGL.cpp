@@ -12,6 +12,8 @@
 #include "ViewWindow.hpp"
 #include "Geometry.hpp"
 #include "InstanceGeometry.hpp"
+#include "Material.hpp"
+#include "Phong.hpp"
 
 #include "console.h"
 
@@ -58,10 +60,14 @@ void ColladaRendererGL::debugRotationHack(const Collada* collada) {
 void ColladaRendererGL::render(Collada* collada) {
    DEBUG_H("ColladaRendererGL::render(Collada* collada)");
 
-
    glPushMatrix();
    debugRotationHack(collada); // For testing something...
    fixAxis_(collada);
+   
+   glEnable(GL_DEPTH_TEST);
+   glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHT0);
+   
    collada->getScene()->render();
    glPopMatrix();
 }
@@ -156,7 +162,6 @@ void ColladaRendererGL::render(Camera* camera) {
    float cy = 0.0f;
    float cz = 0.0f;
 
-   //shared_ptr<Position> target = target_.lock(); // Is this expensive?
    shared_ptr<Position> target = camera->getTarget();
    if(target) {
       cx = target->getX();
@@ -208,10 +213,6 @@ void ColladaRendererGL::render(Grid* grid) {
    glEnd();
 }
 
-void ColladaRendererGL::render(InstanceGeometry* ig) {
-   ig->getGeometry()->render();
-}
-
 void ColladaRendererGL::render(Geometry* geometry) {
    DEBUG_H("void ColladaRendererGL::render(Geometry* '%s')", geometry->getId().c_str());
    GeoPrimIterator iter = geometry->getFirstPrimitive();
@@ -223,7 +224,7 @@ void ColladaRendererGL::render(Geometry* geometry) {
 
 void ColladaRendererGL::render(Triangles* triangles) {
    DEBUG_H("ColladaRendererGL::render(Triangles* triangles)");
-   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
    glBegin(GL_TRIANGLES);
       triangles->GeometricPrimitive::render();
    glEnd();
@@ -237,14 +238,69 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       WARNING("Inefficient primitive rendering!, TODO: convert to vertex buffer object first!");
       what = 1;
    }
-   
+
    PrimIterator iter = geometry->getFirstPrimitive();
    int inputCount = geometry->getInputCount();
-   while(iter != geometry->getEndPrimitive()) {
+   /*while(iter != geometry->getEndPrimitive()) {
       int primNum = geometry->getVertexNum(*iter);
       DEBUG_H("%d %d x=%f. y=%f, z=%f", *iter, primNum, geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      //float x = geometry->getX(primNum);
+      glNormal3f(geometry->getNX(*iter), geometry->getNY(*iter), geometry->getNZ(*iter));
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       iter+=inputCount;
+   }*/
+   
+   int prim_num = 0;
+   while(iter != geometry->getEndPrimitive()) {
+      //glNormal3f(geometry->getNX(prim_num), geometry->getNY(prim_num), geometry->getNZ(prim_num));
+
+      /*for(int i = 0; (i < inputCount) || (iter==geometry->getEndPrimitive()); i++) {
+         DEBUG_M("%d", inputCount);
+         glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+         iter++;
+      }*/
+      glNormal3f(geometry->getNX(*iter), geometry->getNY(*iter), geometry->getNZ(*iter));
+      for(int i = 0; i < 3; i++) {
+         glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+         iter+=inputCount;
+      }
    }
 }
+
+void ColladaRendererGL::render(InstanceGeometry* ig) {
+   shared_ptr<Geometry> geometry = ig->getGeometry();
+
+   GeoPrimIterator iter = geometry->getFirstPrimitive();
+   while(iter != geometry->getEndPrimitive()) {
+      string material_s = (*iter)->getMaterial();
+      shared_ptr<Material> material = ig->getInstanceMaterial(material_s);
+      material->render();
+      (*iter)->render();
+      iter++;
+   }
+}
+
+void ColladaRendererGL::render(Material* material) {
+   shared_ptr<Effect> effect = material->getEffect();
+   effect->render();
+}
+
+void ColladaRendererGL::render(Phong* phong) {
+   //WARNING("Phong effect render attempted!");
+
+   const float (&ambient)[4] = phong->getAmbient().getArray();
+   const float (&diffuse)[4] = phong->getDiffuse().getArray();
+   const float (&specular)[4] = phong->getSpecular().getArray();
+   const float (&emission)[4] = phong->getEmission().getArray();
+   float shininess[1] = {phong->getShininess()};
+
+   glDisable(GL_COLOR_MATERIAL);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+
+   //const float ambient[4] = .getArray();
+   //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, 
+}
+

@@ -20,6 +20,9 @@ class ColladaRendererGL : public ColladaRenderer {
       virtual void render(InstanceGeometry* ig);
       virtual void render(GeometricPrimitive* geometry);
       virtual void render(Triangles* triangles);
+      virtual void render(Material* material);
+      virtual void render(Phong* phong);
+
 
    private:
       void fixAxis_(const Collada* collada);

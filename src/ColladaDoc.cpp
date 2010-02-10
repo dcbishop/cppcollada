@@ -385,12 +385,13 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(const DOMElement* element) {
    }
    triangles->setInputCount(numInputs);
 
-   string materialUrl = getAttribute(element, "material");
-   if(materialUrl.length() > 0) {
+   string material = getAttribute(element, "material");
+   /*if(materialUrl.length() > 0) {
       shared_ptr<ColladaObject> colladaObject(getColladaObjectById(materialUrl));
       //shared_ptr<Material> material(dynamic_pointer_cast<Material>(colladaObject));
       //triangles->setMaterial(material);
-   }
+   }*/
+   triangles->setMaterial(material);
 
    return triangles;
 }
@@ -446,7 +447,7 @@ void dumpElement(const DOMElement* element) {
 
 shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
    DEBUG_M("Entering function...");
-dumpElement(element);
+
    DOMElement* profileCommon = getElementByTagName(element, "profile_COMMON");
    if(!profileCommon) {
       WARNING("No profile_COMMON in effect.");
@@ -482,6 +483,7 @@ dumpElement(element);
          DOMElement* data = getElementByTagName(currentElement, "color");
          if(!data) {
             data = getElementByTagName(currentElement, "float");
+            //DEBUG_M("Got via secondry...");
          }
          #warning ['TODO']: The above float retrevial fails...
 
@@ -498,7 +500,7 @@ dumpElement(element);
             phong->setDiffuse(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
          } else if(isString_(tagName, "ambient")) {
             phong->setAmbient(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
-         } /*else if(isString_(tagName, "specular")) {
+         } else if(isString_(tagName, "specular")) {
             phong->setSpecular(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
          } else if(isString_(tagName, "shininess")) {
             phong->setShininess(floats->at(0));
@@ -510,7 +512,7 @@ dumpElement(element);
             phong->setTransparent(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
          } else if(isString_(tagName, "transparency")) {
             phong->setTransparency(floats->at(0));
-         }*/
+         }
       }
    }
 
@@ -910,7 +912,61 @@ shared_ptr<InstanceGeometry> ColladaDoc::loadInstanceGeometry(const DOMElement* 
       ig->setGeometry(geometry);
      
       #warning ['TODO']: Bind materials!
+      loadInstanceGeometry_BindMaterials_(ig, element);
       return ig;
+}
+
+void ColladaDoc::loadInstanceGeometry_BindMaterials_(shared_ptr<InstanceGeometry> ig, const DOMElement* element) {
+   XMLCh* tag = XMLString::transcode("bind_material");
+   DOMNodeList* elements = element->getElementsByTagName(tag);
+   XMLString::release(&tag);
+
+   // No materials on instance geometry...
+   if(!elements) {
+      return;
+   }
+
+   int length = elements->getLength();
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = elements->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         loadInstanceGeometry_BindMaterial_(ig, currentElement);
+      }
+   }
+}
+
+void ColladaDoc::loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry> ig, const DOMElement* element) {
+   DEBUG_M("Entering function...");
+   
+   DOMElement* tce = getElementByTagName(element, "technique_common");
+   if(!tce) {
+      WARNING("No <technique_common> in <bind_material>.");
+      return;
+   }
+
+   DOMElement* ime = getElementByTagName(tce, "instance_material");
+   if(!ime) {
+      WARNING("No <instance_material> in <technique_common>.");
+      return;
+   }
+
+   string symbol = getAttribute(ime, "symbol");
+   string target = getAttribute(ime, "target");
+
+   DOMElement* bvie = getElementByTagName(ime, "bind_vertex_input");
+   if(!bvie) {
+      WARNING("No <bind_vertex_input> in <instance_material>.");
+      return;
+   }
+
+   string input_semantic = getAttribute(bvie, "input_semantic");
+   string input_set = getAttribute(bvie, "input_set");
+   string semantic = getAttribute(bvie, "semantic");
+   
+   shared_ptr<ColladaObject> colladaObject = getColladaObjectByUrl(target);
+   shared_ptr<Material> material(static_pointer_cast<Material, ColladaObject>(colladaObject));
+   ig->addInstanceMaterial(symbol, material);
 }
 
 shared_ptr<ColladaObject> ColladaDoc::loadInstance(const DOMElement* element, ColladaNode* node) {
@@ -996,7 +1052,9 @@ DOMElement* ColladaDoc::getElementByTagName(const DOMElement* element, string ta
 
    DOMNode* node = elements->item(0);
    if(!node) {
-      ERROR("Weird. Could not get node from nodelist...");
+      //ERROR("Weird. Could not get node from nodelist... tag: '%s'", tag.c_str());
+      //dumpElement(element);
+      
       return NULL;
    }
 

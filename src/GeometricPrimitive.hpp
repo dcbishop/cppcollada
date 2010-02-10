@@ -22,10 +22,14 @@ class GeometricPrimitive : public Renderable {
       float getX(const int& num) const;
       float getY(const int& num) const;
       float getZ(const int& num) const;
+      float getNX(const int& num) const;
+      float getNY(const int& num) const;
+      float getNZ(const int& num) const;
       
       inline void setCount(const int& count) { count_ = count; }
       int getCount() const { return count_; }
       void setMaterial(string material) { material_ = material; }
+      string getMaterial() {return material_; }
 
       PrimIterator getFirstPrimitive() const; //should these be const?
       PrimIterator getEndPrimitive() const;

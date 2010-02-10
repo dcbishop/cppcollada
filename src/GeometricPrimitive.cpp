@@ -30,3 +30,15 @@ float GeometricPrimitive::getY(const int& num) const {
 float GeometricPrimitive::getZ(const int& num) const {
    return vertex_->getZ(num);
 }
+
+float GeometricPrimitive::getNX(const int& num) const {
+   return normal_->getX(num/3);
+}
+
+float GeometricPrimitive::getNY(const int& num) const {
+   return normal_->getY(num/3);
+}
+
+float GeometricPrimitive::getNZ(const int& num) const {
+   return normal_->getZ(num/3);
+}

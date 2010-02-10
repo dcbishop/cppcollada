@@ -16,6 +16,8 @@ class Triangles;
 class GeometricPrimitive;
 class Geometry;
 class InstanceGeometry;
+class Material;
+class Phong;
 
 class ColladaRenderer {
    public:
@@ -34,6 +36,8 @@ class ColladaRenderer {
       virtual void render(InstanceGeometry* ig) = 0;
       virtual void render(GeometricPrimitive* prim) = 0;
       virtual void render(Triangles* triangles) = 0;
+      virtual void render(Material* material) = 0;
+      virtual void render(Phong* phong) = 0;
 };
 
 #endif /* COLLADACPP_COLLADARENDERER_HPP_ */
