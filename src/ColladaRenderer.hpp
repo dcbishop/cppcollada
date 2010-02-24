@@ -38,6 +38,10 @@ class ColladaRenderer {
       virtual void render(Triangles* triangles) = 0;
       virtual void render(Material* material) = 0;
       virtual void render(Phong* phong) = 0;
+      virtual void setSize(const int width, const int height) = 0;
+      virtual void preFrame() = 0;
+      virtual void postFrame() = 0;
+      virtual void init() = 0;
 };
 
 #endif /* COLLADACPP_COLLADARENDERER_HPP_ */

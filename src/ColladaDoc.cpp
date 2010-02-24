@@ -484,6 +484,12 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
          if(!data) {
             data = getElementByTagName(currentElement, "float");
             //DEBUG_M("Got via secondry...");
+         } else if(!data) {
+            data = getElementByTagName(currentElement, "texture");
+            #warning ['TODO']: Handle texture'd images!
+         }
+         if(!data) {
+            continue;
          }
          #warning ['TODO']: The above float retrevial fails...
 

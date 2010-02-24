@@ -22,13 +22,19 @@ class ColladaRendererGL : public ColladaRenderer {
       virtual void render(Triangles* triangles);
       virtual void render(Material* material);
       virtual void render(Phong* phong);
-
+      virtual void preFrame();
+      virtual void postFrame();
+      virtual void init();
+      virtual void setSize(const int width, const int height);
 
    private:
       void fixAxis_(const Collada* collada);
       void renderAxis_();
       void debugRotationHack(const Collada* collada);
+      void setPerspective_();
 
+      int width_;
+      int height_;
 };
 
 #endif /* COLLADACPP_COLLADARENDERERGL_HPP_ */

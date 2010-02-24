@@ -10,7 +10,7 @@
 #include "ColladaManager.hpp"
 #include "ColladaDocManager.hpp"
 #include "ColladaDoc.hpp"
-#include "ViewWindow.hpp"
+#include "ViewWindowSDL.hpp"
 
 #include "SmartPointers.hpp"
 
@@ -25,7 +25,9 @@ using namespace xercesc;
 int main(int argc, char* args[]) {
    //DEBUG_A("Starting...");
    //string filename = "/home/hegemon/tmp/monkeyhead.dae";
-   string filename = "/home/hegemon/tmp/materialtest.dae";
+   string filename = "/home/hegemon/tmp/cubeuvmap.dae";
+   //string filename = "/home/hegemon/tmp/planetest.dae";
+
 
    DEBUG_A("Spawning ColladaManager...");
    ColladaManager cm;
@@ -35,7 +37,7 @@ int main(int argc, char* args[]) {
    cm.scrub();
 
    //DEBUG_A("Spawning window...");
-   ViewWindow vw(800, 600);
+   ViewWindowSDL vw(800, 600);
    vw.setCollada(collada);
    vw.setTitle(filename);
    vw.mainLoop();

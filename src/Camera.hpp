@@ -7,7 +7,7 @@
 const float PI = 3.14152f;
 
 const float Y_MIN = 0.01f;
-const float Y_MAX = 75.0f-Y_MIN;
+const float Y_MAX = 175.0f-Y_MIN;
 
 const float ZOOM_STEP = 0.5f;
 const float ZOOM_MIN = 0.5f;
