@@ -3,11 +3,6 @@
 
 #include "SmartPointers.hpp"
 
-/*#define INDEX_RED = 0;
-#define INDEX_GREEN = 1;
-#define INDEX_BLUE = 2;
-#define INDEX_ALPHA = 3;*/
-
 enum { INDEX_RED, INDEX_GREEN, INDEX_BLUE, INDEX_ALPHA };
 
 class ColorRGBA {
@@ -26,10 +21,6 @@ class ColorRGBA {
       const float (&getArray() const)[4] {return rgba; } 
 
    private:
-      /*float red_;
-      float green_;
-      float blue_;
-      float alpha_;*/
       float rgba[4];
 };
 

@@ -5,7 +5,6 @@ class ColladaCamera : public ColladaObject {
    public:
       float getFov() const;
       void setFov(const float& fov);
-      
       float getNear() const;
       void setNear(const float& near);
 

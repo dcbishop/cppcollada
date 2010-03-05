@@ -6,14 +6,14 @@ void Scale::setScaleXYZ(const float sx, const float sy, const float sz) {
    sz_ = sz;
 }
 
-const float Scale::getScaleX() {
+float Scale::getScaleX() const {
    return sx_;
 }
 
-const float Scale::getScaleY() {
+float Scale::getScaleY() const {
    return sy_;
 }
 
-const float Scale::getScaleZ() {
+float Scale::getScaleZ() const {
    return sz_;
 }

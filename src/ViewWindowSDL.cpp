@@ -17,10 +17,8 @@ using namespace std;
 #include "ColladaRenderer.hpp"
 #include "Grid.hpp"
 
-ViewWindowSDL::ViewWindowSDL(int width, int height) {
+ViewWindowSDL::ViewWindowSDL(const int width, const int height): ViewWindow(width, height) {
    DEBUG_M("ViewWindowSDL spawning...");
-
-   setSize(width, height);
 
    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
       ERROR("SDL: Failed to init video: ", SDL_GetError());
@@ -35,32 +33,9 @@ ViewWindowSDL::ViewWindowSDL(int width, int height) {
 
    renderer_.setSize(getWidth(), getHeight());
 
-   position_ = shared_ptr<Position>(new Position);
-   camera_ = shared_ptr<Camera>(new Camera);
-   camera_->setZoom(10.0f);
-  
-   position_->setX(0.0f);
-   position_->setY(-2.0f);
-   position_->setY(-20.0f);
-
    grid_ = shared_ptr<Grid>(new Grid);
    cam_move_ = false;
    finished_ = false;
-}
-
-void ViewWindowSDL::setCollada(shared_ptr<Collada> collada) {
-   collada_ = collada;
-   collada_->setRenderer(&renderer_);
-   /*if(camera_) {
-      shared_ptr<Position> position = static_pointer_cast<Position, Collada>(collada);
-      camera_->setTarget(position);
-   }*/
-}
-
-void ViewWindowSDL::setCamera(shared_ptr<Camera> camera) {
-   camera_ = camera;
-   camera_->setRenderer(&renderer_);
-   camera_->setTarget(position_);
 }
 
 void ViewWindowSDL::setTitle(const string title) {
@@ -78,7 +53,7 @@ void ViewWindowSDL::draw_() {
    static int fps_ = 0;
    static int mpf_ = 0;
    
-   int current_time = getComputerTime();
+   int current_time = getComputerTime_();
 
    // Limit framerate
    if(limit_fps_ && !( (current_time - last_render_time) >= 1000/60) ) {
@@ -92,22 +67,26 @@ void ViewWindowSDL::draw_() {
       last_fps_time = current_time;
       frame = 0;
       LOG("FPS: %d,\tMPF: %d",fps_, mpf_);
+      /*char title[255];
+      snprintf(title, 254, "CppCollada: \"%s\" FPS: %d, MPF: %d", fps_, mpf_);
+      setTitle(title);*/
    }
    last_render_time = current_time;
 
    renderer_.preFrame();
 
-   camera_->render();
+   getCamera()->render();
    grid_->render();
 
-   if(collada_) {
-      collada_->render();
+   shared_ptr<Collada> collada = getCollada();
+   if(collada) {
+      collada->render();
    }
 
    renderer_.postFrame();
    SDL_GL_SwapBuffers();
 
-   mpf_ = getComputerTime() - current_time;
+   mpf_ = getComputerTime_() - current_time;
 }
 
 /**
@@ -131,8 +110,8 @@ void ViewWindowSDL::checkEvents_() {
             mx_ = event.motion.x;
             my_ = event.motion.y;
             if(cam_move_) {
-               camera_->setRotX(camera_->getRotX() + (GLfloat)event.motion.xrel / getWidth() * 100);
-               camera_->setRotY(camera_->getRotY() - (GLfloat)event.motion.yrel / getHeight() * 100);
+               getCamera()->setRotX(getCamera()->getRotX() + (GLfloat)event.motion.xrel / getWidth() * 100);
+               getCamera()->setRotY(getCamera()->getRotY() - (GLfloat)event.motion.yrel / getHeight() * 100);
             }
             break;
          case SDL_MOUSEBUTTONDOWN:
@@ -155,10 +134,10 @@ void ViewWindowSDL::checkEvents_() {
                   cam_move_ = false;
                   break;
                case 5:
-                  camera_->setZoom(camera_->getZoomTarget() + ZOOM_STEP);
+                  getCamera()->setZoom(getCamera()->getZoomTarget() + ZOOM_STEP);
                   break;
                case 4:
-                  camera_->setZoom(camera_->getZoomTarget() - ZOOM_STEP);
+                  getCamera()->setZoom(getCamera()->getZoomTarget() - ZOOM_STEP);
                   break;
             }
             break;
@@ -190,6 +169,10 @@ void ViewWindowSDL::mainLoop() {
  * Returns the current time that the interface has been running.
  * @return The time.
  */
-int ViewWindowSDL::getComputerTime() {
+int ViewWindowSDL::getComputerTime_() {
    return SDL_GetTicks();
+}
+
+ColladaRenderer* ViewWindowSDL::getRenderer() {
+   return &renderer_;
 }

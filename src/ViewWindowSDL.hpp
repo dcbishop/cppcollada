@@ -1,5 +1,5 @@
-#ifndef COLLADACPP_ViewWindowSDL_HPP_
-#define COLLADACPP_ViewWindowSDL_HPP_
+#ifndef COLLADACPP_VIEWWINDOWSDL_HPP_
+#define COLLADACPP_VIEWWINDOWSDL_HPP_
 
 class Collada;
 
@@ -18,26 +18,21 @@ class Grid;
  */
 class ViewWindowSDL: public ViewWindow {
    public:
-      ViewWindowSDL(int width, int height);
-      void setCollada(shared_ptr<Collada> collada);
-      void setCamera(shared_ptr<Camera> camera);
-      void setTitle(const string title);
-      void mainLoop();
-      int getComputerTime();
+      ViewWindowSDL(const int width, const int height);
+      virtual ColladaRenderer* getRenderer();
+      virtual void setTitle(const string title);
+      virtual void mainLoop();
 
    private:
+      int getComputerTime_();
       void draw_();
       void checkEvents_();
       void drawGrid_();
-
-      shared_ptr<Collada> collada_;
       bool finished_;
       ColladaRendererGL renderer_;
-      shared_ptr<Camera> camera_;
       int mx_, my_;
       bool cam_move_;
-      shared_ptr<Position> position_;
       shared_ptr<Grid> grid_;
 };
 
-#endif /* COLLADACPP_ViewWindowSDL_HPP_ */
+#endif /* COLLADACPP_VIEWWINDOWSDL_HPP_ */

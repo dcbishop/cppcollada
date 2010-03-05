@@ -18,9 +18,9 @@ class Position : private Renderable {
       virtual void setX(const float& x);
       virtual void setY(const float& y);
       virtual void setZ(const float& z);
-      virtual const float getDistanceTo(Position& position);
-      virtual const float getDistanceTo2D(Position& position);
-      virtual const float getDirectionTo2D(Position& position);
+      virtual const float getDistanceTo(const Position& position);
+      virtual const float getDistanceTo2D(const Position& position);
+      virtual const float getDirectionTo2D(const Position& position);
       COLLADA_RENDER_FUNCTION
 
    private:

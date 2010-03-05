@@ -5,7 +5,7 @@ ColladaRenderer* Renderable::getRenderer() {
    return renderer_;
 }
 
-// TODO: Don't have this here... Some global setting...
+#warning ['TODO']: This is a dodgy hack... need one that can be changed at runtime...
 void Renderable::setRenderer(ColladaRenderer* renderer) {
    renderer_ = renderer;
 }

@@ -131,7 +131,6 @@ void NetworkedSensor::processData(std::size_t bytes) {
       } else if (i == 2) {
          rotation_->setRotationGL(2, 0, 0, 1, value);
       }
-      
    }
 
    /*while(token) {

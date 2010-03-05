@@ -1,4 +1,7 @@
 #include "Collada.hpp"
+void Collada::setFilename(const string filename) {
+   filename_ = filename;
+}
 
 void Collada::setScene(shared_ptr<Scene> scene) {
    scene_ = scene;

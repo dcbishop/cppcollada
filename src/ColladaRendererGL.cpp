@@ -107,7 +107,7 @@ void ColladaRendererGL::render(Collada* collada) {
    
    
    glEnable(GL_DEPTH_TEST);
-   glEnable(GL_LIGHTING);
+   //glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
 
    glPolygonMode( GL_FRONT, GL_FILL );
@@ -237,7 +237,9 @@ void ColladaRendererGL::render(Grid* grid) {
    float spacing = grid->getSpacing();
 
    // TODO: This is a stupid way of drawing grid
-   glColor3f(0.2f, 0.2f, 0.2f);
+   glEnable(GL_COLOR_MATERIAL);
+   glDisable(GL_LIGHTING);
+   glColor3f(grid->getRed(), grid->getGreen(), grid->getBlue());
    glBegin(GL_LINES);
    for(int y = 0; y < size_y; y++) {
       float y1 = y * spacing;
@@ -342,6 +344,7 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       //glDisable(GL_DEPTH_TEST);
       iter-=inputCount;
       
+#if 0
       glEnable(GL_COLOR_MATERIAL);
       for(int i = 0; i < 3; i++) {
          glBegin(GL_LINES);
@@ -364,8 +367,10 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       }
       //glEnable(GL_DEPTH_TEST);
       glDisable(GL_COLOR_MATERIAL);
+#endif
       iter+=inputCount;
-      glEnable(GL_LIGHTING);
+      //glEnable(GL_LIGHTING);
+
    }
 }
 

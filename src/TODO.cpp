@@ -11,8 +11,11 @@
 #include "ColladaDocManager.hpp"
 #include "ColladaDoc.hpp"
 #include "ViewWindowSDL.hpp"
+#include "ViewWindowQT.hpp"
 
 #include "SmartPointers.hpp"
+
+#include "Camera.hpp"
 
 //#include "NetworkedSensor.hpp"
 
@@ -36,11 +39,23 @@ int main(int argc, char* args[]) {
    DEBUG_A("Scrubbing Collada docs...");
    cm.scrub();
 
-   //DEBUG_A("Spawning window...");
-   ViewWindowSDL vw(800, 600);
+   shared_ptr<Position> position = shared_ptr<Position>(new Position);
+   position->setX(0.0f);
+   position->setY(0.0f);
+   position->setZ(0.0f);
+
+   shared_ptr<Camera> camera = shared_ptr<Camera>(new Camera);
+   camera->setTarget(position);
+   camera->setZoom(10.0f);
+
+   //ViewWindowQT vwq(800, 600);
+   //ViewWindowSDL vw(800, 600);
+   ViewWindowQT vw(800, 600);
    vw.setCollada(collada);
    vw.setTitle(filename);
+   vw.setCamera(camera);
    vw.mainLoop();
+   
    
    //DEBUG_A("Entering main loop...");
    

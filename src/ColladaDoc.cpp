@@ -1148,6 +1148,7 @@ shared_ptr<Collada> ColladaDoc::getCollada() {
    if(!collada_) {
       collada_ = shared_ptr<Collada>(new Collada());
       collada_->setScene(getScene());
+      collada_->setFilename(url_);
    }
    return collada_;
 }

@@ -140,7 +140,7 @@ void Position::setZ(const float& z) {
  * @param position The other position
  * @return The distance to the other position.
  */
-const float Position::getDistanceTo(Position& position) {
+const float Position::getDistanceTo(const Position& position) {
    float dx = getX() - position.getX();
    float dy = getY() - position.getY();
    float dz = getZ() - position.getZ();
@@ -153,7 +153,7 @@ const float Position::getDistanceTo(Position& position) {
  * @param position The other position
  * @return The distance to the other position.
  */
-const float Position::getDistanceTo2D(Position& position) {
+const float Position::getDistanceTo2D(const Position& position) {
    float diff_x = position.getX() - getX();
    float diff_z = position.getZ() - getZ();
    return sqrt(pow(diff_x, 2) + pow(diff_z, 2));
@@ -164,7 +164,7 @@ const float Position::getDistanceTo2D(Position& position) {
  * @param position The other position.
  * @return The angle.
  */
-const float Position::getDirectionTo2D(Position& position) {
+const float Position::getDirectionTo2D(const Position& position) {
    float diff_x = position.getX() - getX();
    float diff_z = position.getZ() - getZ();
    return atan2(diff_z, diff_x);

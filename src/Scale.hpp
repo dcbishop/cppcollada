@@ -9,9 +9,9 @@
 class Scale: public Renderable {
    public:
       virtual void setScaleXYZ(const float sx, const float sy, const float sz);
-      virtual const float getScaleX();
-      virtual const float getScaleY();
-      virtual const float getScaleZ();
+      virtual float getScaleX() const;
+      virtual float getScaleY() const;
+      virtual float getScaleZ() const;
       COLLADA_RENDER_FUNCTION
 
    private:
