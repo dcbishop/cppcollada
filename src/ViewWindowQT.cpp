@@ -63,10 +63,7 @@ void ViewWindowQT::ViewWidget::paintGL() {
    //mpf_ = getComputerTime_() - current_time;
 }
 
-void ViewWindowQT::ViewWidget::mouseMoveEvent (QMouseEvent *event) {
-   static int oldx = -1;
-   static int oldy = -1;
-
+void ViewWindowQT::ViewWidget::mouseMoveEvent(QMouseEvent *event) {
    int x = event->x();
    int y = event->y();
 
@@ -79,9 +76,53 @@ void ViewWindowQT::ViewWidget::mouseMoveEvent (QMouseEvent *event) {
       camera->setRotY(camera->getRotY() - yrel / vwqt_->getHeight() * 100);
       update();
    //}
-   
+
    oldx = x;
    oldy = y;
+   event->accept();
+}
+
+void ViewWindowQT::ViewWidget::mousePressEvent(QMouseEvent *event) {
+   DEBUG_M("Fired...");
+   oldx = event->x();
+   oldy = event->y();
+   event->accept();
+}
+
+void ViewWindowQT::ViewWidget::mouseReleaseEvent(QMouseEvent *event) {
+   DEBUG_M("Fired...");
+}
+
+void ViewWindowQT::ViewWidget::wheelEvent(QWheelEvent * event) {
+   DEBUG_M("Fired...");
+   int numDegrees = event->delta() / 8;
+   int numSteps = numDegrees / 15;
+
+   if(event->orientation() == Qt::Horizontal) {
+      //scrollHorizontally(numSteps);
+      
+   } else {
+      shared_ptr<Camera> camera = vwqt_->getCamera();
+      camera->setZoom(camera->getZoomTarget() + ZOOM_STEP * -numSteps);
+      DEBUG_M("%d", numSteps);
+      //scrollVertically(numSteps);
+   }
+   event->accept();
+   update();
+}
+
+void ViewWindowQT::ViewWidget::keyPressEvent(QKeyEvent * event) {
+   if(event->matches(QKeySequence::Quit) ||
+      event->key() == Qt::Key_Q ||
+      event->key() == Qt::Key_Escape) {
+      DEBUG_M("Quit key pressed...");
+      vwqt_->app_->quit();
+      return;
+   }
+}
+
+void ViewWindowQT::ViewWidget::keyReleaseEvent(QKeyEvent * event) {
+
 }
 
 ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width, height) {

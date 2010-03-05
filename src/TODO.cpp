@@ -67,6 +67,6 @@ int main(int argc, char* args[]) {
    ns.start();*/
    //int a;
    //cin >> a;
-   
+   LOG("Goodbye...");
 
 }

@@ -32,10 +32,17 @@ class ViewWindowQT: public ViewWindow {
          void paintGL();
          ColladaRendererGL renderer_;
          void mouseMoveEvent (QMouseEvent* event);
+         void mousePressEvent(QMouseEvent *event);
+         void mouseReleaseEvent(QMouseEvent *event);
+         void wheelEvent(QWheelEvent * event);
+         void keyPressEvent(QKeyEvent * event);
+         void keyReleaseEvent(QKeyEvent * event);
 
       private:
          ViewWindowQT *vwqt_;
          shared_ptr<Grid> grid_;
+         int oldx;
+         int oldy;
    };
 
    public:
