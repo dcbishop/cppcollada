@@ -71,9 +71,9 @@ void ViewWindowQT::ViewWidget::mouseMoveEvent (QMouseEvent *event) {
    int y = event->y();
 
    //if(oldx != -1 || oldy != -1) {
-   int xrel = x-oldx;
-   int yrel = y-oldy;
-      DEBUG_M("Mouse move... xrel: %d width:%d", xrel, vwqt_->getWidth());
+   float xrel = x-oldx;
+   float yrel = y-oldy;
+      DEBUG_M("Mouse move... xrel: %f width:%d", xrel, vwqt_->getWidth());
       shared_ptr<Camera> camera = vwqt_->getCamera();      
       camera->setRotX(camera->getRotX() + xrel / vwqt_->getWidth() * 100);
       camera->setRotY(camera->getRotY() - yrel / vwqt_->getHeight() * 100);
