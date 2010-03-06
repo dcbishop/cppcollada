@@ -7,6 +7,7 @@
 class Phong : public Effect {
    public:
       COLLADA_RENDER_FUNCTION
+      Phong();
       void setEmission(const float& red, const float& green, const float& blue, const float& alpha);
       void setAmbient(const float& red, const float& green, const float& blue, const float& alpha);
       void setDiffuse(const float& red, const float& green, const float& blue, const float& alpha);

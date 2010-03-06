@@ -1,5 +1,16 @@
 #include "Phong.hpp"
 
+Phong::Phong() {
+   setDiffuse(0.5, 0.5, 0.5, 1.0);
+   setAmbient(0.0, 0.0, 0.0, 1.0);
+   setEmission(0.0, 0.0, 0.0, 1.0);
+   setSpecular(0.0, 0.0, 0.0, 1.0);
+   setTransparent(0.0, 0.0, 0.0, 1.0);
+   setReflectivity(0.0);
+   setShininess(0.0);
+   setTransparency(0.0);
+}
+
 void Phong::setEmission(const float& red, const float& green, const float& blue, const float& alpha) {
    emission_.setColor(red, green, blue, alpha);
 }

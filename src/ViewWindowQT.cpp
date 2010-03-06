@@ -19,6 +19,7 @@ void ViewWindowQT::ViewWidget::initializeGL() {
 }
 
 void ViewWindowQT::ViewWidget::resizeGL(int width, int height) {
+	DEBUG_M("Resize %d %d", width, height);
    renderer_.setSize(width, height);
 }
 
@@ -66,46 +67,41 @@ void ViewWindowQT::ViewWidget::paintGL() {
 void ViewWindowQT::ViewWidget::mouseMoveEvent(QMouseEvent *event) {
    int x = event->x();
    int y = event->y();
-
-   //if(oldx != -1 || oldy != -1) {
    float xrel = x-oldx;
    float yrel = y-oldy;
-      DEBUG_M("Mouse move... xrel: %f width:%d", xrel, vwqt_->getWidth());
-      shared_ptr<Camera> camera = vwqt_->getCamera();      
-      camera->setRotX(camera->getRotX() + xrel / vwqt_->getWidth() * 100);
-      camera->setRotY(camera->getRotY() - yrel / vwqt_->getHeight() * 100);
-      update();
-   //}
+
+   shared_ptr<Camera> camera = vwqt_->getCamera();      
+   camera->setRotX(camera->getRotX() + xrel / vwqt_->getWidth() * 100);
+   camera->setRotY(camera->getRotY() - yrel / vwqt_->getHeight() * 100);
+   update();
 
    oldx = x;
    oldy = y;
+
    event->accept();
 }
 
 void ViewWindowQT::ViewWidget::mousePressEvent(QMouseEvent *event) {
-   DEBUG_M("Fired...");
+   DEBUG_H("Fired...");
    oldx = event->x();
    oldy = event->y();
    event->accept();
 }
 
 void ViewWindowQT::ViewWidget::mouseReleaseEvent(QMouseEvent *event) {
-   DEBUG_M("Fired...");
+   DEBUG_H("Fired...");
 }
 
 void ViewWindowQT::ViewWidget::wheelEvent(QWheelEvent * event) {
-   DEBUG_M("Fired...");
+   DEBUG_H("Fired...");
    int numDegrees = event->delta() / 8;
    int numSteps = numDegrees / 15;
 
    if(event->orientation() == Qt::Horizontal) {
-      //scrollHorizontally(numSteps);
-      
+      // left/right scrolling...
    } else {
       shared_ptr<Camera> camera = vwqt_->getCamera();
       camera->setZoom(camera->getZoomTarget() + ZOOM_STEP * -numSteps);
-      DEBUG_M("%d", numSteps);
-      //scrollVertically(numSteps);
    }
    event->accept();
    update();
@@ -140,16 +136,15 @@ ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width,
    /*QWidget window;
    window.resize(getWidth(), getHeight());
    window.show();
-   
    QGLWidget opengl;
    opengl.show();*/
    
-   //QPushButton test("TestButton", 0);
-   //test.resize(100, 30);
+   QPushButton test("TestButton", 0);
+   test.resize(100, 30);
    //app.setMainWidget(&test);
    //window.addWidget(test);
    //window.setWindowOpacity(0.5f);
-   //test.show();
+   test.show();
 
    //finished_ = false;
    //app.exec();

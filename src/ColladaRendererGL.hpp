@@ -2,6 +2,7 @@
 #define COLLADACPP_COLLADARENDERERGL_HPP_
 
 #include "ColladaRenderer.hpp"
+#include "Phong.hpp"
 
 class ColladaRendererGL : public ColladaRenderer {
    public:
@@ -28,11 +29,18 @@ class ColladaRendererGL : public ColladaRenderer {
       virtual void setSize(const int width, const int height);
 
    private:
+      void renderDefaultMaterial_();
       void fixAxis_(const Collada* collada);
       void renderAxis_();
       void debugRotationHack(const Collada* collada);
       void setPerspective_();
+      void setPolygonMode_();
+      void setRenderMode_();
+      void setUnlitMode_();
+      void setLights_();
 
+
+      Phong defaultMaterial_;
       int width_;
       int height_;
 };

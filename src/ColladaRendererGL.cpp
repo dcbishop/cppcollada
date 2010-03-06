@@ -23,13 +23,13 @@
 #include <iostream>
 
 void ColladaRendererGL::init() {
-   
+   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+   defaultMaterial_.setRenderer(this);
 }
 
 void ColladaRendererGL::preFrame() {
    setPerspective_();
    glLoadIdentity();
-   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -53,7 +53,6 @@ void ColladaRendererGL::render(ColladaObject* colladaObject) {
    DEBUG_H("ColladaRendererGL::render(ColladaObject* colladaObject)");
    WARNING("Tried to render raw ColladaObject '%s'", colladaObject->getId().c_str());
    //colladaObject->render();
-   
 }
 
 void ColladaRendererGL::fixAxis_(const Collada* collada) {
@@ -92,32 +91,12 @@ void ColladaRendererGL::render(Collada* collada) {
    debugRotationHack(collada); // For testing something...
    fixAxis_(collada);
 
-   static float pos = 1.0f;
-   pos+=0.01;
-   glDisable(GL_LIGHTING);
-   glPushMatrix();
-
-   float lx = 0.0;
-   float ly = 0.0;
-   float lz = pos;
-   
-   glTranslatef(lx, ly, lz);
-   renderAxis_();
-   glPopMatrix();
-   
-   
    glEnable(GL_DEPTH_TEST);
-   //glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
+   setRenderMode_();
+   setPolygonMode_();
 
-   glPolygonMode( GL_FRONT, GL_FILL );
-   glEnable(GL_CULL_FACE);
-   glCullFace(GL_FRONT);
-   glFrontFace(GL_CW);
-   
+   setLights_();
 
-   float light_pos[] = {lx, ly, lz, 1.0};
-   glLightfv(GL_LIGHT0,GL_POSITION,light_pos);
 
    collada->getScene()->render();
    glPopMatrix();
@@ -179,6 +158,7 @@ void ColladaRendererGL::renderAxis_() {
       glVertex3f(0.0, 0.0, 0.0);
       glVertex3f(0.0, 0.0, 1.0);
    glEnd();
+   glColor3f(1.0, 1.0, 1.0);
 }
 
 void ColladaRendererGL::render(Position* position) {
@@ -228,7 +208,7 @@ void ColladaRendererGL::render(Camera* camera) {
 void ColladaRendererGL::render(Grid* grid) {
    DEBUG_H("void ColladaRendererGL::render(Grid* grid)");
 
-   glDisable(GL_LIGHTING);
+   setUnlitMode_();
    
    int size_x = grid->getSizeX();
    int size_y = grid->getSizeY();
@@ -236,9 +216,7 @@ void ColladaRendererGL::render(Grid* grid) {
 
    float spacing = grid->getSpacing();
 
-   // TODO: This is a stupid way of drawing grid
-   glEnable(GL_COLOR_MATERIAL);
-   glDisable(GL_LIGHTING);
+   // TODO: This is a stupid way of drawing grid. Add Z grid.
    glColor3f(grid->getRed(), grid->getGreen(), grid->getBlue());
    glBegin(GL_LINES);
    for(int y = 0; y < size_y; y++) {
@@ -307,7 +285,7 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       iter+=inputCount;
    }*/
-   
+   glEnable(GL_NORMALIZE);
    int prim_num = 0;
    while(iter != geometry->getEndPrimitive()) {
       //glNormal3f(geometry->getNX(prim_num), geometry->getNY(prim_num), geometry->getNZ(prim_num));
@@ -339,14 +317,14 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       }
       glEnd();
       
-      glEnable(GL_NORMALIZE);
-      glDisable(GL_LIGHTING);
+      
+      //glDisable(GL_LIGHTING);
       //glDisable(GL_DEPTH_TEST);
       iter-=inputCount;
       
 #if 0
-      glEnable(GL_COLOR_MATERIAL);
-      for(int i = 0; i < 3; i++) {
+      //glEnable(GL_COLOR_MATERIAL);
+      //for(int i = 0; i < 3; i++) {
          glBegin(GL_LINES);
             glColor3f(0.0, 1.0, 0.0);
             glVertex3f(x[i], y[i], z[i]);
@@ -366,7 +344,7 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
          glEnd();
       }
       //glEnable(GL_DEPTH_TEST);
-      glDisable(GL_COLOR_MATERIAL);
+
 #endif
       iter+=inputCount;
       //glEnable(GL_LIGHTING);
@@ -382,18 +360,25 @@ void ColladaRendererGL::render(InstanceGeometry* ig) {
    while(iter != geometry->getEndPrimitive()) {
       string material_s = (*iter)->getMaterial();
 
-      #warning ['TODO']: Render a default grey material if none is found.
       if(!material_s.empty()) {
          shared_ptr<Material> material(ig->getInstanceMaterial(material_s));
 
          if(material.get() != NULL) {
             material->render();
+         } else {
+            renderDefaultMaterial_();
          }
+      } else {
+         renderDefaultMaterial_();
       }
 
       (*iter)->render();
       iter++;
    }
+}
+
+void ColladaRendererGL::renderDefaultMaterial_() {
+   defaultMaterial_.render();
 }
 
 void ColladaRendererGL::render(Material* material) {
@@ -402,8 +387,47 @@ void ColladaRendererGL::render(Material* material) {
    effect->render();
 }
 
+void ColladaRendererGL::setRenderMode_() {
+   glDisable(GL_COLOR_MATERIAL);
+   glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHT0);
+}
+
+void ColladaRendererGL::setUnlitMode_() {
+   glDisable(GL_LIGHTING);
+}
+
+void ColladaRendererGL::setPolygonMode_() {
+   glPolygonMode(GL_FRONT, GL_FILL);
+   glEnable(GL_CULL_FACE);
+   glCullFace(GL_FRONT);
+   glFrontFace(GL_CW);
+}
+
+void ColladaRendererGL::setLights_() {
+   // DEBUG: Move the light up, render some axis
+   static float pos = 1.0f;
+   pos+=0.01;
+   glDisable(GL_LIGHTING);
+   glPushMatrix();
+
+   float lx = 0.0;
+   float ly = 0.0;
+   float lz = pos;
+   
+   glTranslatef(lx, ly, lz);
+   renderAxis_();
+   glPopMatrix();
+
+   float light_pos[] = {lx, ly, lz, 1.0};
+   glLightfv(GL_LIGHT0,GL_POSITION,light_pos);
+}
+
 void ColladaRendererGL::render(Phong* phong) {
    DEBUG_H("void ColladaRendererGL::render(Phong* phong)");
+
+   setRenderMode_();
+
    const float (&ambient)[4] = phong->getAmbient().getArray();
    const float (&diffuse)[4] = phong->getDiffuse().getArray();
    const float (&specular)[4] = phong->getSpecular().getArray();
@@ -412,7 +436,7 @@ void ColladaRendererGL::render(Phong* phong) {
 
    #warning ['TODO']: Apply per-pixel Phong shader...
 
-   glDisable(GL_COLOR_MATERIAL);
+   glColor4f(diffuse[0], diffuse[1], diffuse[2], diffuse[3]);
    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
