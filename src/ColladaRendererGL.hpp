@@ -27,6 +27,7 @@ class ColladaRendererGL : public ColladaRenderer {
       virtual void postFrame();
       virtual void init();
       virtual void setSize(const int width, const int height);
+      int debugPrimDraw;
 
    private:
       void renderDefaultMaterial_();

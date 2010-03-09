@@ -97,6 +97,7 @@ class ColladaDoc {
       void loadInstanceGeometry_BindMaterials_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
       void loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
       bool isString_(const XMLCh* tag1, string tag2);
+      string loadEffectNewparam_(const DOMElement* element, string sid);
 
       string url_;
       XercesDOMParser* parser_;

@@ -27,8 +27,8 @@ using namespace xercesc;
 
 int main(int argc, char* args[]) {
    //DEBUG_A("Starting...");
-   //string filename = "/home/hegemon/tmp/monkeyhead.dae";
-   string filename = "/home/hegemon/tmp/cubeuvmap.dae";
+   string filename = "/home/hegemon/tmp/monkeyhead.dae";
+   //string filename = "/home/hegemon/tmp/cubeuvmap.dae";
    //string filename = "/home/hegemon/tmp/planetest.dae";
 
 

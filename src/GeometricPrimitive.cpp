@@ -32,13 +32,13 @@ float GeometricPrimitive::getZ(const int& num) const {
 }
 
 float GeometricPrimitive::getNX(const int& num) const {
-   return normal_->getX(num/3);
+   return normal_->getX(num);
 }
 
 float GeometricPrimitive::getNY(const int& num) const {
-   return normal_->getY(num/3);
+   return normal_->getY(num);
 }
 
 float GeometricPrimitive::getNZ(const int& num) const {
-   return normal_->getZ(num/3);
+   return normal_->getZ(num);
 }

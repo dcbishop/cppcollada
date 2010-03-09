@@ -9,6 +9,67 @@
 #include "Collada.hpp"
 #include "ColladaRendererGL.hpp"
 
+ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width, height) {
+   DEBUG_M("ViewWindowQT spawning...");
+
+   //renderer_.setSize(getWidth(), getHeight());
+   int argc = 1;
+   char* argv[] = {"Blah"};
+   //QApplication app(argc, argv);
+   //QApplication app();
+   app_ = new QApplication(argc, argv);
+   vw_ = new ViewWidget(this);
+   vw_->show();
+   //vw_->setMouseTracking(true);
+   /*QWidget window;
+   window.resize(getWidth(), getHeight());
+   window.show();
+   QGLWidget opengl;
+   opengl.show();*/
+   
+   QPushButton test("TestButton", 0);
+   test.resize(100, 30);
+   //app.setMainWidget(&test);
+   //window.addWidget(test);
+   //window.setWindowOpacity(0.5f);
+   test.show();
+
+   //finished_ = false;
+   //app.exec();
+}
+
+ViewWindowQT::~ViewWindowQT() {
+   DEBUG_M("Cleaning up ViewWindowQT...");
+   delete vw_;
+   delete app_;
+}
+
+void ViewWindowQT::setTitle(const string title) {
+   if(vw_) {
+      vw_->setWindowTitle(title.c_str());
+   }
+}
+
+/**
+ * The main rendering and input loop.
+ */
+void ViewWindowQT::mainLoop() {
+   DEBUG_L("Interface::mainLoop()");
+
+   //while(!finished_) {
+      //checkEvents_();
+      //draw_();
+   //}
+   if(app_) {
+      app_->exec();
+   }
+   DEBUG_M("Finished...");
+}
+
+ColladaRenderer* ViewWindowQT::getRenderer() {
+   return &vw_->renderer_;
+}
+
 ViewWindowQT::ViewWidget::ViewWidget(ViewWindowQT* vwqt) {
       vwqt_ = vwqt;
       grid_ = shared_ptr<Grid>(new Grid);
@@ -119,65 +180,4 @@ void ViewWindowQT::ViewWidget::keyPressEvent(QKeyEvent * event) {
 
 void ViewWindowQT::ViewWidget::keyReleaseEvent(QKeyEvent * event) {
 
-}
-
-ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width, height) {
-   DEBUG_M("ViewWindowSDL spawning...");
-
-   //renderer_.setSize(getWidth(), getHeight());
-   int argc = 1;
-   char* argv[] = {"Blah"};
-   //QApplication app(argc, argv);
-   //QApplication app();
-   app_ = new QApplication(argc, argv);
-   vw_ = new ViewWidget(this);
-   vw_->show();
-   //vw_->setMouseTracking(true);
-   /*QWidget window;
-   window.resize(getWidth(), getHeight());
-   window.show();
-   QGLWidget opengl;
-   opengl.show();*/
-   
-   QPushButton test("TestButton", 0);
-   test.resize(100, 30);
-   //app.setMainWidget(&test);
-   //window.addWidget(test);
-   //window.setWindowOpacity(0.5f);
-   test.show();
-
-   //finished_ = false;
-   //app.exec();
-}
-
-ViewWindowQT::~ViewWindowQT() {
-   DEBUG_M("Cleaning up ViewWindowQT...");
-   delete vw_;
-   delete app_;
-}
-
-void ViewWindowQT::setTitle(const string title) {
-   if(vw_) {
-      vw_->setWindowTitle(title.c_str());
-   }
-}
-
-/**
- * The main rendering and input loop.
- */
-void ViewWindowQT::mainLoop() {
-   DEBUG_L("Interface::mainLoop()");
-
-   //while(!finished_) {
-      //checkEvents_();
-      //draw_();
-   //}
-   if(app_) {
-      app_->exec();
-   }
-   DEBUG_M("Finished...");
-}
-
-ColladaRenderer* ViewWindowQT::getRenderer() {
-   return &vw_->renderer_;
 }

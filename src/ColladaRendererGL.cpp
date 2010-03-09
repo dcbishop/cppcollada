@@ -25,6 +25,7 @@
 void ColladaRendererGL::init() {
    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
    defaultMaterial_.setRenderer(this);
+   debugPrimDraw = -1;
 }
 
 void ColladaRendererGL::preFrame() {
@@ -276,6 +277,88 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       what = 1;
    }
 
+   static int debugfun = -1;
+   debugfun++;
+
+   glEnd();
+   int num = -1;
+   PrimIterator iter = geometry->getFirstPrimitive();
+   int inputCount = geometry->getInputCount();
+   while(iter != geometry->getEndPrimitive()) {
+      num++;
+      
+      
+      //if(num != debugfun) {iter+=inputCount*3; continue;}; //DEBUG: Draw a specific prim number...
+      
+      /*int primNum = geometry->getVertexNum(*iter);
+      DEBUG_H("%d %d x=%f. y=%f, z=%f", *iter, primNum, geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glNormal3f(geometry->getNX(*iter), geometry->getNY(*iter), geometry->getNZ(*iter));
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      iter+=inputCount;*/
+      int vertexNum = geometry->getVertexNum(*iter);
+      //int normalNum = geometry->getNormalNum(*iter+1);
+      #warning ['TODO']: Plus input offset not +1...
+      
+      glBegin(GL_TRIANGLES);
+      //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glNormal3f(geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      iter+=inputCount;
+      
+      //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glNormal3f(geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      iter+=inputCount;
+
+      //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glNormal3f(geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      glEnd();
+      iter+=inputCount;
+
+      
+      // DEBUG DRAW NORMAL LINES!
+      if(num != debugPrimDraw) {continue;}; //DEBUG: Draw a specific prim number...
+      //continue;
+      iter-=inputCount*3;
+      setUnlitMode_();
+      glEnable(GL_COLOR_MATERIAL);
+      glColor3f(1.0,0,0);
+      
+      glBegin(GL_LINES);
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glVertex3f(geometry->getX(*iter)+geometry->getNX(*(iter+1)),
+               geometry->getY(*iter)+geometry->getNY(*(iter+1)),
+               geometry->getZ(*iter)+geometry->getNZ(*(iter+1)));
+      glEnd();
+      iter+=inputCount;
+      glBegin(GL_LINES);
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glVertex3f(geometry->getX(*iter)+geometry->getNX(*(iter+1)),
+               geometry->getY(*iter)+geometry->getNY(*(iter+1)),
+               geometry->getZ(*iter)+geometry->getNZ(*(iter+1)));
+      glEnd();
+      iter+=inputCount;
+      glBegin(GL_LINES);
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glVertex3f(geometry->getX(*iter)+geometry->getNX(*(iter+1)),
+               geometry->getY(*iter)+geometry->getNY(*(iter+1)),
+               geometry->getZ(*iter)+geometry->getNZ(*(iter+1)));
+      glEnd();
+      iter+=inputCount;
+
+      glDisable(GL_COLOR_MATERIAL);
+      setRenderMode_();
+
+   }
+}
+#if 0
    PrimIterator iter = geometry->getFirstPrimitive();
    int inputCount = geometry->getInputCount();
    /*while(iter != geometry->getEndPrimitive()) {
@@ -351,6 +434,7 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
 
    }
 }
+#endif
 
 void ColladaRendererGL::render(InstanceGeometry* ig) {
    DEBUG_H("void ColladaRendererGL::render(InstanceGeometry* ig) {");
@@ -399,7 +483,7 @@ void ColladaRendererGL::setUnlitMode_() {
 
 void ColladaRendererGL::setPolygonMode_() {
    glPolygonMode(GL_FRONT, GL_FILL);
-   glEnable(GL_CULL_FACE);
+   //glEnable(GL_CULL_FACE);
    glCullFace(GL_FRONT);
    glFrontFace(GL_CW);
 }

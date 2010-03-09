@@ -484,9 +484,15 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
          if(!data) {
             data = getElementByTagName(currentElement, "float");
             //DEBUG_M("Got via secondry...");
-         } else if(!data) {
+         }
+         if(!data) {
             data = getElementByTagName(currentElement, "texture");
             #warning ['TODO']: Handle texture'd images!
+            WARNING("Textures not yet handled!");
+            //string sid = getAttribute(element, "sid");
+            //string textcoord = getAttribute(element, "textcoord");
+            //something = loadEffectNewparam_(profileCommon, sid);
+            continue;
          }
          if(!data) {
             continue;
@@ -523,6 +529,33 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
    }
 
    return effect;
+}
+
+string ColladaDoc::loadEffectNewparam_(const DOMElement* element, string sid) {  
+   DOMNodeList* elements = getElementsByTagName(element, "newparam");
+   if(!elements) {
+      return "";
+   }
+
+   int length = elements->getLength();
+   shared_ptr<Vertices> vertices(new Vertices);
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = elements->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+
+         string sid = getAttribute(currentElement, "semantic");
+         string url = getAttribute(currentElement, "source");
+
+         const XMLCh* tagName = currentElement->getTagName();
+         if(isString_(tagName, "float_array")) {
+            shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+            shared_ptr<Source> src(dynamic_pointer_cast<Source, ColladaObject>(colladaObject));
+            vertices->setPosition(src);
+         }
+      }
+   }
+
 }
 
 shared_ptr<Input> ColladaDoc::loadInput(const DOMElement* element) {
@@ -580,9 +613,7 @@ shared_ptr<Source> ColladaDoc::loadSource(const DOMElement* element) {
 void ColladaDoc::loadSourceTechnique(const DOMElement* element, shared_ptr<Source> source) {
    DEBUG_M("Entering function...");
 
-   XMLCh* tag = XMLString::transcode("accessor");
-   DOMNodeList* elements = element->getElementsByTagName(tag);
-   XMLString::release(&tag);
+   DOMNodeList* elements = getElementsByTagName(element, "accessor");
 
    // No translation on node...
    if(!elements) {
@@ -865,7 +896,7 @@ void ColladaDoc::loadRotations(const DOMElement* element, RotationGL* rotation) 
    int length = elements->getLength();
    for(int i = 0; i < length; i++) {
       DOMNode* currentNode = elements->item(i);
-      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
          DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
          loadRotation(currentElement, rotation, i);
       }
