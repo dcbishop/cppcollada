@@ -25,7 +25,7 @@
 using namespace std;
 using namespace xercesc;
 
-int main(int argc, char* args[]) {
+int main(int argc, char* argv[]) {
    //DEBUG_A("Starting...");
    string filename = "/home/hegemon/tmp/monkeyhead.dae";
    //string filename = "/home/hegemon/tmp/cubeuvmap.dae";

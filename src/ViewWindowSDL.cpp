@@ -109,7 +109,7 @@ void ViewWindowSDL::checkEvents_() {
          case SDL_MOUSEMOTION:
             mx_ = event.motion.x;
             my_ = event.motion.y;
-            DEBUG_L("Mouse motion %f %f)", (GLfloat)event.motion.xrel, (GLfloat)event.motion.yrel );
+            DEBUG_H("Mouse motion %f %f)", (GLfloat)event.motion.xrel, (GLfloat)event.motion.yrel );
             if(cam_move_) {
                getCamera()->setRotX(getCamera()->getRotX() + (GLfloat)event.motion.xrel / getWidth() * 100);
                getCamera()->setRotY(getCamera()->getRotY() - (GLfloat)event.motion.yrel / getHeight() * 100);
@@ -143,7 +143,10 @@ void ViewWindowSDL::checkEvents_() {
             }
             break;
          case SDL_VIDEORESIZE:
-            //resizeEvent_(event);
+            setSize(event.resize.w, event.resize.h);
+            DEBUG_M("SDL_VIDEORESIZE %d %d", getWidth(), getHeight());
+            SDL_SetVideoMode(getWidth(), getHeight(), 0, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL | SDL_RESIZABLE);
+            renderer_.setSize(getWidth(), getHeight());
             break;
          default:
             DEBUG_L("Unknown event occured...");

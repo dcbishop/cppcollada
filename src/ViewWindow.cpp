@@ -5,6 +5,7 @@
 #include "console.h"
 
 ViewWindow::ViewWindow(const int width, const int height) {
+   camera_ = shared_ptr<Camera>();
    setSize(width, height);
 }
 

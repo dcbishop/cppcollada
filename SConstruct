@@ -11,7 +11,7 @@ debug_flag = ARGUMENTS.get('debug', 0)
 
 env.Tool('colourful', toolpath=['scons-tools'])
 #env.AppendUnique(LIBS=['m', 'IL', 'mxml', 'rcbc', 'luabind'])
-#env.Tool('qt')
+env.Tool('qt')
 env.AppendUnique(LIBS=['xerces-c', 'GL', 'GLU'])#, 'boost_thread', 'libboost_system'])
 env.AppendUnique(CCFLAGS=['-llibboost_system', '-llibboost_thread'])
 env['QTDIR'] = '/usr'

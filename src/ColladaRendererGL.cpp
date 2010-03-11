@@ -23,14 +23,16 @@
 #include <iostream>
 
 void ColladaRendererGL::init() {
-   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
    defaultMaterial_.setRenderer(this);
    debugPrimDraw = -1;
+   glEnable(GL_MULTISAMPLE);
 }
 
 void ColladaRendererGL::preFrame() {
    setPerspective_();
    glLoadIdentity();
+   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+   glClearDepth(10000.0f);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -41,12 +43,13 @@ void ColladaRendererGL::postFrame() {
 void ColladaRendererGL::setSize(const int width, const int height) {
    width_ = width;
    height_ = height;
+   DEBUG_M("setSize(%d, %d)=%f", width, height, width_ / height_);
 }
 
 void ColladaRendererGL::setPerspective_() {
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gluPerspective(45.0f, width_ / height_, 0.1f, 10000.0f);
+   gluPerspective(90.0f, 1.0 * width_ / height_, 0.1f, 10000.0f);
    glMatrixMode(GL_MODELVIEW);
 }
 
