@@ -33,7 +33,6 @@ class ColladaRendererGL : public ColladaRenderer {
       void renderDefaultMaterial_();
       void fixAxis_(const Collada* collada);
       void renderAxis_();
-      void debugRotationHack(const Collada* collada);
       void setPerspective_();
       void setPolygonMode_();
       void setRenderMode_();

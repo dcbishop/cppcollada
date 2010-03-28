@@ -15,10 +15,10 @@ class Collada : public Renderable {
       #warning ['TODO']: Filename?
       #warning ['TODO']: Asset information... created by and so on...
       void setFilename(const string filename);
+      string getFilename();
       void setScene(shared_ptr<Scene> scene);
       shared_ptr<Scene> getScene();
       COLLADA_RENDER_FUNCTION
-      shared_ptr<Rotation> debugRotationHack; // TODO: remove me, for testing...
 
    private:
       shared_ptr<Scene> scene_;

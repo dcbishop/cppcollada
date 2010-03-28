@@ -11,6 +11,7 @@ using namespace std;
 #include "../GameData/SmartPointers.hpp"
 #include "../Render/ColladaRendererGL.hpp"
 #include "../Render/Renderable.hpp"
+#include "../QTGui/QTEditCollada.hpp"
 
 #include "../Debug/console.h"
 class Grid;
@@ -41,13 +42,18 @@ class OpenGLScene : public QGraphicsScene {
       OpenGLScene(ViewWindowQT* vwqt);
       ~OpenGLScene() { DEBUG_M("Cleaning up OpenGLScene");}
       void drawBackground(QPainter *painter, const QRectF &rect);
+      void addOverlayedWidget(QWidget* widget);
 
       ColladaRendererGL renderer_;
 
+   public slots:
+      void editCollada();
+
+
    private:
-      QWidget *testButton_;
       ViewWindowQT *vwqt_;
       shared_ptr<Grid> grid_;
+      QTime time_;
 };
 
 /**

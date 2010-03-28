@@ -80,19 +80,10 @@ void ColladaRendererGL::fixAxis_(const Collada* collada) {
 
 }
 
-void ColladaRendererGL::debugRotationHack(const Collada* collada) {
-   shared_ptr<Rotation> rotation;
-   rotation = collada->debugRotationHack;
-   if(rotation) {
-      rotation->render();
-   }
-}
-
 void ColladaRendererGL::render(Collada* collada) {
    DEBUG_H("ColladaRendererGL::render(Collada* collada)");
 
    glPushMatrix();
-   debugRotationHack(collada); // For testing something...
    fixAxis_(collada);
 
    glEnable(GL_DEPTH_TEST);

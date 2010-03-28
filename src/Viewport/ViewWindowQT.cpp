@@ -13,18 +13,51 @@ OpenGLScene::OpenGLScene(ViewWindowQT* vwqt) {
    grid_ = shared_ptr<Grid>(new Grid);
    vwqt_ = vwqt;
    renderer_.setSize(vwqt_->getWidth(), vwqt_->getHeight());
-   QWidget *testDialog = new QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-   testDialog->setWindowOpacity(0.8);
-   testDialog->setWindowTitle("Test Dialog!");
-   testDialog->setLayout(new QVBoxLayout);
+
+   QWidget *editCollada = new QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+   //editCollada->setWindowOpacity(0.8);
+   editCollada->setWindowTitle("Edit Collada");
+   editCollada->setLayout(new QVBoxLayout);
    
-   testButton_ = new QPushButton(tr("Push Me!"));
-   testDialog->layout()->addWidget(testButton_);
+   QPushButton* editColladaButton = new QPushButton(tr("Edit Collada"));
+   editCollada->layout()->addWidget(editColladaButton);
+
+   /*testEditCollada = new QTEditCollada();
+   testEditCollada->resize(200, 200);
+   QGraphicsProxyWidget *proxy2 = new QGraphicsProxyWidget(0, Qt::Dialog);
+   proxy2->setWidget(testEditCollada);
+   addItem(proxy2);*/
+
+   /*QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(0, Qt::Dialog);
+   proxy->setWidget(editCollada);
+   addItem(proxy);*/
    
+   connect(editColladaButton, SIGNAL(clicked()), this, SLOT(editCollada()));
+   addOverlayedWidget(editCollada);
+
+
+   //testEditCollada->show();
+   time_.start();
+
+}
+
+void OpenGLScene::editCollada() {
+   DEBUG_A("Oh boy!, PANCAKES!");
+
+   QTEditCollada* newEditCollada = new QTEditCollada(vwqt_->getCollada());
+   addOverlayedWidget(newEditCollada);
+}
+
+
+void OpenGLScene::addOverlayedWidget(QWidget* widget) {
+   if(!widget) {
+      return;
+   }
+
    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(0, Qt::Dialog);
-   proxy->setWidget(testDialog);
+   proxy->setWidget(widget);
    addItem(proxy);
-   
+
    QPointF pos(10, 10);
    foreach (QGraphicsItem *item, items()) {
       item->setFlag(QGraphicsItem::ItemIsMovable);
@@ -49,6 +82,30 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
       return;
    }
 
+   static int frame = 0;
+   static int last_render_time = 0;
+   static int last_fps_time = 0;
+   static bool limit_fps_ = true;
+   static int fps_ = 0;
+   static int mpf_ = 0;
+   
+   int current_time = time_.elapsed();
+
+   // Limit framerate
+   /*if(limit_fps_ && !( (current_time - last_render_time) >= 1000/60) ) {
+      return;
+   }*/
+
+   // Calculate FPS
+   frame++;
+   if(current_time - last_fps_time > 1000) {
+      fps_ = frame*1000.0f/(current_time-last_fps_time);
+      last_fps_time = current_time;
+      frame = 0;
+      LOG("FPS: %d,\tMPF: %d",fps_, mpf_);
+   }
+   last_render_time = current_time;
+
    painter->beginNativePainting();
 
    renderer_.preFrame();
@@ -69,6 +126,8 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
    painter->endNativePainting();
 
    QTimer::singleShot(20, this, SLOT(update()));
+   int end_time = time_.elapsed();
+   mpf_ = end_time - current_time;
 }
 
 ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width, height) {
@@ -79,7 +138,8 @@ ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width,
    char* argv[] = {"Blah"};
    //QApplication app(argc, argv);
    //QApplication app();
-   QApplication::setStyle(QStyleFactory::create("motif"));
+   
+   //QApplication::setStyle(QStyleFactory::create("motif"));
    app_ = new QApplication(argc, argv);
   
    //vw_ = new ViewWidget(this);
@@ -87,15 +147,15 @@ ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width,
 
 //   view.setViewport(new ViewWidget(this));
     
-    scene_ = new OpenGLScene(this);
-    vw_ = new ViewWidget(this);
-    vw_->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-    vw_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    vw_->setScene(scene_);
-    vw_->show();
+   scene_ = new OpenGLScene(this);
+   vw_ = new ViewWidget(this);
+   vw_->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+   vw_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+   vw_->setScene(scene_);
+   vw_->show();
 
-    vw_->resize(1024, 768);
-    //camera_ = NULL;
+   vw_->resize(1024, 768);
+   //camera_ = NULL;
    //vw_->show();
    //vw_->setMouseTracking(true);
    /*QWidget window;
@@ -175,7 +235,7 @@ void ViewWidget::paintGL() {
    static int fps_ = 0;
    static int mpf_ = 0;
    
-   int current_time = getComputerTime_();
+   int current_time = time_->currentTime();
 
    // Limit framerate
    if(limit_fps_ && !( (current_time - last_render_time) >= 1000/60) ) {
@@ -190,7 +250,7 @@ void ViewWidget::paintGL() {
       frame = 0;
       LOG("FPS: %d,\tMPF: %d",fps_, mpf_);
    }
-   last_render_time = current_time;*/
+   last_render_time = current_time;
 
    renderer_.preFrame();
 
@@ -208,7 +268,7 @@ void ViewWidget::paintGL() {
    renderer_.postFrame();
    swapBuffers();
 
-   //mpf_ = getComputerTime_() - current_time;
+   mpf_ = time_->currentTime() - current_time;*/
 }
 #endif
 
