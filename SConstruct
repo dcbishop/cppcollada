@@ -4,12 +4,7 @@ from glob import glob
 
 prog_target = 'colladatest'
 sources = glob('src/*.cpp')
-sources += glob('src/Collada/*.cpp')
-sources += glob('src/Viewport/*.cpp')
-sources += glob('src/Render/*.cpp')
-sources += glob('src/Debug/*.cpp')
-sources += glob('src/GameData/*.cpp')
-sources += glob('src/Main/*.cpp')
+sources += glob('src/*/*.cpp')
 
 env = Environment(build_dir='build')
 win32 = ARGUMENTS.get('win32', 0)
