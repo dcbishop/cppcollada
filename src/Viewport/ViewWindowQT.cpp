@@ -9,50 +9,40 @@
 #include "../Collada/Collada.hpp"
 #include "../Render/ColladaRendererGL.hpp"
 
+#include "../QTGui/QTEditScene.hpp"
+#include "../QTGui/QTEditGeneric.hpp"
+
 OpenGLScene::OpenGLScene(ViewWindowQT* vwqt) {
    grid_ = shared_ptr<Grid>(new Grid);
    vwqt_ = vwqt;
    renderer_.setSize(vwqt_->getWidth(), vwqt_->getHeight());
 
    QWidget *editCollada = new QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-   //editCollada->setWindowOpacity(0.8);
    editCollada->setWindowTitle("Edit Collada");
    editCollada->setLayout(new QVBoxLayout);
    
    QPushButton* editColladaButton = new QPushButton(tr("Edit Collada"));
    editCollada->layout()->addWidget(editColladaButton);
-
-   /*testEditCollada = new QTEditCollada();
-   testEditCollada->resize(200, 200);
-   QGraphicsProxyWidget *proxy2 = new QGraphicsProxyWidget(0, Qt::Dialog);
-   proxy2->setWidget(testEditCollada);
-   addItem(proxy2);*/
-
-   /*QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(0, Qt::Dialog);
-   proxy->setWidget(editCollada);
-   addItem(proxy);*/
    
    connect(editColladaButton, SIGNAL(clicked()), this, SLOT(editCollada()));
    addOverlayedWidget(editCollada);
 
-
-   //testEditCollada->show();
    time_.start();
 
 }
 
 void OpenGLScene::editCollada() {
    DEBUG_A("Oh boy!, PANCAKES!");
-
-   QTEditCollada* newEditCollada = new QTEditCollada(vwqt_->getCollada());
-   addOverlayedWidget(newEditCollada);
+   newEditCollada = new QTEditCollada(vwqt_->getCollada());
+   addOverlayedWidget((QWidget*)newEditCollada);
 }
 
-
 void OpenGLScene::addOverlayedWidget(QWidget* widget) {
+   DEBUG_M("Entering function... %p", widget);
    if(!widget) {
       return;
    }
+   widget->setWindowOpacity(0.8);
 
    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(0, Qt::Dialog);
    proxy->setWidget(widget);
@@ -67,13 +57,17 @@ void OpenGLScene::addOverlayedWidget(QWidget* widget) {
       item->setPos(pos.x() - rect.x(), pos.y() - rect.y());
       pos += QPointF(0, 10 + rect.height());
    }
+
+   QTEditGeneric* qtedit = dynamic_cast<QTEditGeneric*>(widget);
+   if(qtedit) {
+      qtedit->setOpenGLScene(this);
+   }
 }
 
 void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
    if (painter->paintEngine()->type() != QPaintEngine::OpenGL
       && painter->paintEngine()->type() != QPaintEngine::OpenGL2)
    {
-      //qWarning("OpenGLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view");
       static bool nospam = false;
       if(!nospam) {
          WARNING("No OpenGL viewport widget set!");
@@ -85,7 +79,6 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
    static int frame = 0;
    static int last_render_time = 0;
    static int last_fps_time = 0;
-   static bool limit_fps_ = true;
    static int fps_ = 0;
    static int mpf_ = 0;
    
@@ -273,13 +266,11 @@ void ViewWidget::paintGL() {
 #endif
 
 void ViewWidget::resizeEvent(QResizeEvent *event) {
-   DEBUG_M("Fired... A");
    if (scene())
       scene()->setSceneRect(QRect(QPoint(0, 0), event->size()));
    QGraphicsView::resizeEvent(event);
-   
+
    vwqt_->getRenderer()->setSize(event->size().width(), event->size().height());
-   DEBUG_M("Fired... B");
 }
 
 void ViewWidget::mouseMoveEvent(QMouseEvent *event) {
@@ -339,7 +330,7 @@ void ViewWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 void ViewWidget::wheelEvent(QWheelEvent * event) {
    // Check if the event is handled by the overdrawn QT widgets
-   DEBUG_M("Fired... A");
+
    /*QGraphicsView::wheelEvent(event);
    if(event->isAccepted()) {
       return;

@@ -28,6 +28,9 @@ void ColladaRendererGL::init() {
    glEnable(GL_MULTISAMPLE);
 }
 
+/**
+ * OpenGL stuff to run prior to each drawing of the frame.
+ */
 void ColladaRendererGL::preFrame() {
    setPerspective_();
    glLoadIdentity();
@@ -36,14 +39,21 @@ void ColladaRendererGL::preFrame() {
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+/**
+ * OpenGL stuff to run after each drawing of the frame.
+ */
 void ColladaRendererGL::postFrame() {
    glFlush();
 }
 
+/**
+ * Set the size of the OpenGL renderer.
+ */
 void ColladaRendererGL::setSize(const int width, const int height) {
    width_ = width;
    height_ = height;
    DEBUG_M("setSize(%d, %d)=%f", width, height, width_ / height_);
+   //TODO: Set perspective here? or just let the next frame update do it?
 }
 
 void ColladaRendererGL::setPerspective_() {
@@ -271,8 +281,9 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       what = 1;
    }
 
-   static int debugfun = -1;
-   debugfun++;
+   // DEBUG: debugfun used to filter used to draw on a specific polygon number for testing purposes
+   //static int debugfun = -1;
+   //debugfun++;
 
    glEnd();
    int num = -1;
@@ -280,7 +291,6 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
    int inputCount = geometry->getInputCount();
    while(iter != geometry->getEndPrimitive()) {
       num++;
-      
       
       //if(num != debugfun) {iter+=inputCount*3; continue;}; //DEBUG: Draw a specific prim number...
       
@@ -482,16 +492,21 @@ void ColladaRendererGL::setPolygonMode_() {
    glFrontFace(GL_CW);
 }
 
+/**
+ * Setup the lights. This is currently a fixed light for debugging purposes.
+ */
+#warning ['TODO']: Use actual lights...
 void ColladaRendererGL::setLights_() {
    // DEBUG: Move the light up, render some axis
-   static float pos = 1.0f;
-   pos+=0.01;
+   //static float debugPos = 1.0f;
+   //debugPos+=0.01;
    glDisable(GL_LIGHTING);
    glPushMatrix();
 
-   float lx = 0.0;
-   float ly = 0.0;
-   float lz = pos;
+   float lx = -2.0;
+   float ly = -2.0;
+   float lz = 2.0;
+   //float lz = debugPos;
    
    glTranslatef(lx, ly, lz);
    renderAxis_();

@@ -1,15 +1,14 @@
 #ifndef COLLADACPP_INSTANCEGEOMETRY_HPP_
 #define COLLADACPP_INSTANCEGEOMETRY_HPP_
 
-#include <map>
 #include <string>
+#include <unordered_map>
 using namespace std;
 
 #include "../Collada/ColladaObject.hpp"
 #include "../Collada/Material.hpp"
 
-#warning ['TODO']: Should be some kind of hashmap (unordered_map?)...
-typedef map<string, shared_ptr<Material>> MaterialMap;
+typedef unordered_map<string, shared_ptr<Material>> MaterialMap;
 typedef MaterialMap::iterator MaterialMapIterator;
 typedef pair<string, shared_ptr<Material>> MaterialMapPair;
 

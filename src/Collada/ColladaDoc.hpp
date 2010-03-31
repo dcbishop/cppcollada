@@ -39,6 +39,8 @@ class Source;
 class Material;
 class Effect;
 class InstanceGeometry;
+class Sampler2D;
+class Image;
 
 #include "../GameData/SmartPointers.hpp"
 
@@ -79,6 +81,7 @@ class ColladaDoc {
       shared_ptr<Triangles> loadTriangles(const DOMElement* element);
       shared_ptr<Source> loadSource(const DOMElement* element);
       shared_ptr<Material> loadMaterial(const DOMElement* element);
+      shared_ptr<ColladaObject> loadSampler2D(const DOMElement* profileCommon, const DOMElement* element);
       void loadSourceTechnique(const DOMElement* element, shared_ptr<Source> source);
       DOMElement* getElementByTagName(const DOMElement* element, string tag);
       shared_ptr<Collada> getCollada();
@@ -90,14 +93,16 @@ class ColladaDoc {
       shared_ptr<Input> loadInput(const DOMElement* element);
       shared_ptr<vector<int>> loadPrimitives(const DOMElement* element);
       shared_ptr<Effect> loadEffect(const DOMElement* element);
-
+      shared_ptr<ColladaObject> loadNewparam(const DOMElement* profileCommon, const DOMElement* node);
+      shared_ptr<ColladaObject> loadSurface(const DOMElement* element);
+      shared_ptr<Image> loadImage(const DOMElement* element);
 
    private:
       void buildIdMap_();
       void loadInstanceGeometry_BindMaterials_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
       void loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
       bool isString_(const XMLCh* tag1, string tag2);
-      string loadEffectNewparam_(const DOMElement* element, string sid);
+      shared_ptr<ColladaObject> loadEffectNewparamBySid_(const DOMElement* profileCommon, string sid);
 
       string url_;
       XercesDOMParser* parser_;

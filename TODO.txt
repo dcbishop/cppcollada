@@ -1,0 +1,23 @@
+* Subclass all ambient, diffuse and so on Phong params into a
+  "fx_common_color_or_texture_type" as per the Collada spec.
+  Allow for both a color and texture option (back linking textcoords a
+  hassle?).
+
+* Rewrite the Collada loader, to load everything in order?
+  (But in pratice Images come after effects for some reason?).
+
+* Store all id's / sid's in the Collada type to allow for path setting.
+  (Requires the loader to pass the origional Collada object around.)
+
+* Consider making the XML engine pluggable like rendering engine?
+
+* Maybe replace QT editor windows with an inbuilt HTTP server and webkit
+  rendered windows?
+
+* Collada version differences.
+  In Collada 1.4.1 a <texture> will link to a <sampler2D> which will
+  link to a <surface type="2D"> which will then <init_from> an <image>.
+  In Collada 1.5 <texture> links directly to a <sampler2D> that
+  <instance_image>'s an <image>.
+
+* QT Widgets draw in reversed order, window on top is window behind o_O

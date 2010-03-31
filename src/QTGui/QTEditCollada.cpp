@@ -1,4 +1,5 @@
 #include "../QTGui/QTEditCollada.hpp"
+
 #include "../Viewport/ViewWindowQT.hpp"
 
 #include "../Debug/console.h"
@@ -6,23 +7,27 @@
 QTEditCollada::QTEditCollada(shared_ptr<Collada> collada) {
    collada_ = collada;
 
-   QPushButton* sceneButton_ = new QPushButton("Edit Scene");
-   connect(sceneButton_, SIGNAL(clicked()), this, SLOT(editScene()));
+   sceneButton_ = new QPushButton("Edit Scene");
+   connect(sceneButton_, SIGNAL(clicked()), this, SLOT(edit()));
    
-   QLabel* filename = new QLabel(collada_->getFilename().c_str());
+   filenameLabel_ = new QLabel(collada_->getFilename().c_str());
 
    setWindowTitle(tr("Collada"));
 
    QVBoxLayout *layout = new QVBoxLayout;
    layout->setMargin(5);
-   layout->addWidget(filename);
+   layout->addWidget(filenameLabel_);
    layout->addWidget(sceneButton_);
    setLayout(layout);
 }
 
-void QTEditCollada::editScene() {
-   DEBUG_A("Oh boy, PANCAKES!");
-   OpenGLScene* parent = (OpenGLScene*)parentWidget();
-   QTEditCollada* newSceneEditTest = new QTEditCollada(collada_);
-   //parent->addOverlayedWidget(newSceneEditTest);
+void QTEditCollada::edit() {
+   DEBUG_A("Oh boy, PANCAKES! %p");
+   if(!collada_) {
+      ERROR("Collada edit window with no collada attached...");
+      return;
+   }
+
+   setChildEditor(new QTEditScene(collada_->getScene()));
+   QTEditGeneric::edit();
 }

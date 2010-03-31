@@ -54,6 +54,8 @@ class OpenGLScene : public QGraphicsScene {
       ViewWindowQT *vwqt_;
       shared_ptr<Grid> grid_;
       QTime time_;
+      QWidget *editScene;
+      QTEditCollada* newEditCollada;
 };
 
 /**
