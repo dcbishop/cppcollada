@@ -16,7 +16,7 @@ using namespace std;
 
 #warning ['TODO']: ColladaNodes can have other transition types...
 
-typedef vector<shared_ptr<ColladaObject>> InstanceVector;
+typedef vector<ColladaObjectPtr> InstanceVector;
 typedef InstanceVector::iterator InstanceIterator;
 
 class ColladaNode : public ColladaObject, public Position, public RotationGL, public Scale {
@@ -24,12 +24,13 @@ class ColladaNode : public ColladaObject, public Position, public RotationGL, pu
       InstanceIterator getFirstInstance();
       InstanceIterator getEndInstance();
       
-      void addInstance(shared_ptr<ColladaObject> instance);
+      void addInstance(ColladaObjectPtr instance);
       COLLADA_RENDER_FUNCTION
       
    private:
       string layer_;
-      vector<shared_ptr<ColladaObject>> instances_;
+      vector<ColladaObjectPtr> instances_;
 };
+typedef shared_ptr<ColladaNode> ColladaNodePtr;
 
 #endif /* COLLADACPP_NODE_HPP_ */

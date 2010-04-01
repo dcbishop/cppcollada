@@ -17,18 +17,14 @@ class InstanceGeometry : public ColladaObject {
       COLLADA_RENDER_FUNCTION
       void setGeometry(shared_ptr<Geometry> geometry) { geometry_ = geometry; }
       shared_ptr<Geometry> getGeometry() {return geometry_;}
-
-      void addInstanceMaterial(string symbol, shared_ptr<Material> material) {
-         materials_.insert(MaterialMapPair(symbol, material));
-      }
-
-      shared_ptr<Material> getInstanceMaterial(string symbol) {
-         return materials_.find(symbol)->second;
-      }
+      void addInstanceMaterial(string symbol, shared_ptr<Material> material);
+      shared_ptr<Material> getInstanceMaterial(string symbol);
 
    private:
       shared_ptr<Geometry> geometry_;
       MaterialMap materials_;
 };
+typedef shared_ptr<InstanceGeometry> InstanceGeometryPtr;
+
 
 #endif /* COLLADACPP_INSTANCEGEOMETRY_HPP_ */

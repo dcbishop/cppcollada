@@ -64,8 +64,6 @@ int main(int argc, char* argv[]) {
    NetworkedSensor ns;
    ns.setOrientationTarget(rotation);
    ns.start();*/
-   //int a;
-   //cin >> a;
-   LOG("Goodbye...");
 
+   LOG("Goodbye...");
 }

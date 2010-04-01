@@ -13,6 +13,7 @@ class GeometricPrimitive : public Renderable {
    public:
       void setVertex(shared_ptr<Input> input) { vertex_ = input; }
       void setNormal(shared_ptr<Input> input) { normal_ = input; }
+      void setTexCoord(shared_ptr<Input> input) { texCoord_ = input; }
       void setPrimitives(shared_ptr<PrimVector> primitives) { primitives_ = primitives; }
       void setInputCount(const int& count) { inputCount_ = count; }
       int getInputCount() const { return inputCount_; }
@@ -25,6 +26,8 @@ class GeometricPrimitive : public Renderable {
       float getNX(const int& num) const;
       float getNY(const int& num) const;
       float getNZ(const int& num) const;
+      float getS(const int& num) const;
+      float getT(const int& num) const;
       
       inline void setCount(const int& count) { count_ = count; }
       int getCount() const { return count_; }
@@ -38,10 +41,13 @@ class GeometricPrimitive : public Renderable {
    private:
       shared_ptr<Input> vertex_;
       shared_ptr<Input> normal_;
+      shared_ptr<Input> texCoord_;
       shared_ptr<PrimVector> primitives_;
       int count_;
       int inputCount_;
       string material_;
 };
+typedef shared_ptr<GeometricPrimitive> GeometricPrimitivePtr;
+
 
 #endif /* COLLADACPP_GEOMETRICPRIMITIVE_HPP_ */

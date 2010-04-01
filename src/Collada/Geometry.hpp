@@ -16,5 +16,6 @@ class Geometry : public ColladaObject {
    private:
       GeoPrimVector primitives_;
 };
+typedef shared_ptr<Geometry> GeometryPtr;
 
 #endif /* COLLADACPP_GEOMETRY_HPP_ */

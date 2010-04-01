@@ -3,6 +3,10 @@
   Allow for both a color and texture option (back linking textcoords a
   hassle?).
 
+* The Materials/Effect/Texture system need a overhaul. Use a generic
+  shader and allow for things like using textures on non-diffuse
+  properties. Also perpixel lighting. This ties into the above note.
+
 * Rewrite the Collada loader, to load everything in order?
   (But in pratice Images come after effects for some reason?).
 
@@ -21,3 +25,10 @@
   <instance_image>'s an <image>.
 
 * QT Widgets draw in reversed order, window on top is window behind o_O
+
+* Seperate Source/Input's with Texture S/T coords from XYZ ones (and RGBA).
+
+* Update getColladaObjectById in ColladaDoc to store a list of
+  ids->ColladaObjects to save on reloading, prevent duplicates.
+
+* Normals seem screwed.

@@ -42,3 +42,11 @@ float GeometricPrimitive::getNY(const int& num) const {
 float GeometricPrimitive::getNZ(const int& num) const {
    return normal_->getZ(num);
 }
+
+float GeometricPrimitive::getS(const int& num) const {
+   return texCoord_->getS(num);
+}
+
+float GeometricPrimitive::getT(const int& num) const {
+   return texCoord_->getT(num);
+}

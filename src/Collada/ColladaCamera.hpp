@@ -1,6 +1,8 @@
 #ifndef COLLADACPP_COLLADACAMERA_HPP_
 #define COLLADACPP_COLLADACAMERA_HPP_
 
+#warning ['TODO']: This isn't actually used yet...
+
 class ColladaCamera : public ColladaObject {
    public:
       float getFov() const;

@@ -171,7 +171,10 @@ DOMElement* ColladaDoc::getElementById(string id) {
 }
 
 /**
- * 
+ * Returns a DOMNodeList of elements that match a tag.
+ * @param element The root element to search in.
+ * @param tag The tag to look for.
+ * @return A list of elements matching the tag.
  */
 DOMNodeList* ColladaDoc::getElementsByTagName(const DOMElement* element, string tag) {
    DEBUG_M("Entering function...");
@@ -181,13 +184,16 @@ DOMNodeList* ColladaDoc::getElementsByTagName(const DOMElement* element, string 
    return nl;
 }
 
-shared_ptr<ColladaObject> ColladaDoc::getColladaObjectById(string id) {
+/**
+ * Gets a ColladaObject based on its XML id.
+ */
+ColladaObjectPtr ColladaDoc::getColladaObjectById(string id) {
    DEBUG_M("Entering function: id='%s'", id.c_str());
-   shared_ptr<ColladaObject> colladaObject;
+   ColladaObjectPtr colladaObject;
    DOMElement* element = getElementById(id);
    if(!element) {
       WARNING("Failed to find XML node with id '%s'", id.c_str());
-      return shared_ptr<ColladaObject>();
+      return ColladaObjectPtr();
    }
 
    #warning ['TODO']: Keep a list of colladaobjects and their ids for quick loading
@@ -197,6 +203,12 @@ shared_ptr<ColladaObject> ColladaDoc::getColladaObjectById(string id) {
    return colladaObject;
 }
 
+/**
+ * Checks if a XMLCh* has the same text as a tag2.
+ * @param tag1 The tag in XMLCh* format.
+ * @param tag2 The tag in string format.
+ * @return true if they match, or false.
+ */
 bool ColladaDoc::isString_(const XMLCh* tag1, string tag2) {
    DEBUG_V("Entering function...");
    XMLCh* tag2_c = XMLString::transcode(tag2.c_str());
@@ -210,11 +222,16 @@ bool ColladaDoc::isString_(const XMLCh* tag1, string tag2) {
    return false;
 }
 
-shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(const DOMElement* element) {
+/**
+ * Loads a ColladaObject from a DOMElement based on it's tag type.
+ * @param element The DOMElement to load from.
+ * @return a ColladaObject loaded from the element.
+ */
+ColladaObjectPtr ColladaDoc::loadColladaObject(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    const XMLCh* tagName = element->getTagName();
-   shared_ptr<ColladaObject> colladaObject;
+   ColladaObjectPtr colladaObject;
 
    char* tagName_c = XMLString::transcode(tagName);
    if(isString_(tagName, "visual_scene")) {
@@ -251,7 +268,7 @@ shared_ptr<ColladaObject> ColladaDoc::loadColladaObject(const DOMElement* elemen
       DEBUG_H("Load effect");
       shared_ptr<Effect> effect(loadEffect(element));
       colladaObject = effect;
-   /*} else if(isString_(tagName, "sampler2D")) {
+   /*} else if(isString_(tagName, "sampler2D")) { // We load this elsewhere
       DEBUG_H("Load sampler2D");
       shared_ptr<Sampler2D> sampler2D(loadSampler2D(element));
       colladaObject = sampler2D;*/
@@ -385,6 +402,10 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(const DOMElement* element) {
                triangles->setVertex(input);
             } else if(semantic.compare("NORMAL") == 0) {
                triangles->setNormal(input);
+            } else if(semantic.compare("TEXCOORD") == 0) {
+               triangles->setTexCoord(input);
+            } else {
+               WARNING("Unhandled semantic '%s' in <Triangles>", semantic.c_str());
             }
          } else if(isString_(tagName, "p")) {
             shared_ptr<vector<int>> primitives = loadPrimitives(currentElement);
@@ -396,7 +417,7 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(const DOMElement* element) {
 
    string material = getAttribute(element, "material");
    /*if(materialUrl.length() > 0) {
-      shared_ptr<ColladaObject> colladaObject(getColladaObjectById(materialUrl));
+      ColladaObjectPtr colladaObject(getColladaObjectById(materialUrl));
       //shared_ptr<Material> material(dynamic_pointer_cast<Material>(colladaObject));
       //triangles->setMaterial(material);
    }*/
@@ -438,7 +459,7 @@ shared_ptr<Material> ColladaDoc::loadMaterial(const DOMElement* element) {
 
    shared_ptr<Material> material(new Material());
    string url = getAttribute(instanceEffect, "url");
-   shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+   ColladaObjectPtr colladaObject(getColladaObjectByUrl(url));
    if(colladaObject) {
       shared_ptr<Effect> effect = dynamic_pointer_cast<Effect>(colladaObject);
       material->setEffect(effect);
@@ -492,27 +513,33 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
          DOMElement* data = getElementByTagName(currentElement, "color");
          if(!data) {
             data = getElementByTagName(currentElement, "float");
-            //DEBUG_M("Got via secondry...");
+            //DEBUG_M("It's a float...");
          }
          if(!data) {
             data = getElementByTagName(currentElement, "texture");
             #warning ['TODO']: Handle texture'd images!
             if(data) {
-               WARNING("Textures not yet handled!");
+               WARNING("Textures not yet handled correctly!");
                string texcoord = getAttribute(data, "texcoord");
                string texture = getAttribute(data, "texture");
-               shared_ptr<ColladaObject> sampler2D = loadEffectNewparamBySid_(profileCommon, texture);
-               // TODO: Bind texture here...
+               ColladaObjectPtr co = loadEffectNewparamBySid_(profileCommon, texture);
+               ImagePtr image = dynamic_pointer_cast<Image, ColladaObject>(co);
+               if(image) {
+                  DEBUG_M("Binding image to texture hack...");
+                  phong->setTextureHack(image);
+                  phong->setTexCoordHack(texcoord);
+               } else {
+                  WARNING("Was expecting an Image. Got something else...");
+                  //DEBUG_M("Something: '%s', '%s'", co->getId().c_str(), co->getName().c_str());
+               }
                continue;
             }
          }
          if(!data) {
-            WARNING("Unknown effect paramater data type...");
+            WARNING("Unknown <effect> paramater data type...");
             continue;
          }
          #warning ['TODO']: The above float retrevial fails...
-
-         dumpElement(currentElement);
 
          const XMLCh* data_x = data->getTextContent();
          char* data_c = XMLString::transcode(data_x);
@@ -545,21 +572,20 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
 }
 
 /**
- * Loads a newparam in a profileCommon.
+ * Finds a <newparam> tag in a DOMElement from it's sid.
+ * Loads it into a ColladaObject.
+ * @param profileCommon The root DOMElement containing the <newparam>
+ * @param sid The sid
  */
-shared_ptr<ColladaObject> ColladaDoc::loadEffectNewparamBySid_(const DOMElement* profileCommon, string sid) {
+ColladaObjectPtr ColladaDoc::loadEffectNewparamBySid_(const DOMElement* profileCommon, string sid) {
    DEBUG_M("Entering function...");
-   //return shared_ptr<ColladaObject>();
-
+   //return ColladaObjectPtr();
 
    DOMNodeList* elements = getElementsByTagName(profileCommon, "newparam");
    if(!elements) {
       WARNING("\tNo <newparam> tags found...");
-      return shared_ptr<ColladaObject>();
+      return ColladaObjectPtr();
    }
-
-   //const XMLCh* tagName = profileCommon->getTagName();
-
 
    int length = elements->getLength();
    for(int i = 0; i < length; i++) {
@@ -569,17 +595,27 @@ shared_ptr<ColladaObject> ColladaDoc::loadEffectNewparamBySid_(const DOMElement*
          DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
 
          string currentSid = getAttribute(currentElement, "sid");
-         DEBUG_M("My name is '%s', and I love you.", sid.c_str());
+         DEBUG_M("My name is '%s', and I love you. '%s'", sid.c_str(), currentSid.c_str());
          if(currentSid.compare(sid) == 0) {
-            shared_ptr<ColladaObject> co = loadNewparam(profileCommon, currentElement);
+            DEBUG_M("MATCHED!");
+            ColladaObjectPtr co = loadNewparam(profileCommon, currentElement);
+            return co;
          }
       }
    }
-   DEBUG_M("Egads!, the end has occured!");
-   return shared_ptr<ColladaObject>();
+   DEBUG_M("Egads!, the end has occured! I was unable to find '%s'", sid.c_str());
+   return ColladaObjectPtr();
 }
 
-shared_ptr<ColladaObject> ColladaDoc::loadNewparam(const DOMElement* profileCommon, const DOMElement* node) {
+/**
+ * Loads a <newparam>.
+ * @param profileCommon The root DOMElement node, in case searching for
+ * another <newparam> is required.
+ * @param node The <newparam> node.
+ * @return A Sampler2D or Surface???
+ */
+// TODO: This is a bit of a hack.
+ColladaObjectPtr ColladaDoc::loadNewparam(const DOMElement* profileCommon, const DOMElement* node) {
    DEBUG_M("Entering function...");
    DOMNodeList* children = node->getChildNodes();
    int length = children->getLength();
@@ -605,7 +641,6 @@ shared_ptr<ColladaObject> ColladaDoc::loadNewparam(const DOMElement* profileComm
             WARNING("float based <newparam>'s not supported");
             continue;
          } else if(tagName_s.compare("surface") == 0) { // We want these
-            WARNING("<surface> not supported");
             return loadSurface(currentElement);
             continue;
          } else if(tagName_s.compare("sampler2D") == 0) {
@@ -617,10 +652,11 @@ shared_ptr<ColladaObject> ColladaDoc::loadNewparam(const DOMElement* profileComm
       }
    }
    WARNING("Could now load newparam, missing its 'parameter_type' subtag.");
-   return shared_ptr<ColladaObject>();
+   return ColladaObjectPtr();
 }
 
-shared_ptr<ColladaObject> ColladaDoc::loadSampler2D(const DOMElement* profileCommon, const DOMElement* element) {
+// This cheats and falls through to the loadSurface (which also cheats and gets the Image.
+ColladaObjectPtr ColladaDoc::loadSampler2D(const DOMElement* profileCommon, const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    DOMNodeList* children = element->getChildNodes();
@@ -640,14 +676,18 @@ shared_ptr<ColladaObject> ColladaDoc::loadSampler2D(const DOMElement* profileCom
             string data_s = data_c;
             XMLString::release(&data_c);
             return loadEffectNewparamBySid_(profileCommon, data_s);
+         } else if(tagName_s.compare("instance_image") == 0) {
+            WARNING("COLLADA 1.5 not yet supported.");
+            return ColladaObjectPtr();
          }
       }
    }
    WARNING("Sampler2D failed to load...");
-   return shared_ptr<ColladaObject>();
+   return ColladaObjectPtr();
 }
 
-shared_ptr<ColladaObject> ColladaDoc::loadSurface(const DOMElement* element) {
+// This cheats and returns a Image not a surface
+ColladaObjectPtr ColladaDoc::loadSurface(const DOMElement* element) {
    DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
    for(int i = 0; i < length; i++) {
@@ -669,7 +709,7 @@ shared_ptr<ColladaObject> ColladaDoc::loadSurface(const DOMElement* element) {
       }
    }
    WARNING("Sampler2D failed to load...");
-   return shared_ptr<ColladaObject>();
+   return ColladaObjectPtr();
 }
 
 shared_ptr<Image> ColladaDoc::loadImage(const DOMElement* element) {
@@ -704,9 +744,12 @@ shared_ptr<Input> ColladaDoc::loadInput(const DOMElement* element) {
    input->setOffset(atoi(offset.c_str()));
    
    string url = getAttribute(element, "source");
-   shared_ptr<ColladaObject> sourceObj = getColladaObjectByUrl(url);
+   ColladaObjectPtr sourceObj = getColladaObjectByUrl(url);
    shared_ptr<Source> source(static_pointer_cast<Source, ColladaObject>(sourceObj));
    input->setSource(source);
+
+   string semantic = getAttribute(element, "semantic");
+   input->setSemantic(semantic);
    
    loadId(element, input.get());
    loadName(element, input.get());
@@ -784,21 +827,21 @@ void ColladaDoc::loadSourceTechnique(const DOMElement* element, shared_ptr<Sourc
          const XMLCh* tagName = currentElement->getTagName();
          char* data_c = XMLString::transcode(tagName);
 
-         DEBUG_M("LOOP: '%s'", data_c);
-
          if(isString_(tagName, "param")) {
             string name = getAttribute(currentElement, "name");
             if(name.compare("X") == 0) {
-               DEBUG_M("SETXOFF");
                source->setXOff(params);
             } else if(name.compare("Y") == 0) {
-               DEBUG_M("SETYOFF");
                source->setYOff(params);
             } else if(name.compare("Z") == 0) {
-               DEBUG_M("SETZOFF");
                source->setZOff(params);
+            } else if(name.compare("S") == 0) {
+               source->setSOff(params);
+            } else if(name.compare("T") == 0) {
+               source->setTOff(params);
+            } else {
+               WARNING("Unhandled param type '%s' in <source>", name.c_str());
             }
-
             params++;
          }
          XMLString::release(&data_c);
@@ -806,26 +849,17 @@ void ColladaDoc::loadSourceTechnique(const DOMElement* element, shared_ptr<Sourc
    }
 }
 
+/***
+ * Loads a Vertices from a DOMElement <vertices> element.
+ * @param element The DOMElement with the <vertices> tag.
+ * @return The loaded vertices.
+ */
 shared_ptr<Vertices> ColladaDoc::loadVertices(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
-   /*XMLCh* tag = XMLString::transcode("input");
-   DOMNodeList* elements = element->getElementsByTagName(tag);
-   XMLString::release(&tag);
-
-   if(!elements) {
-      ERROR("No <input> node found in file...");
-      return shared_ptr<Vertices>();
-   }
-
-   int length = elements->getLength();
-   if(length > 1) {
-      WARNING("Multiple <input> node's found in file...");
-      //return shared_ptr<Vertices>();
-   }*/
-   
    DOMNodeList* elements = getElementsByTagName(element, "input");
    if(!elements) {
+      WARNING("<vertices> with no <input>...");
       return shared_ptr<Vertices>();
    }
 
@@ -839,9 +873,11 @@ shared_ptr<Vertices> ColladaDoc::loadVertices(const DOMElement* element) {
          string semantic = getAttribute(currentElement, "semantic");
          string url = getAttribute(currentElement, "source");
          if(semantic.compare("POSITION") == 0) {
-            shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+            ColladaObjectPtr colladaObject(getColladaObjectByUrl(url));
             shared_ptr<Source> src(dynamic_pointer_cast<Source, ColladaObject>(colladaObject));
             vertices->setPosition(src);
+         } else {
+            WARNING("Unhandled semantic '%s' in <vertices>", semantic.c_str());
          }
       }
    }
@@ -902,7 +938,7 @@ shared_ptr<VisualScene> ColladaDoc::loadVisualScene(const DOMElement* element) {
       DOMNode* currentNode = children->item(i);
       if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
          DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
-         shared_ptr<ColladaObject> colladaObject(getColladaObjectById(getAttribute(currentElement, "id")));
+         ColladaObjectPtr colladaObject(getColladaObjectById(getAttribute(currentElement, "id")));
          shared_ptr<ColladaNode> node(static_pointer_cast<ColladaNode, ColladaObject>(colladaObject));
          visualScene->addColladaNode(node);
       }
@@ -1058,7 +1094,7 @@ void ColladaDoc::loadInstances(const DOMElement* element, ColladaNode* node) {
       DOMNode* currentNode = children->item(i);
       if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE ) {
          DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
-         shared_ptr<ColladaObject> instance = loadInstance(currentElement, node);
+         ColladaObjectPtr instance = loadInstance(currentElement, node);
          if(instance) {
             node->addInstance(instance);
          }
@@ -1073,7 +1109,7 @@ shared_ptr<InstanceGeometry> ColladaDoc::loadInstanceGeometry(const DOMElement* 
 
       // Get the real geometry node
       string url = getAttribute(element, "url");
-      shared_ptr<ColladaObject> colladaObject = getColladaObjectByUrl(url);
+      ColladaObjectPtr colladaObject = getColladaObjectByUrl(url);
       shared_ptr<Geometry> geometry(static_pointer_cast<Geometry, ColladaObject>(colladaObject));
       ig->setGeometry(geometry);
      
@@ -1130,12 +1166,12 @@ void ColladaDoc::loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry>
    string input_set = getAttribute(bvie, "input_set");
    string semantic = getAttribute(bvie, "semantic");
    
-   shared_ptr<ColladaObject> colladaObject = getColladaObjectByUrl(target);
+   ColladaObjectPtr colladaObject = getColladaObjectByUrl(target);
    shared_ptr<Material> material(static_pointer_cast<Material, ColladaObject>(colladaObject));
    ig->addInstanceMaterial(symbol, material);
 }
 
-shared_ptr<ColladaObject> ColladaDoc::loadInstance(const DOMElement* element, ColladaNode* node) {
+ColladaObjectPtr ColladaDoc::loadInstance(const DOMElement* element, ColladaNode* node) {
    DEBUG_M("Entering function...");
 
    string instance_geometry_s = "instance_geometry";
@@ -1144,7 +1180,7 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(const DOMElement* element, Co
 
    // Not an instance...
    if(url.length() == 0) {
-      return shared_ptr<ColladaObject>();
+      return ColladaObjectPtr();
    }
 
    const XMLCh* tagName = element->getTagName();
@@ -1161,21 +1197,21 @@ shared_ptr<ColladaObject> ColladaDoc::loadInstance(const DOMElement* element, Co
       colladaObject = getColladaObjectByUrl(url);
    }*/
 
-   //shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
-   shared_ptr<ColladaObject> colladaObject;
+   //ColladaObjectPtr colladaObject(getColladaObjectByUrl(url));
+   ColladaObjectPtr colladaObject;
 
    if(XMLString::compareIString(tagName, geometry_tag) == 0) {
-      //shared_ptr<ColladaObject> colladaObject = instanceGeometry;
-      //shared_ptr<ColladaObject> colladaObject(dynamic_pointer_cast<ColladaObject, InstanceGeometry>(instanceGeometry));
-      //shared_ptr<ColladaObject> colladaObject = loadInstanceGeometry(element);
+      //ColladaObjectPtr colladaObject = instanceGeometry;
+      //ColladaObjectPtr colladaObject(dynamic_pointer_cast<ColladaObject, InstanceGeometry>(instanceGeometry));
+      //ColladaObjectPtr colladaObject = loadInstanceGeometry(element);
       shared_ptr<InstanceGeometry> instanceGeometry = loadInstanceGeometry(element);
-      //shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+      //ColladaObjectPtr colladaObject(getColladaObjectByUrl(url));
       colladaObject = instanceGeometry;
       
       //XMLString::release(&geometry_tag);
       //return instanceGeometry;
    } else {
-      shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+      ColladaObjectPtr colladaObject(getColladaObjectByUrl(url));
       //XMLString::release(&geometry_tag);
       //return colladaObject;
    }
@@ -1275,24 +1311,24 @@ shared_ptr<Scene> ColladaDoc::getScene() {
 
 shared_ptr<VisualScene> ColladaDoc::getVisualScene(string url) {
    DEBUG_M("Entering function... url='%s'", url.c_str());
-   shared_ptr<ColladaObject> colladaObject(getColladaObjectByUrl(url));
+   ColladaObjectPtr colladaObject(getColladaObjectByUrl(url));
    shared_ptr<VisualScene> visualScene(static_pointer_cast<VisualScene, ColladaObject>(colladaObject));
    #warning ['TODO']: Safer dynamic cast?
    return visualScene;
 }
 
-shared_ptr<ColladaObject> ColladaDoc::getColladaObjectByUrl(string url) {
+ColladaObjectPtr ColladaDoc::getColladaObjectByUrl(string url) {
    DEBUG_M("Entering function... url='%s'", url.c_str());
    if(url.length() == 0) {
       WARNING("Tried to load blank url...");
-      return shared_ptr<ColladaObject>();
+      return ColladaObjectPtr();
    }
 
    if(!ColladaUrl::isInternal(url)) {
       DEBUG_H("It's an external url");
       if(!manager_) {
          // TODO: Alternativly, spawn its own manager...
-         return shared_ptr<ColladaObject>();
+         return ColladaObjectPtr();
       }
       return manager_->getColladaObjectByUrl(url);
    }

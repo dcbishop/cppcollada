@@ -3,6 +3,7 @@
 
 #include "../GameData/ColorRGBA.hpp"
 #include "../Collada/Effect.hpp"
+#include "../Collada/Image.hpp"
 
 class Phong : public Effect {
    public:
@@ -28,6 +29,10 @@ class Phong : public Effect {
       const ColorRGBA &getTransparent() { return transparent_; }
       const float &getTransparency() { return transparency_; }
 
+      void setTextureHack(ImagePtr image);
+      void setTexCoordHack(string texCoord);
+      ImagePtr getTextureHack();
+
 
    private:
       ColorRGBA emission_;
@@ -39,6 +44,8 @@ class Phong : public Effect {
       float reflectivity_;
       ColorRGBA transparent_;
       float transparency_;
+      ImagePtr textureHack_; /* This is a tempory hack */
+      string texCoordHack_;
 };
-
+typedef shared_ptr<Phong> PhongPtr;
 #endif /* COLLADACPP_PHONG_HPP_ */

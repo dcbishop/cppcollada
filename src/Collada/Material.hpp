@@ -13,6 +13,8 @@ class Material : public ColladaObject {
    private:
       shared_ptr<Effect> effect_;
 };
+typedef shared_ptr<Material> MaterialPtr;
+
 
 #endif /* COLLADACPP_MATERIAL_HPP_ */
 

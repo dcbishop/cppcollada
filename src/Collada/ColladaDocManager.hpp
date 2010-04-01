@@ -14,6 +14,7 @@ using namespace std;
 #include <xercesc/util/PlatformUtils.hpp>
 using namespace xercesc;
 
+#include "../Collada/ColladaObject.hpp"
 class VisualScene;
 class ColladaDoc;
 class Scene;
@@ -30,7 +31,7 @@ class ColladaDocManager {
    public:
       shared_ptr<ColladaDoc> getColladaDoc(const string& url);
       void unloadColladaDocs();
-      shared_ptr<ColladaObject> getColladaObjectByUrl(const string& url);
+      ColladaObjectPtr getColladaObjectByUrl(const string& url);
 
    private:
       ColladaDocMap colladaDocs_;

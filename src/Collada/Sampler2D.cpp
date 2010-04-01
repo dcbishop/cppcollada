@@ -9,6 +9,6 @@ shared_ptr<Image> Sampler2D::getImage() {
    //shared_ptr<Surface> surface = dynamic_cast<shared_ptr<Surface>>
 }
 
-void Sampler2D::setImage(shared_ptr<ColladaObject> source) {
+void Sampler2D::setImage(ColladaObjectPtr source) {
    sourceOrImage_ = source;
 }

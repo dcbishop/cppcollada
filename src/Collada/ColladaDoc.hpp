@@ -43,6 +43,7 @@ class Sampler2D;
 class Image;
 
 #include "../GameData/SmartPointers.hpp"
+#include "../Collada/ColladaObject.hpp"
 
 typedef map<string, DOMElement*> ElementIdMap;
 typedef ElementIdMap::iterator ElementIdMapIterator;
@@ -56,11 +57,11 @@ class ColladaDoc {
       DOMDocument* loadColladaDocFile(const string& filename);
       DOMNodeList* getElementsByTagName(const DOMElement* element, string tag);
       DOMElement* getElementById(string id);
-      shared_ptr<ColladaObject> getColladaObjectById(string id);
+      ColladaObjectPtr getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
       shared_ptr<vector<float>> getFloats(string text);
-      shared_ptr<ColladaObject> loadColladaObject(const DOMElement* element);
+      ColladaObjectPtr loadColladaObject(const DOMElement* element);
       string getAttribute(const DOMElement* element, string attribute);
       void loadId(const DOMElement* element, Id* id);
       void loadName(const DOMElement* element, Name* name);
@@ -73,7 +74,7 @@ class ColladaDoc {
       void loadScale(const DOMElement* element, Scale* scale);
       void loadInstances(const DOMElement* element, ColladaNode* node);
       shared_ptr<ColladaLight> loadColladaLight(const DOMElement* element);
-      shared_ptr<ColladaObject> loadInstance(const DOMElement* element, ColladaNode* node);
+      ColladaObjectPtr loadInstance(const DOMElement* element, ColladaNode* node);
       shared_ptr<InstanceGeometry> loadInstanceGeometry(const DOMElement* element);
       shared_ptr<ColladaCamera> loadColladaCamera(const DOMElement* element);
       shared_ptr<Mesh> loadMesh(const DOMElement* element);
@@ -81,7 +82,7 @@ class ColladaDoc {
       shared_ptr<Triangles> loadTriangles(const DOMElement* element);
       shared_ptr<Source> loadSource(const DOMElement* element);
       shared_ptr<Material> loadMaterial(const DOMElement* element);
-      shared_ptr<ColladaObject> loadSampler2D(const DOMElement* profileCommon, const DOMElement* element);
+      ColladaObjectPtr loadSampler2D(const DOMElement* profileCommon, const DOMElement* element);
       void loadSourceTechnique(const DOMElement* element, shared_ptr<Source> source);
       DOMElement* getElementByTagName(const DOMElement* element, string tag);
       shared_ptr<Collada> getCollada();
@@ -89,12 +90,12 @@ class ColladaDoc {
       bool isUrlLocal(string url);
       string getUrlId(string url);
       shared_ptr<VisualScene> getVisualScene(string url);
-      shared_ptr<ColladaObject> getColladaObjectByUrl(string url);
+      ColladaObjectPtr getColladaObjectByUrl(string url);
       shared_ptr<Input> loadInput(const DOMElement* element);
       shared_ptr<vector<int>> loadPrimitives(const DOMElement* element);
       shared_ptr<Effect> loadEffect(const DOMElement* element);
-      shared_ptr<ColladaObject> loadNewparam(const DOMElement* profileCommon, const DOMElement* node);
-      shared_ptr<ColladaObject> loadSurface(const DOMElement* element);
+      ColladaObjectPtr loadNewparam(const DOMElement* profileCommon, const DOMElement* node);
+      ColladaObjectPtr loadSurface(const DOMElement* element);
       shared_ptr<Image> loadImage(const DOMElement* element);
 
    private:
@@ -102,7 +103,7 @@ class ColladaDoc {
       void loadInstanceGeometry_BindMaterials_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
       void loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
       bool isString_(const XMLCh* tag1, string tag2);
-      shared_ptr<ColladaObject> loadEffectNewparamBySid_(const DOMElement* profileCommon, string sid);
+      ColladaObjectPtr loadEffectNewparamBySid_(const DOMElement* profileCommon, string sid);
 
       string url_;
       XercesDOMParser* parser_;

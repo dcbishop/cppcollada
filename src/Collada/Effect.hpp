@@ -5,5 +5,6 @@
 
 class Effect : public ColladaObject {
 };
+typedef shared_ptr<Effect> EffectPtr;
 
 #endif /* COLLADACPP_EFFECT_HPP_ */

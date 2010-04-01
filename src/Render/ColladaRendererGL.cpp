@@ -13,6 +13,7 @@
 #include "../Collada/InstanceGeometry.hpp"
 #include "../Collada/Material.hpp"
 #include "../Collada/Phong.hpp"
+#include "../Collada/Effect.hpp"
 #include "../GameData/Grid.hpp"
 
 #include "../Debug/console.h"
@@ -450,6 +451,16 @@ void ColladaRendererGL::render(InstanceGeometry* ig) {
 
       if(!material_s.empty()) {
          shared_ptr<Material> material(ig->getInstanceMaterial(material_s));
+         EffectPtr effect = material->getEffect();
+         PhongPtr phong = dynamic_pointer_cast<Phong, Effect>(effect);
+         if(phong && phong->getTextureHack()) {
+            //TODO: OpenGL bind texture...
+            static bool nospam = false;
+            if(!nospam) {
+               WARNING("OpenGL texture bind now yet supported...");
+               nospam = true;
+            }
+         }
 
          if(material.get() != NULL) {
             material->render();

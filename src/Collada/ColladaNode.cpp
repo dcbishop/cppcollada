@@ -1,6 +1,6 @@
 #include "../Collada/ColladaNode.hpp"
 
-void ColladaNode::addInstance(shared_ptr<ColladaObject> instance) {
+void ColladaNode::addInstance(ColladaObjectPtr instance) {
    instances_.push_back(instance);
 }
 

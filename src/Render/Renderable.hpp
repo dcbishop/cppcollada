@@ -11,7 +11,6 @@ class Renderable {
    public:
       static ColladaRenderer* getRenderer();
       static void setRenderer(ColladaRenderer* renderer_);
-      //virtual void render() = 0;
       COLLADA_PURE_RENDER_FUNCTION
 
    private:

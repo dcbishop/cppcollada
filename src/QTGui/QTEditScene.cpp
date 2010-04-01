@@ -20,5 +20,5 @@ QTEditScene::QTEditScene(shared_ptr<Scene> scene) {
 void QTEditScene::edit() {
    WARNING("STUB FUNCTION");
    //setChildEditor(new QTEditVisualScene(collada_->getScene()));
-   QTEditGeneric::edit();
+   //QTEditGeneric::edit();
 }

@@ -31,13 +31,13 @@ shared_ptr<Scene> Collada::getScene() {
 /**
  * Adds a ColladaObject to the Collada's list of IDs.
  */
-void Collada::addId(const string id, shared_ptr<ColladaObject> object) {
+void Collada::addId(const string id, ColladaObjectPtr object) {
    ids_.insert(IdMapPair(id, object));
 }
 
 /**
  * Get's a ColladaObject from the Collada by it's ID.
  */
-shared_ptr<ColladaObject> Collada::getId(const string id) {
+ColladaObjectPtr Collada::getId(const string id) {
    return ids_.find(id)->second;
 }

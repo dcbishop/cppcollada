@@ -126,46 +126,17 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
 ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width, height) {
    DEBUG_M("ViewWindowQT spawning...");
 
-   //renderer_.setSize(getWidth(), getHeight());
    int argc = 1;
    char* argv[] = {"Blah"};
-   //QApplication app(argc, argv);
-   //QApplication app();
-   
    //QApplication::setStyle(QStyleFactory::create("motif"));
    app_ = new QApplication(argc, argv);
-  
-   //vw_ = new ViewWidget(this);
-   //vw_->setAutoFillBackground(false);
-
-//   view.setViewport(new ViewWidget(this));
-    
    scene_ = new OpenGLScene(this);
    vw_ = new ViewWidget(this);
    vw_->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
    vw_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
    vw_->setScene(scene_);
+   vw_->resize(getWidth(), getHeight());
    vw_->show();
-
-   vw_->resize(1024, 768);
-   //camera_ = NULL;
-   //vw_->show();
-   //vw_->setMouseTracking(true);
-   /*QWidget window;
-   window.resize(getWidth(), getHeight());
-   window.show();
-   QGLWidget opengl;
-   opengl.show();*/
-   
-   //QPushButton test("TestButton", 0);
-   //test.resize(100, 30);
-   //app.setMainWidget(&test);
-   //window.addWidget(test);
-   //window.setWindowOpacity(0.5f);
-   //test.show();
-
-   //finished_ = false;
-   //app_->exec();
 }
 
 ViewWindowQT::~ViewWindowQT() {
@@ -187,11 +158,6 @@ void ViewWindowQT::setTitle(const string title) {
  */
 void ViewWindowQT::mainLoop() {
    DEBUG_L("Interface::mainLoop()");
-
-   //while(!finished_) {
-      //checkEvents_();
-      //draw_();
-   //}
    if(app_) {
       app_->exec();
    }
@@ -208,62 +174,8 @@ void ViewWindowQT::quit() {
 
 ViewWidget::ViewWidget(ViewWindowQT* vwqt) {
    vwqt_ = vwqt;
+   mouseDown_ = false;
 }
-
-#if 0
-void ViewWidget::initializeGL() {
-   renderer_.init();
-}
-
-void ViewWidget::resizeGL(int width, int height) {
-	DEBUG_M("Resize %d %d", width, height);
-   renderer_.setSize(width, height);
-}
-
-void ViewWidget::paintGL() {
-   /*static int frame = 0;
-   static int last_render_time = 0;
-   static int last_fps_time = 0;
-   static bool limit_fps_ = true;
-   static int fps_ = 0;
-   static int mpf_ = 0;
-   
-   int current_time = time_->currentTime();
-
-   // Limit framerate
-   if(limit_fps_ && !( (current_time - last_render_time) >= 1000/60) ) {
-      return;
-   }
-
-   // Calculate FPS
-   frame++;
-   if(current_time - last_fps_time > 1000) {
-      fps_ = frame*1000.0f/(current_time-last_fps_time);
-      last_fps_time = current_time;
-      frame = 0;
-      LOG("FPS: %d,\tMPF: %d",fps_, mpf_);
-   }
-   last_render_time = current_time;
-
-   renderer_.preFrame();
-
-   if(getCamera() != shared_ptr<Camera>()) {
-      vwqt_->getCamera()->render();
-   }
-
-   grid_->render();
-
-   shared_ptr<Collada> collada = vwqt_->getCollada();
-   if(collada) {
-      collada->render();
-   }
-
-   renderer_.postFrame();
-   swapBuffers();
-
-   mpf_ = time_->currentTime() - current_time;*/
-}
-#endif
 
 void ViewWidget::resizeEvent(QResizeEvent *event) {
    if (scene())
@@ -330,12 +242,11 @@ void ViewWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 void ViewWidget::wheelEvent(QWheelEvent * event) {
    // Check if the event is handled by the overdrawn QT widgets
-
    /*QGraphicsView::wheelEvent(event);
    if(event->isAccepted()) {
       return;
-   }
-   DEBUG_M("Fired... B");*/
+   }*/
+
    int numDegrees = event->delta() / 8;
    int numSteps = numDegrees / 15;
 

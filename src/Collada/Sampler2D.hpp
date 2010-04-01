@@ -15,10 +15,10 @@
 class Sampler2D : public ColladaObject {
    public:
       shared_ptr<Image> getImage();
-      void setImage(shared_ptr<ColladaObject> source);
+      void setImage(ColladaObjectPtr source);
 
    private:
-      shared_ptr<ColladaObject> sourceOrImage_;
+      ColladaObjectPtr sourceOrImage_;
 };
 
 #endif /* COLLADACPP_COLLADA_SAMPLER2D_HPP_ */

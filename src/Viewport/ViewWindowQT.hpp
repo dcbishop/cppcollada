@@ -22,20 +22,6 @@ class Grid;
 class ViewWindowQT;
 class ViewWidget;
 
-/*class GraphicsView : public QGraphicsView {
-   public:
-      GraphicsView() {
-         setWindowTitle("Test!");
-      }
-      
-   protected:
-      void resizeEvent(QResizeEvent *event) {
-         if (scene())
-            scene()->setSceneRect(QRect(QPoint(0, 0), event->size()));
-         QGraphicsView::resizeEvent(event);
-      }
-};*/
-
 class OpenGLScene : public QGraphicsScene {
    Q_OBJECT
    public:
@@ -84,11 +70,6 @@ class ViewWidget: public QGraphicsView {
    Q_OBJECT
    public:
       ViewWidget(ViewWindowQT* vwqt);
-      //void initializeGL();
-      //void resizeGL(int width, int heigh);
-      //void paintGL();
-      ///ColladaRendererGL renderer_;
-
       void resizeEvent(QResizeEvent *event);
       void mouseMoveEvent (QMouseEvent* event);
       void mousePressEvent(QMouseEvent *event);

@@ -14,5 +14,6 @@ class Image: public ColladaObject {
    private:
       string filename_;
 };
+typedef shared_ptr<Image> ImagePtr;
 
 #endif /* COLLADACPP_COLLADA_IMAGE_HPP_ */

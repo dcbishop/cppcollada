@@ -1,4 +1,5 @@
 #include "../Collada/Phong.hpp"
+#include "../Collada/Image.hpp"
 
 Phong::Phong() {
    setDiffuse(0.5, 0.5, 0.5, 1.0);
@@ -45,4 +46,20 @@ void Phong::setTransparent(const float& red, const float& green, const float& bl
 
 void Phong::setTransparency(const float& value) {
    transparency_ = value;
+}
+
+/**
+ * This sets an overiding texture Image. It will just override the diffuse channel if it exists.
+ * This should really work with otherchannels other than diffuse.
+ */
+void Phong::setTextureHack(ImagePtr image) {
+   textureHack_ = image;
+}
+
+ImagePtr Phong::getTextureHack() {
+   return textureHack_;
+}
+
+void Phong::setTexCoordHack(string texCoord) {
+   texCoordHack_ = texCoord;
 }
