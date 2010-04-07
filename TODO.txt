@@ -36,3 +36,5 @@
 * Some things (textures mostly) are looked up in an unsorted_map in the
   main rendering loop and they probably don't need to be in reality. I
   am just being pedantic about things being render agnostic as possible.
+
+* Vertices class seems to be a pointless clone of Input...

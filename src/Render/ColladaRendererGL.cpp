@@ -282,14 +282,45 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
    static int nospam;
    if(!nospam) {
       WARNING("Inefficient primitive rendering!, TODO: convert to vertex buffer object first!");
-      what = 1;
+      nospam = 1;
    }
 
    // DEBUG: debugfun used to filter used to draw on a specific polygon number for testing purposes
    //static int debugfun = -1;
    //debugfun++;
 
+   
+   int vertexCount = geometry->getVertexCount();
+   for(int i = 0; i < vertexCount; i++) {
+      glTexCoord2f(geometry->getS(i), geometry->getT(i));
+      glNormal3f(geometry->getNX(i), geometry->getNY(i), geometry->getNZ(i));
+      glVertex3f(geometry->getX(i), geometry->getY(i), geometry->getZ(i));
+   }
+
+   // TODO: Move this bool somewhere else...
+   bool renderNormals = false;
+   if(!renderNormals) {
+      return;
+   }
+
+   setUnlitMode_();
    glEnd();
+   glEnable(GL_COLOR_MATERIAL);
+   glColor4f(1.0, 0.0, 0.0, 1.0);
+   glDisable(GL_TEXTURE_2D);
+   glBegin(GL_LINES);
+   //Render Normals
+   for(int i = 0; i < vertexCount; i++) {
+      glVertex3f(geometry->getX(i), geometry->getY(i), geometry->getZ(i));
+      glVertex3f(geometry->getX(i) + geometry->getNX(i),
+         geometry->getY(i)+geometry->getNY(i),
+         geometry->getZ(i)+geometry->getNZ(i));
+   }
+   setLights_();
+   setRenderMode_();
+   return;
+
+   //glEnd();
    int num = -1;
    PrimIterator iter = geometry->getFirstPrimitive();
    int inputCount = geometry->getInputCount();
@@ -303,39 +334,39 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       glNormal3f(geometry->getNX(*iter), geometry->getNY(*iter), geometry->getNZ(*iter));
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       iter+=inputCount;*/
-      int vertexNum = geometry->getVertexNum(*iter);
+      //int vertexNum = geometry->getVertexNum(*iter);
       //int normalNum = geometry->getNormalNum(*iter+1);
       #warning ['TODO']: Plus input offset not +1...
       
       glBegin(GL_TRIANGLES);
       //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
       glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
-      glNormal3f(geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       
       //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
-      iter+=inputCount;
+      iter++;
       
       //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
       glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
-      glNormal3f(geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       
       
       //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
-      iter+=inputCount;
+      iter++;
 
       //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
       glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
-      glNormal3f(geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
 
       //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
       glEnd();
-      iter+=inputCount;
+      iter++;
 
       
       // DEBUG DRAW NORMAL LINES!

@@ -12,6 +12,7 @@ class Input : public ColladaObject {
       void setSource(shared_ptr<Source> source) { source_ = source; }
       void setSemantic(string semantic) { semantic_ = semantic; }
 
+      virtual int getCount() {return source_->getCount();}
       virtual float getX(const int& num) const { return source_->getXPos(num); }
       virtual float getY(const int& num) const { return source_->getYPos(num); }
       virtual float getZ(const int& num) const { return source_->getZPos(num); }

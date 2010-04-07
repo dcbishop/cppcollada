@@ -17,8 +17,7 @@ class GeometricPrimitive : public Renderable {
       void setPrimitives(shared_ptr<PrimVector> primitives) { primitives_ = primitives; }
       void setInputCount(const int& count) { inputCount_ = count; }
       int getInputCount() const { return inputCount_; }
-
-      int getVertexNum(const int& num) const;
+      int getVertexCount() const { return primitives_->size()/getInputCount(); }
 
       float getX(const int& num) const;
       float getY(const int& num) const;
@@ -39,6 +38,10 @@ class GeometricPrimitive : public Renderable {
       COLLADA_RENDER_FUNCTION
 
    private:
+      int getVertexNum_(const int& num) const;
+      int getNormalNum_(const int& num) const;
+      int getTexCoordNum_(const int& num) const;
+
       shared_ptr<Input> vertex_;
       shared_ptr<Input> normal_;
       shared_ptr<Input> texCoord_;
