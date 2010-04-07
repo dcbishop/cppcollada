@@ -40,10 +40,9 @@ class Camera : public Position, public Renderable {
       float getRotX() const {return rx_;}
       float getRotY() const {return ry_;}
 
-      
-      const float getX() const;
-      const float getY() const;
-      const float getZ() const;
+      float getX() const;
+      float getY() const;
+      float getZ() const;
 
       COLLADA_RENDER_FUNCTION
 

@@ -34,7 +34,7 @@ Camera::Camera() {
 #warning ['TODO']: Use this or kill it...
 Camera::~Camera() {
 }
-
+   
 /**
  * Sets the Object that the camera tracks.
  */
@@ -59,7 +59,7 @@ void Camera::update(const int& time) {
    //Object::update(time);
 }
 
-const float Camera::getX() const {
+inline float Camera::getX() const {
    float theta = getRotX();
    float phi = getRotY();
    return getZoom() *
@@ -68,14 +68,14 @@ const float Camera::getX() const {
    
 }
 
-const float Camera::getY() const {
-   float theta = getRotX();
+inline float Camera::getY() const {
+   //float theta = getRotX();
    float phi = getRotY();
    return getZoom() *
       (cos(phi*(PI/180)));
 }
 
-const float Camera::getZ() const {
+inline float Camera::getZ() const {
    float theta = getRotX();
    float phi = getRotY();
    return getZoom() *
@@ -103,7 +103,7 @@ float Camera::getZoomTarget() const {
  * Gets the current field of view.
  * @return The current FOV (not the target FOV).
  */
-float Camera::getFov() const {
+inline float Camera::getFov() const {
    //return fov_.getValueCurrent();
    return fov_;
 }
@@ -112,7 +112,7 @@ float Camera::getFov() const {
  * Sets the target field of view.
  * @param fov field of view
  */
-void Camera::setFov(const float& fov) {
+inline void Camera::setFov(const float& fov) {
    //fov_.setValue(fov);
    fov_ = fov;
 }
@@ -139,7 +139,7 @@ void Camera::setZoom(const float& zoom) {
  * Sets the camera rotation around the target.
  * @param rx
  */
-void Camera::setRotX(const float& rx) {
+inline void Camera::setRotX(const float& rx) {
    //Object::setRotX(rx);
    rx_ = rx;
 }
@@ -148,7 +148,7 @@ void Camera::setRotX(const float& rx) {
  * Sets the camera rotation above the target.
  * @param ry
  */
-void Camera::setRotY(const float& ry) {
+inline void Camera::setRotY(const float& ry) {
    /* Stop flipping over the top  */
    if(ry < Y_MIN) {
       ry_ = Y_MIN;

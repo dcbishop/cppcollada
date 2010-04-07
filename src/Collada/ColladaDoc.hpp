@@ -87,10 +87,10 @@ class ColladaDoc {
       DOMElement* getElementByTagName(const DOMElement* element, string tag);
       shared_ptr<Collada> getCollada();
       shared_ptr<Scene> getScene();
-      bool isUrlLocal(string url);
-      string getUrlId(string url);
-      shared_ptr<VisualScene> getVisualScene(string url);
-      ColladaObjectPtr getColladaObjectByUrl(string url);
+      bool isUrlLocal(const string& url);
+      string getUrlId(const string& url);
+      shared_ptr<VisualScene> getVisualScene(const string& url);
+      ColladaObjectPtr getColladaObjectByUrl(const string& url);
       shared_ptr<Input> loadInput(const DOMElement* element);
       shared_ptr<vector<int>> loadPrimitives(const DOMElement* element);
       shared_ptr<Effect> loadEffect(const DOMElement* element);

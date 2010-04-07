@@ -19,19 +19,21 @@ class Phong : public Effect {
       void setTransparent(const float& red, const float& green, const float& blue, const float& alpha);
       void setTransparency(const float& value);
       
-      const ColorRGBA &getEmission() { return emission_; }
-      const ColorRGBA &getAmbient() { return ambient_; }
-      const ColorRGBA &getDiffuse() { return diffuse_; }
-      const ColorRGBA &getSpecular() { return specular_; }
-      const float &getShininess() { return shininess_; }
-      const ColorRGBA &getReflective() { return reflective_; }
-      const float &getReflectivity() { return reflectivity_; }
-      const ColorRGBA &getTransparent() { return transparent_; }
-      const float &getTransparency() { return transparency_; }
+      const ColorRGBA &getEmission() const { return emission_; }
+      const ColorRGBA &getAmbient() const { return ambient_; }
+      const ColorRGBA &getDiffuse() const { return diffuse_; }
+      const ColorRGBA &getSpecular() const { return specular_; }
+      const float &getShininess() const { return shininess_; }
+      const ColorRGBA &getReflective() const { return reflective_; }
+      const float &getReflectivity() const { return reflectivity_; }
+      const ColorRGBA &getTransparent() const { return transparent_; }
+      const float &getTransparency() const { return transparency_; }
 
       void setTextureHack(ImagePtr image);
       void setTexCoordHack(string texCoord);
       ImagePtr getTextureHack();
+      int getTextureHackId();
+      void setTextureHackId(const int& textureHackId);
 
 
    private:
@@ -46,6 +48,7 @@ class Phong : public Effect {
       float transparency_;
       ImagePtr textureHack_; /* This is a tempory hack */
       string texCoordHack_;
+      int textureHackId_; 
 };
 typedef shared_ptr<Phong> PhongPtr;
 #endif /* COLLADACPP_PHONG_HPP_ */

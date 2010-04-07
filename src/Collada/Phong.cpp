@@ -10,6 +10,7 @@ Phong::Phong() {
    setReflectivity(0.0);
    setShininess(0.0);
    setTransparency(0.0);
+   setTextureHackId(0);
 }
 
 void Phong::setEmission(const float& red, const float& green, const float& blue, const float& alpha) {
@@ -62,4 +63,12 @@ ImagePtr Phong::getTextureHack() {
 
 void Phong::setTexCoordHack(string texCoord) {
    texCoordHack_ = texCoord;
+}
+
+int Phong::getTextureHackId() {
+   return textureHackId_;
+}
+
+inline void Phong::setTextureHackId(const int& textureHackId) {
+   textureHackId_ = textureHackId;
 }

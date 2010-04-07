@@ -7,18 +7,18 @@ enum { INDEX_RED, INDEX_GREEN, INDEX_BLUE, INDEX_ALPHA };
 
 class ColorRGBA {
    public:
-      void setRed(const float& red) { rgba[INDEX_RED] = red; }
-      void setGreen(const float& green) { rgba[INDEX_GREEN] = green; }
-      void setBlue(const float& blue) { rgba[INDEX_BLUE] = blue; }
-      void setAlpha(const float& alpha) { rgba[INDEX_ALPHA] = alpha; }
-      void setColor(const shared_ptr<ColorRGBA> color) { setRed(color->getRed()); setGreen(color->getGreen()); setBlue(color->getBlue()); setAlpha(color->getAlpha()); }
-      void setColor(const float& red, const float& green, const float& blue, const float& alpha) { setRed(red); setGreen(green); setBlue(blue); setAlpha(alpha); }
-      void setColor(const float& red, const float& green, const float& blue) { setColor(red, green, blue, 1.0f); }
-      const float getRed() const { return rgba[INDEX_RED]; }
-      const float getGreen() const { return rgba[INDEX_GREEN]; }
-      const float getBlue() const { return rgba[INDEX_BLUE]; }
-      const float getAlpha() const { return rgba[INDEX_ALPHA]; }
-      const float (&getArray() const)[4] {return rgba; } 
+      inline void setRed(const float& red) { rgba[INDEX_RED] = red; }
+      inline void setGreen(const float& green) { rgba[INDEX_GREEN] = green; }
+      inline void setBlue(const float& blue) { rgba[INDEX_BLUE] = blue; }
+      inline void setAlpha(const float& alpha) { rgba[INDEX_ALPHA] = alpha; }
+      inline void setColor(const shared_ptr<ColorRGBA> color) { setRed(color->getRed()); setGreen(color->getGreen()); setBlue(color->getBlue()); setAlpha(color->getAlpha()); }
+      inline void setColor(const float& red, const float& green, const float& blue, const float& alpha) { setRed(red); setGreen(green); setBlue(blue); setAlpha(alpha); }
+      inline void setColor(const float& red, const float& green, const float& blue) { setColor(red, green, blue, 1.0f); }
+      inline float getRed() const { return rgba[INDEX_RED]; }
+      inline float getGreen() const { return rgba[INDEX_GREEN]; }
+      inline float getBlue() const { return rgba[INDEX_BLUE]; }
+      inline float getAlpha() const { return rgba[INDEX_ALPHA]; }
+      inline const float (&getArray() const)[4] {return rgba; } 
 
    private:
       float rgba[4];

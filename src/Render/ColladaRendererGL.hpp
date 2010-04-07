@@ -3,6 +3,7 @@
 
 #include "../Render/ColladaRenderer.hpp"
 #include "../Collada/Phong.hpp"
+#include "../Render/ColladaRendererGL_DevIL.hpp"
 
 class ColladaRendererGL : public ColladaRenderer {
    public:
@@ -43,6 +44,7 @@ class ColladaRendererGL : public ColladaRenderer {
       Phong defaultMaterial_;
       int width_;
       int height_;
+      ColladaRendererGL_DevIL imageLoader_;
 };
 
 #endif /* COLLADACPP_COLLADARENDERERGL_HPP_ */

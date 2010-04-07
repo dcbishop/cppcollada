@@ -15,6 +15,7 @@
 OpenGLScene::OpenGLScene(ViewWindowQT* vwqt) {
    grid_ = shared_ptr<Grid>(new Grid);
    vwqt_ = vwqt;
+   renderer_.init();
    renderer_.setSize(vwqt_->getWidth(), vwqt_->getHeight());
 
    QWidget *editCollada = new QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint);

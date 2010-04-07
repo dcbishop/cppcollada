@@ -1309,7 +1309,7 @@ shared_ptr<Scene> ColladaDoc::getScene() {
    return scene_;
 }
 
-shared_ptr<VisualScene> ColladaDoc::getVisualScene(string url) {
+shared_ptr<VisualScene> ColladaDoc::getVisualScene(const string& url) {
    DEBUG_M("Entering function... url='%s'", url.c_str());
    ColladaObjectPtr colladaObject(getColladaObjectByUrl(url));
    shared_ptr<VisualScene> visualScene(static_pointer_cast<VisualScene, ColladaObject>(colladaObject));
@@ -1317,7 +1317,7 @@ shared_ptr<VisualScene> ColladaDoc::getVisualScene(string url) {
    return visualScene;
 }
 
-ColladaObjectPtr ColladaDoc::getColladaObjectByUrl(string url) {
+ColladaObjectPtr ColladaDoc::getColladaObjectByUrl(const string& url) {
    DEBUG_M("Entering function... url='%s'", url.c_str());
    if(url.length() == 0) {
       WARNING("Tried to load blank url...");

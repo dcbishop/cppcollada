@@ -24,9 +24,12 @@
 #include <iostream>
 
 void ColladaRendererGL::init() {
+   LOG("Initilizing OpenGL renderer...");
    defaultMaterial_.setRenderer(this);
    debugPrimDraw = -1;
+   imageLoader_.init();
    glEnable(GL_MULTISAMPLE);
+   LOG("Initilized OpenGL renderer...");
 }
 
 /**
@@ -276,8 +279,8 @@ void ColladaRendererGL::render(Triangles* triangles) {
 void ColladaRendererGL::render(GeometricPrimitive* geometry) {
    DEBUG_H("ColladaRendererGL::render(GeometricPrimitive* geometry)");
 
-   static int what;
-   if(!what) {
+   static int nospam;
+   if(!nospam) {
       WARNING("Inefficient primitive rendering!, TODO: convert to vertex buffer object first!");
       what = 1;
    }
@@ -306,22 +309,29 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       
       glBegin(GL_TRIANGLES);
       //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
       glNormal3f(geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      
       //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
       iter+=inputCount;
       
       //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
       glNormal3f(geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      
+      
       //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
       iter+=inputCount;
 
       //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
       glNormal3f(geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+
       //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
       glEnd();
@@ -451,16 +461,6 @@ void ColladaRendererGL::render(InstanceGeometry* ig) {
 
       if(!material_s.empty()) {
          shared_ptr<Material> material(ig->getInstanceMaterial(material_s));
-         EffectPtr effect = material->getEffect();
-         PhongPtr phong = dynamic_pointer_cast<Phong, Effect>(effect);
-         if(phong && phong->getTextureHack()) {
-            //TODO: OpenGL bind texture...
-            static bool nospam = false;
-            if(!nospam) {
-               WARNING("OpenGL texture bind now yet supported...");
-               nospam = true;
-            }
-         }
 
          if(material.get() != NULL) {
             material->render();
@@ -547,7 +547,21 @@ void ColladaRendererGL::render(Phong* phong) {
    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission);
    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 
-   //const float ambient[4] = .getArray();
-   //glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, 
+   if(phong->getTextureHack()) {
+      int texid = phong->getTextureHackId();
+      if(!texid) {
+         texid = imageLoader_.loadImage(phong->getTextureHack());
+         phong->setTextureHackId(texid);
+      }
+      if(texid > 0) {
+         glBindTexture(GL_TEXTURE_2D, texid);
+         glEnable(GL_TEXTURE_2D);
+         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      } else {
+         glDisable(GL_TEXTURE_2D);
+      }
+   } else {
+      glBindTexture( GL_TEXTURE_2D, NULL); //TODO: C++0x nullptr
+   }
 }
-

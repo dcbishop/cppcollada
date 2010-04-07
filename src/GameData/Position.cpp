@@ -22,7 +22,7 @@ Position Position::getPosition() {
  * Sets the Position.
  * @param
  */
-void Position::setPosition(Position& position) {
+inline void Position::setPosition(Position& position) {
    setXYZ(position.getX(), position.getY(), position.getZ());
 }
 
@@ -39,7 +39,7 @@ void Position::setPosition(Position& position) {
  * @see getY()
  * @see getZ()
  */
-void Position::setXYZ(const float &x, const float &y, const float &z) {
+inline void Position::setXYZ(const float &x, const float &y, const float &z) {
    Position::setX(x);
    Position::setY(y);
    Position::setZ(z);
@@ -56,7 +56,7 @@ void Position::setXYZ(const float &x, const float &y, const float &z) {
  * @see getZ()
  * @return The X coordinate.
  */
-const float Position::getX() const {
+inline float Position::getX() const {
    return x_;
 }
 
@@ -71,7 +71,7 @@ const float Position::getX() const {
  * @see getZ()
  * @return The Y coordinate.
  */
-const float Position::getY() const {
+inline float Position::getY() const {
    return y_;
 }
 
@@ -86,7 +86,7 @@ const float Position::getY() const {
  * @see getZ()
  * @return The Z coordinate.
  */
-const float Position::getZ() const {
+inline float Position::getZ() const {
    return z_;
 }
 
@@ -101,7 +101,7 @@ const float Position::getZ() const {
  * @see getZ()
  * @param x the X coordinate
  */
-void Position::setX(const float& x) {
+inline void Position::setX(const float& x) {
    x_ = x;
 }
 
@@ -116,7 +116,7 @@ void Position::setX(const float& x) {
  * @see getZ()
  * @param x the Y coordinate
  */
-void Position::setY(const float& y) {
+inline void Position::setY(const float& y) {
    y_ = y;
 }
 
@@ -131,7 +131,7 @@ void Position::setY(const float& y) {
  * @see getZ()
  * @param x the Z coordinate
  */
-void Position::setZ(const float& z) {
+inline void Position::setZ(const float& z) {
    z_ = z;
 }
 
@@ -140,7 +140,7 @@ void Position::setZ(const float& z) {
  * @param position The other position
  * @return The distance to the other position.
  */
-const float Position::getDistanceTo(const Position& position) {
+inline float Position::getDistanceTo(const Position& position) {
    float dx = getX() - position.getX();
    float dy = getY() - position.getY();
    float dz = getZ() - position.getZ();
@@ -153,7 +153,7 @@ const float Position::getDistanceTo(const Position& position) {
  * @param position The other position
  * @return The distance to the other position.
  */
-const float Position::getDistanceTo2D(const Position& position) {
+inline float Position::getDistanceTo2D(const Position& position) {
    float diff_x = position.getX() - getX();
    float diff_z = position.getZ() - getZ();
    return sqrt(pow(diff_x, 2) + pow(diff_z, 2));
@@ -164,7 +164,7 @@ const float Position::getDistanceTo2D(const Position& position) {
  * @param position The other position.
  * @return The angle.
  */
-const float Position::getDirectionTo2D(const Position& position) {
+inline float Position::getDirectionTo2D(const Position& position) {
    float diff_x = position.getX() - getX();
    float diff_z = position.getZ() - getZ();
    return atan2(diff_z, diff_x);
