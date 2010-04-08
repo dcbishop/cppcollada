@@ -190,16 +190,27 @@ DOMNodeList* ColladaDoc::getElementsByTagName(const DOMElement* element, string 
 ColladaObjectPtr ColladaDoc::getColladaObjectById(string id) {
    DEBUG_M("Entering function: id='%s'", id.c_str());
    ColladaObjectPtr colladaObject;
+
+   // Check to see if it has already been loaded and return it if found.
+   ColladaObjectMapIterator iter = objectMap_.find(id);
+   if(iter != objectMap_.end()) {
+      DEBUG_M("Already preloaded... returning refrence...");
+      return iter->second;
+   }
+
+   // Find the XML Element with the id
    DOMElement* element = getElementById(id);
    if(!element) {
       WARNING("Failed to find XML node with id '%s'", id.c_str());
       return ColladaObjectPtr();
    }
 
-   #warning ['TODO']: Keep a list of colladaobjects and their ids for quick loading
+   // Load the ColladaObject from the XML node.
    colladaObject = loadColladaObject(element);
 
-   //TODO: Add to list of Objects/ids
+   // Add element to out list of already loaded objects.
+   objectMap_.insert(ColladaObjectMapPair(id, colladaObject));
+
    return colladaObject;
 }
 
@@ -282,11 +293,12 @@ ColladaObjectPtr ColladaDoc::loadColladaObject(const DOMElement* element) {
 
    DEBUG_H("Loading: '%s'", tagName_c);
 
-   XMLString::release(&tagName_c);
+   
    if(colladaObject != NULL) {
       loadId(element, colladaObject.get());
       loadName(element, colladaObject.get());
    }
+   XMLString::release(&tagName_c);
 
    return colladaObject;
    
@@ -517,7 +529,7 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
          }
          if(!data) {
             data = getElementByTagName(currentElement, "texture");
-            #warning ['TODO']: Handle texture'd images!
+            #warning ['TODO']: Do real texturing...
             if(data) {
                WARNING("Textures not yet handled correctly!");
                string texcoord = getAttribute(data, "texcoord");
@@ -1266,7 +1278,7 @@ DOMElement* ColladaDoc::getElementByTagName(const DOMElement* element, string ta
 /**
  * Gets the main Scene of the Collada file.
  */
-shared_ptr<Scene> ColladaDoc::getScene() {
+ScenePtr ColladaDoc::getScene() {
    DEBUG_M("Entering function...");
 
    if(scene_) {
@@ -1274,10 +1286,11 @@ shared_ptr<Scene> ColladaDoc::getScene() {
    }
 
    DOMElement* node = getElementByTagName(xmlDoc_->getDocumentElement(), "scene");
+   if(!node) {
+      return ScenePtr();
+   }
 
-   #warning ['TODO']: Keep a copy of the scene for quick retrevial...
-
-   shared_ptr<Scene> scene_(new Scene());
+   ScenePtr scene_(new Scene());
    #warning ['TODO']: Load the scene into the Scene node...
 
    DOMNodeList* children = node->getChildNodes();

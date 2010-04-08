@@ -1,7 +1,7 @@
 #ifndef COLLADACPP_COLLADADOCMANAGER_HPP_
 #define COLLADACPP_COLLADADOCMANAGER_HPP_
 
-#include <map>
+#include <unordered_map>
 #include <string>
 using namespace std;
 
@@ -20,7 +20,7 @@ class ColladaDoc;
 class Scene;
 class ColladaObject;
 
-typedef map<string, shared_ptr<ColladaDoc>> ColladaDocMap;
+typedef unordered_map<string, shared_ptr<ColladaDoc>> ColladaDocMap;
 typedef ColladaDocMap::iterator ColladaDocMapIterator;
 typedef pair<string, shared_ptr<ColladaDoc>> ColladaDocMapPair;
 

@@ -21,5 +21,6 @@ class Scene: public Renderable {
    private:
       VisualSceneVector visualScenes_;
 };
+typedef shared_ptr<Scene> ScenePtr;
 
 #endif /* COLLADACPP_SCENE_HPP_ */

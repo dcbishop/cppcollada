@@ -9,7 +9,7 @@ class VisualScene;
 
 #include <iostream>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -44,10 +44,15 @@ class Image;
 
 #include "../GameData/SmartPointers.hpp"
 #include "../Collada/ColladaObject.hpp"
+#include "../Collada/Scene.hpp"
 
-typedef map<string, DOMElement*> ElementIdMap;
+typedef unordered_map<string, DOMElement*> ElementIdMap;
 typedef ElementIdMap::iterator ElementIdMapIterator;
 typedef pair<string, DOMElement*> ElementIdMapPair;
+
+typedef unordered_map<string, ColladaObjectPtr> ColladaObjectMap;
+typedef ColladaObjectMap::iterator ColladaObjectMapIterator;
+typedef pair<string, ColladaObjectPtr> ColladaObjectMapPair;
 
 class ColladaDoc {
    public:
@@ -86,7 +91,7 @@ class ColladaDoc {
       void loadSourceTechnique(const DOMElement* element, shared_ptr<Source> source);
       DOMElement* getElementByTagName(const DOMElement* element, string tag);
       shared_ptr<Collada> getCollada();
-      shared_ptr<Scene> getScene();
+      ScenePtr getScene();
       bool isUrlLocal(const string& url);
       string getUrlId(const string& url);
       shared_ptr<VisualScene> getVisualScene(const string& url);
@@ -110,6 +115,7 @@ class ColladaDoc {
       DOMDocument* xmlDoc_;
       ColladaDocManager* manager_;
       ElementIdMap idMap_;
+      ColladaObjectMap objectMap_;
       shared_ptr<Collada> collada_;
       shared_ptr<Scene> scene_;
 };
