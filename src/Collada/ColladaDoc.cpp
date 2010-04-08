@@ -1013,7 +1013,9 @@ void ColladaDoc::loadTranslation(const DOMElement* element, Position* position) 
 }
 
 /**
- * 
+ * loads a <scale> node into a object that supports it.
+ * @param element The <scale> node to load the paramters from.
+ * @param scale The object to apply the scale to.
  */
 void ColladaDoc::loadScale(const DOMElement* element, Scale* scale) {
    DEBUG_M("Entering function...");
@@ -1097,6 +1099,11 @@ shared_ptr<ColladaNode> ColladaDoc::loadColladaNode(const DOMElement* element) {
    return node;
 }
 
+/**
+ * This loads <instance_* and binds elements in a <node> tag.
+ * @param element the <node> element to load the instances from.
+ * @param node The ColladaNode to bind the instances too.
+ */
 void ColladaDoc::loadInstances(const DOMElement* element, ColladaNode* node) {
    DEBUG_M("Entering function...");
 
@@ -1114,7 +1121,11 @@ void ColladaDoc::loadInstances(const DOMElement* element, ColladaNode* node) {
    }
 }
 
-
+/**
+ * Loads an InstanceGeometry from a XML node.
+ * @param element The <instance_geometry> XML node.
+ * @return The loaded InstanceGeometry.
+ */
 shared_ptr<InstanceGeometry> ColladaDoc::loadInstanceGeometry(const DOMElement* element) {
       DEBUG_M("Entering function...");
       shared_ptr<InstanceGeometry> ig(new InstanceGeometry);
@@ -1130,6 +1141,11 @@ shared_ptr<InstanceGeometry> ColladaDoc::loadInstanceGeometry(const DOMElement* 
       return ig;
 }
 
+/**
+ * Loads all the <bind_Materials> for an InstanceGeometry
+ * @param ig The InstanceGeometry to bind the materials to.
+ * @param element The <instance_geometry> node to process for <bind_Materials>.
+ */
 void ColladaDoc::loadInstanceGeometry_BindMaterials_(shared_ptr<InstanceGeometry> ig, const DOMElement* element) {
    XMLCh* tag = XMLString::transcode("bind_material");
    DOMNodeList* elements = element->getElementsByTagName(tag);
@@ -1150,6 +1166,11 @@ void ColladaDoc::loadInstanceGeometry_BindMaterials_(shared_ptr<InstanceGeometry
    }
 }
 
+/**
+ * Loads a Material that is bound to an InstanceGeometry.
+ * @param ig The InstanceGeometry to bind the material too.
+ * @param element The <bind_material> XML node.
+ */
 void ColladaDoc::loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry> ig, const DOMElement* element) {
    DEBUG_M("Entering function...");
    
@@ -1252,6 +1273,12 @@ ColladaObjectPtr ColladaDoc::loadInstance(const DOMElement* element, ColladaNode
 // instance_light x
 // instance_node x
 
+/**
+ * Returns the first child element that matches the tag.
+ * @param element The root element to search.
+ * @param tag The tag to match.
+ * @return The found DOMElement or NULL.
+ */
 DOMElement* ColladaDoc::getElementByTagName(const DOMElement* element, string tag) {
    DOMNodeList* elements = getElementsByTagName(element, tag);
    if(!elements) {
@@ -1277,6 +1304,8 @@ DOMElement* ColladaDoc::getElementByTagName(const DOMElement* element, string ta
 
 /**
  * Gets the main Scene of the Collada file.
+ * Will load VisualScenes and all the required objects.
+ * @return The main Scene.
  */
 ScenePtr ColladaDoc::getScene() {
    DEBUG_M("Entering function...");
@@ -1323,6 +1352,13 @@ ScenePtr ColladaDoc::getScene() {
    return scene_;
 }
 
+/**
+ * Returns a ColladaObject from it's COLLADA url. Will load it from XML
+ * also works for external files in which case it will tell the
+ * ColladaDocManager to load that file.
+ * @param url The url of the COLLADA object.
+ * @return The loaded ColladaObject
+ */
 ColladaObjectPtr ColladaDoc::getColladaObjectByUrl(const string& url) {
    DEBUG_M("Entering function... url='%s'", url.c_str());
    if(url.length() == 0) {
@@ -1345,6 +1381,7 @@ ColladaObjectPtr ColladaDoc::getColladaObjectByUrl(const string& url) {
 
 /**
  * Returns a Collada object based on the xml file.
+ * @return A loaded Collada object.
  */
 shared_ptr<Collada> ColladaDoc::getCollada() {
    DEBUG_M("Entering function...");
