@@ -5,6 +5,7 @@
  * A COLLADA visual_scene.
  */
 #include <vector>
+using namespace std;
 
 #include "../GameData/SmartPointers.hpp"
 #include "../Collada/ColladaObject.hpp"
@@ -26,5 +27,6 @@ class VisualScene : public ColladaObject {
    private:
       ColladaNodeVector nodes_;
 };
+typedef shared_ptr<VisualScene> VisualScenePtr;
 
 #endif /* COLLADACPP_VISUALSCENE_HPP_ */

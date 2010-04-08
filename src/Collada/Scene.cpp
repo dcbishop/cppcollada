@@ -1,9 +1,13 @@
 #include "../Collada/Scene.hpp"
 
-void Scene::setVisualScene(shared_ptr<VisualScene> visualScene) {
-   visualScene_ = visualScene;
+void Scene::addVisualScene(VisualScenePtr visualScene) {
+   visualScenes_.push_back(visualScene);
 }
 
-shared_ptr<VisualScene> Scene::getVisualScene() {
-   return visualScene_;
+VisualSceneIterator Scene::getFirstVisualScene() {
+   return visualScenes_.begin();
+}
+
+VisualSceneIterator Scene::getEndVisualScene() {
+   return visualScenes_.end();
 }

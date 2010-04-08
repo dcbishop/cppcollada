@@ -3,17 +3,23 @@
 
 #include "../GameData/SmartPointers.hpp"
 #include "../Render/Renderable.hpp"
+#include "../Collada/VisualScene.hpp";
 
-class VisualScene;
+#include <vector>
+using namespace std;
+
+typedef vector<VisualScenePtr> VisualSceneVector;
+typedef VisualSceneVector::iterator VisualSceneIterator;
 
 class Scene: public Renderable {
    public:
-      void setVisualScene(shared_ptr<VisualScene> scene);
-      shared_ptr<VisualScene> getVisualScene();
+      void addVisualScene(VisualScenePtr visualScene);
+      VisualSceneIterator getFirstVisualScene();
+      VisualSceneIterator getEndVisualScene();
       COLLADA_RENDER_FUNCTION
 
    private:
-      shared_ptr<VisualScene> visualScene_;
+      VisualSceneVector visualScenes_;
 };
 
 #endif /* COLLADACPP_SCENE_HPP_ */

@@ -2,7 +2,6 @@
 #define COLLADACPP_SOURCE_HPP_
 
 #include "../GameData/SmartPointers.hpp"
-
 #include "../Collada/ColladaObject.hpp"
 
 #include "../Debug/console.h"

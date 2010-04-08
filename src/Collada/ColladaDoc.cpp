@@ -1294,11 +1294,11 @@ shared_ptr<Scene> ColladaDoc::getScene() {
          if(XMLString::compareIString(tagName, "instance_visual_scene") == 0) {
             shared_ptr<VisualScene> visualScene(getVisualScene(url));
             DEBUG_H(" got scene");
-            scene_->setVisualScene(visualScene);
+            scene_->addVisualScene(visualScene);
          } else if(XMLString::compareIString(tagName, "instance_physics_scene") == 0) {
             // TODO: Load physics scene...
             //PhysicsScene* physicsScene = getPhysicsScene(id);
-            //scene->setPhysicsScene(physicsScene);
+            //scene->addPhysicsScene(physicsScene);
          }
          XMLString::release(&tagName);
          XMLString::release(&url);

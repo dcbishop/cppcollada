@@ -118,8 +118,12 @@ void ColladaRendererGL::render(Collada* collada) {
 
 void ColladaRendererGL::render(Scene* scene) {
    DEBUG_H("ColladaRendererGL::render(Scene* scene)");
-   if(scene->getVisualScene()) {
-      scene->getVisualScene()->render();
+
+   VisualSceneIterator vsi = scene->getFirstVisualScene();
+   VisualSceneIterator vsie = scene->getEndVisualScene();
+   while(vsi != vsie) {
+      (*vsi)->render();
+      vsi++;
    }
 }
 
