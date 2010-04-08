@@ -1305,11 +1305,12 @@ ScenePtr ColladaDoc::getScene() {
          char *url = XMLString::transcode(currentElement->getAttribute(url_x));
          DEBUG_M("getScene visual url: '%s'", url);
          if(XMLString::compareIString(tagName, "instance_visual_scene") == 0) {
-            shared_ptr<VisualScene> visualScene(getVisualScene(url));
+            shared_ptr<ColladaObject> co = getColladaObjectByUrl(url);
+            shared_ptr<VisualScene> visualScene = dynamic_pointer_cast<VisualScene, ColladaObject>(co);
             DEBUG_H(" got scene");
             scene_->addVisualScene(visualScene);
          } else if(XMLString::compareIString(tagName, "instance_physics_scene") == 0) {
-            // TODO: Load physics scene...
+            #warning ['TODO']: Load physics scene...
             //PhysicsScene* physicsScene = getPhysicsScene(id);
             //scene->addPhysicsScene(physicsScene);
          }
@@ -1320,14 +1321,6 @@ ScenePtr ColladaDoc::getScene() {
    }
 
    return scene_;
-}
-
-shared_ptr<VisualScene> ColladaDoc::getVisualScene(const string& url) {
-   DEBUG_M("Entering function... url='%s'", url.c_str());
-   ColladaObjectPtr colladaObject(getColladaObjectByUrl(url));
-   shared_ptr<VisualScene> visualScene(static_pointer_cast<VisualScene, ColladaObject>(colladaObject));
-   #warning ['TODO']: Safer dynamic cast?
-   return visualScene;
 }
 
 ColladaObjectPtr ColladaDoc::getColladaObjectByUrl(const string& url) {
