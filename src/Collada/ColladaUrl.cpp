@@ -28,6 +28,19 @@ const string ColladaUrl::getId(const string& url) {
 }
 
 /**
+ * Returns the fragment+id part of the URL 
+ * @param url The URL.
+ * @return the id (the # and text after it).
+ */
+const string ColladaUrl::getFragment(const string& url) {
+   int hashPos = url.rfind("#");
+   if(hashPos < 0) {
+      return "";
+   }
+   return url.substr(hashPos);
+}
+
+/**
  * Returns the URL without the id part.
  * @param url The url to return.
  * @return The url without the id.

@@ -1290,8 +1290,8 @@ shared_ptr<Scene> ColladaDoc::getScene() {
          char *tagName = XMLString::transcode(currentElement->getTagName());
          XMLCh* url_x = XMLString::transcode("url");
          char *url = XMLString::transcode(currentElement->getAttribute(url_x));
+         DEBUG_M("getScene visual url: '%s'", url);
          if(XMLString::compareIString(tagName, "instance_visual_scene") == 0) {
-            DEBUG_H("getScene visual url: '%s'", url);
             shared_ptr<VisualScene> visualScene(getVisualScene(url));
             DEBUG_H(" got scene");
             scene_->setVisualScene(visualScene);
@@ -1325,9 +1325,10 @@ ColladaObjectPtr ColladaDoc::getColladaObjectByUrl(const string& url) {
    }
 
    if(!ColladaUrl::isInternal(url)) {
-      DEBUG_H("It's an external url");
+      DEBUG_M("It's an external url");
       if(!manager_) {
          // TODO: Alternativly, spawn its own manager...
+         DEBUG_M("No ColladaDocManager?");
          return ColladaObjectPtr();
       }
       return manager_->getColladaObjectByUrl(url);

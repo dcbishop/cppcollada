@@ -3,6 +3,8 @@
 #include "../Collada/ColladaDoc.hpp"
 #include "../Collada/ColladaUrl.hpp"
 
+#include "../Debug/console.h"
+
 /**
  * Gets a COLLADA XML document from URL.
  * Loads it if necessary.
@@ -27,12 +29,18 @@ shared_ptr<ColladaDoc> ColladaDocManager::getColladaDoc(const string& url) {
  * @return the loaded object or NULL.
  */
 ColladaObjectPtr ColladaDocManager::getColladaObjectByUrl(const string& url) {
+   DEBUG_M("getColladaObjectByUrl(%s)", url.c_str());
+
    string strippedUrl = ColladaUrl::getStrippedUrl(url);
-   shared_ptr<ColladaDoc> colladaDoc(getColladaDoc(strippedUrl));
+   string filename = ColladaUrl::getFilename(url);
+   string fragment = ColladaUrl::getFragment(url);
+   DEBUG_M("strippedUrl='%s', filename='%s', fragment='%s'", strippedUrl.c_str(), filename.c_str(), fragment.c_str());
+   shared_ptr<ColladaDoc> colladaDoc(getColladaDoc(filename));
    if(!colladaDoc) {
       return ColladaObjectPtr();
    }
-   return colladaDoc->getColladaObjectByUrl(url);
+
+   return colladaDoc->getColladaObjectByUrl(fragment);
 }
 
 /**

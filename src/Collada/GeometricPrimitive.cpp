@@ -59,9 +59,15 @@ float GeometricPrimitive::getNZ(const int& num) const {
 }
 
 float GeometricPrimitive::getS(const int& num) const {
+   if(!texCoord_) {
+      return -1.0f;
+   }
    return texCoord_->getS(getTexCoordNum_(num));
 }
 
 float GeometricPrimitive::getT(const int& num) const {
+   if(!texCoord_) {
+      return -1.0f;
+   }
    return texCoord_->getT(getTexCoordNum_(num));
 }

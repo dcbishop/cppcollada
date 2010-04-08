@@ -29,9 +29,10 @@ int main(int argc, char* argv[]) {
    LOG("Starting main...");
    //DEBUG_A("Starting...");
    //string filename = "/home/hegemon/tmp/monkeyhead.dae";
-   string filename = "/home/hegemon/tmp/cubeuvmap.dae";
+   //string filename = "/home/hegemon/tmp/cubeuvmap.dae";
+   string filename = "/home/hegemon/tmp/externtest.dae";
    //string filename = "/home/hegemon/tmp/planetest.dae";
-
+   //string filename = "/home/hegemon/tmp/materialtest.dae";
 
    DEBUG_A("Spawning ColladaManager...");
    ColladaManager cm;

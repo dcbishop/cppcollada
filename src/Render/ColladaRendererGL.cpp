@@ -47,6 +47,7 @@ void ColladaRendererGL::preFrame() {
  * OpenGL stuff to run after each drawing of the frame.
  */
 void ColladaRendererGL::postFrame() {
+   glDisable(GL_CULL_FACE); //Cullface interfears with Qt for some reason
    glFlush();
 }
 
@@ -69,7 +70,11 @@ void ColladaRendererGL::setPerspective_() {
 
 void ColladaRendererGL::render(ColladaObject* colladaObject) {
    DEBUG_H("ColladaRendererGL::render(ColladaObject* colladaObject)");
-   WARNING("Tried to render raw ColladaObject '%s'", colladaObject->getId().c_str());
+   static bool nospam = false;
+   if(!nospam) {
+      WARNING("Tried to render raw ColladaObject '%s'", colladaObject->getId().c_str());
+      nospam = true;
+   }
    //colladaObject->render();
 }
 
@@ -514,7 +519,15 @@ void ColladaRendererGL::renderDefaultMaterial_() {
 void ColladaRendererGL::render(Material* material) {
    DEBUG_H("void ColladaRendererGL::render(Material* material)");
    shared_ptr<Effect> effect = material->getEffect();
-   effect->render();
+   if(effect.get()) {
+      effect->render();
+   } else {
+      static bool nospam = false;
+      if(!nospam) {
+         WARNING("Failed to load an Effect in Material '%s'. Future failed material load warnings will be supressed.", material->getId().c_str());
+         nospam = true;
+      }
+   }
 }
 
 void ColladaRendererGL::setRenderMode_() {
@@ -529,9 +542,9 @@ void ColladaRendererGL::setUnlitMode_() {
 
 void ColladaRendererGL::setPolygonMode_() {
    glPolygonMode(GL_FRONT, GL_FILL);
-   //glEnable(GL_CULL_FACE);
-   glCullFace(GL_FRONT);
-   glFrontFace(GL_CW);
+   glFrontFace(GL_CCW);
+   glCullFace(GL_BACK);
+   glEnable(GL_CULL_FACE);
 }
 
 /**

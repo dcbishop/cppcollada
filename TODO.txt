@@ -7,8 +7,11 @@
   shader and allow for things like using textures on non-diffuse
   properties. Also perpixel lighting. This ties into the above note.
 
+*  Try implement the COLLADA FX specs. Would fix above.
+
 * Rewrite the Collada loader, to load everything in order?
   (But in pratice Images come after effects for some reason?).
+  Might be fine the way it is? Call on need does seem to work fine.
 
 * Store all id's / sid's in the Collada type to allow for path setting.
   (Requires the loader to pass the origional Collada object around.)
@@ -31,10 +34,10 @@
 * Update getColladaObjectById in ColladaDoc to store a list of
   ids->ColladaObjects to save on reloading, prevent duplicates.
 
-* Normals seem screwed.
-
 * Some things (textures mostly) are looked up in an unsorted_map in the
   main rendering loop and they probably don't need to be in reality. I
   am just being pedantic about things being render agnostic as possible.
+  Now days is an unsorted_map lookup to costly to put in a main render
+  loop? Maybe I'm over optimizing...
 
 * Vertices class seems to be a pointless clone of Input...

@@ -9,6 +9,7 @@ using namespace std;
  */
 namespace ColladaUrl {
    const string getId(const string& url);
+   const string getFragment(const string& url);
    const string getStrippedUrl(const string& url);
    const bool isInternal(const string& url);
    const string getFilename(const string& url);
