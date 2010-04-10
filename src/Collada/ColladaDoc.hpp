@@ -113,7 +113,7 @@ class ColladaDoc {
       string url_;
       XercesDOMParser* parser_;
       DOMDocument* xmlDoc_;
-      ColladaDocManager* manager_;
+      ColladaDocManager* colladaDocManager_;
       ElementIdMap idMap_;
       ColladaObjectMap objectMap_;
       shared_ptr<Collada> collada_;

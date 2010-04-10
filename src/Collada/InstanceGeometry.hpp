@@ -19,6 +19,8 @@ class InstanceGeometry : public ColladaObject {
       shared_ptr<Geometry> getGeometry() {return geometry_;}
       void addInstanceMaterial(string symbol, shared_ptr<Material> material);
       shared_ptr<Material> getInstanceMaterial(string symbol);
+      MaterialMapIterator getFirstMaterial() { return materials_.begin(); }
+      MaterialMapIterator getEndMaterial() { return materials_.end(); }
 
    private:
       shared_ptr<Geometry> geometry_;

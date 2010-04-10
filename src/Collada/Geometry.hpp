@@ -1,6 +1,9 @@
 #ifndef COLLADACPP_GEOMETRY_HPP_
 #define COLLADACPP_GEOMETRY_HPP_
 
+#include <vector>
+using namespace std;
+
 #include "../Collada/ColladaObject.hpp"
 
 typedef vector<shared_ptr<GeometricPrimitive>> GeoPrimVector;

@@ -34,8 +34,8 @@ OpenGLScene::OpenGLScene(ViewWindowQT* vwqt) {
 
 void OpenGLScene::editCollada() {
    DEBUG_A("Oh boy!, PANCAKES!");
-   newEditCollada = new QTEditCollada(vwqt_->getCollada());
-   addOverlayedWidget((QWidget*)newEditCollada);
+   newEditColladas = new QTEditColladas(vwqt_->getColladaManager());
+   addOverlayedWidget((QWidget*)newEditColladas);
 }
 
 void OpenGLScene::addOverlayedWidget(QWidget* widget) {

@@ -12,6 +12,7 @@ using namespace std;
 #include "../Render/ColladaRendererGL.hpp"
 #include "../Render/Renderable.hpp"
 #include "../QTGui/QTEditCollada.hpp"
+#include "../QTGui/QTEditColladas.hpp"
 
 #include "../Debug/console.h"
 class Grid;
@@ -41,7 +42,7 @@ class OpenGLScene : public QGraphicsScene {
       shared_ptr<Grid> grid_;
       QTime time_;
       QWidget *editScene;
-      QTEditCollada* newEditCollada;
+      QTEditColladas* newEditColladas;
 };
 
 /**

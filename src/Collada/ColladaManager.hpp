@@ -1,5 +1,5 @@
-#ifndef COLLADACPP_COLLADAMANAGER_HPP_
-#define COLLADACPP_COLLADAMANAGER_HPP_
+#ifndef COLLADACPP_COLLADA_COLLADAMANAGER_HPP_
+#define COLLADACPP_COLLADA_COLLADAMANAGER_HPP_
 
 /**
  * Stores open Collada files for processing...
@@ -19,21 +19,28 @@ using namespace xercesc;
 
 #include "../Collada/Collada.hpp"
 #include "../Collada/ColladaDocManager.hpp"
+#include "../GameData/SmartPointers.hpp"
 
 class VisualScene;
+class ColladaDocManager;
 
 typedef map<string, shared_ptr<Collada>> ColladaMap;
 typedef ColladaMap::iterator ColladaMapIterator;
 typedef pair<string, shared_ptr<Collada>> ColladaMapPair;
 
-class ColladaManager {
+class ColladaManager : public ColladaObject {
    public:
-      shared_ptr<Collada> getCollada(const string& url);
+      ColladaManager();
+      ColladaPtr getCollada(const string& url);
+      void addCollada(const string& url, ColladaPtr collada);
+      ColladaMap* getColladaMap() { return &colladas_; }
+      ColladaMapIterator getColladaNum(const int& num);
       void scrub();
 
    private:
       ColladaMap colladas_;
       ColladaDocManager colladaDocManager_;
 };
+typedef shared_ptr<ColladaManager> ColladaManagerPtr;
 
-#endif /* COLLADACPP_COLLADAMANAGER_HPP_ */
+#endif /* COLLADACPP_COLLADA_COLLADAMANAGER_HPP_ */

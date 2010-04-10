@@ -5,6 +5,7 @@
 #include "../Collada/Collada.hpp"
 #include "../QTGui/QTEditGeneric.hpp"
 #include "../QTGui/QTEditScene.hpp"
+#include "../QTGui/TreeModel.hpp"
 
 class QTEditCollada : public QTEditGeneric {
    Q_OBJECT
@@ -19,6 +20,8 @@ class QTEditCollada : public QTEditGeneric {
       shared_ptr<Collada> collada_;
       QPushButton* sceneButton_;
       QLabel* filenameLabel_;
+      QTreeView* tree_;
+      TreeModel* model_;
 };
 
 #endif /* COLLADACPP_QTGUI_QTEDITCOLLADA_HPP_ */

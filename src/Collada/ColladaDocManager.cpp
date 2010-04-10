@@ -1,5 +1,6 @@
 #include "../Collada/ColladaDocManager.hpp"
 
+#include "../Collada/ColladaManager.hpp"
 #include "../Collada/ColladaDoc.hpp"
 #include "../Collada/ColladaUrl.hpp"
 
@@ -49,3 +50,8 @@ ColladaObjectPtr ColladaDocManager::getColladaObjectByUrl(const string& url) {
 void ColladaDocManager::unloadColladaDocs() {
    colladaDocs_.clear();
 }
+
+void ColladaDocManager::setColladaManager(ColladaManager* cm) {
+   colladaManager_ = cm;
+}
+

@@ -31,7 +31,7 @@ ColladaDoc::ColladaDoc(ColladaDocManager* manager, string url) {
    DEBUG_M("Entering function...");
    url_ = url;
    xmlDoc_ = loadColladaDoc(url);
-   manager_ = manager;
+   colladaDocManager_ = manager;
    buildIdMap_();
 }
 
@@ -246,23 +246,27 @@ ColladaObjectPtr ColladaDoc::loadColladaObject(const DOMElement* element) {
 
    char* tagName_c = XMLString::transcode(tagName);
    if(isString_(tagName, "visual_scene")) {
-      shared_ptr<VisualScene> visualScene(loadVisualScene(element));
+      VisualScenePtr visualScene(loadVisualScene(element));
       colladaObject = visualScene;
+      collada_->addLibraryVisualScene(visualScene);
    } else if(isString_(tagName, "node")) {
       shared_ptr<ColladaNode> node(loadColladaNode(element));
       colladaObject = node;
    } else if(isString_(tagName, "geometry")) {
       DEBUG_H("Load geometry");
-      shared_ptr<Geometry> geometry(loadGeometry(element));
+      GeometryPtr geometry(loadGeometry(element));
       colladaObject = geometry;
+      collada_->addLibraryGeometry(geometry);
    } else if(isString_(tagName, "camera")) {
       DEBUG_H("Load camera");
       shared_ptr<ColladaCamera> camera(loadColladaCamera(element));
       colladaObject = camera;
+      collada_->addLibraryCamera(camera);
    } else if(isString_(tagName, "light")) {
       DEBUG_H("Load light");
-      shared_ptr<ColladaLight> light(loadColladaLight(element));
+      ColladaLightPtr light(loadColladaLight(element));
       colladaObject = light;
+      collada_->addLibraryLight(light);
    } else if(isString_(tagName, "source")) {
       DEBUG_H("Load source");
       shared_ptr<Source> source(loadSource(element));
@@ -273,12 +277,14 @@ ColladaObjectPtr ColladaDoc::loadColladaObject(const DOMElement* element) {
       colladaObject = vertices;
    } else if(isString_(tagName, "material")) {
       DEBUG_H("Load material");
-      shared_ptr<Material> material(loadMaterial(element));
+      MaterialPtr material(loadMaterial(element));
       colladaObject = material;
+      collada_->addLibraryMaterial(material);
    } else if(isString_(tagName, "effect")) {
       DEBUG_H("Load effect");
-      shared_ptr<Effect> effect(loadEffect(element));
+      EffectPtr effect(loadEffect(element));
       colladaObject = effect;
+      collada_->addLibraryEffect(effect);
    /*} else if(isString_(tagName, "sampler2D")) { // We load this elsewhere
       DEBUG_H("Load sampler2D");
       shared_ptr<Sampler2D> sampler2D(loadSampler2D(element));
@@ -287,6 +293,7 @@ ColladaObjectPtr ColladaDoc::loadColladaObject(const DOMElement* element) {
       DEBUG_H("Load image");
       shared_ptr<Image> image(loadImage(element));
       colladaObject = image;
+      collada_->addLibraryImage(image);
    } else {
       WARNING("Tried to load unsupported object '%s'.", tagName_c);
    }
@@ -1310,17 +1317,19 @@ DOMElement* ColladaDoc::getElementByTagName(const DOMElement* element, string ta
 ScenePtr ColladaDoc::getScene() {
    DEBUG_M("Entering function...");
 
+   // Scene already loaded, return that
    if(scene_) {
       return scene_;
    }
 
+   // COLLADA file doesn't contain a <scene>
    DOMElement* node = getElementByTagName(xmlDoc_->getDocumentElement(), "scene");
    if(!node) {
       return ScenePtr();
    }
 
+   // Create a new Scene object
    ScenePtr scene_(new Scene());
-   #warning ['TODO']: Load the scene into the Scene node...
 
    DOMNodeList* children = node->getChildNodes();
    int length = children->getLength();
@@ -1366,14 +1375,20 @@ ColladaObjectPtr ColladaDoc::getColladaObjectByUrl(const string& url) {
       return ColladaObjectPtr();
    }
 
+   #warning ['TODO']: The only real reason to preload the 
+   // Stupidly preload the whole collada file
+   if(!collada_) {
+      getCollada();
+   }
+
    if(!ColladaUrl::isInternal(url)) {
       DEBUG_M("It's an external url");
-      if(!manager_) {
+      if(!colladaDocManager_) {
          // TODO: Alternativly, spawn its own manager...
          DEBUG_M("No ColladaDocManager?");
          return ColladaObjectPtr();
       }
-      return manager_->getColladaObjectByUrl(url);
+      return colladaDocManager_->getColladaObjectByUrl(url);
    }
 
    return getColladaObjectById(ColladaUrl::getId(url));
@@ -1389,6 +1404,7 @@ shared_ptr<Collada> ColladaDoc::getCollada() {
       collada_ = shared_ptr<Collada>(new Collada());
       collada_->setScene(getScene());
       collada_->setFilename(url_);
+      colladaDocManager_->getColladaManager()->addCollada(url_, collada_);
    }
    return collada_;
 }

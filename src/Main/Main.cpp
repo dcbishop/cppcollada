@@ -35,11 +35,11 @@ int main(int argc, char* argv[]) {
    //string filename = "/home/hegemon/tmp/materialtest.dae";
 
    DEBUG_A("Spawning ColladaManager...");
-   ColladaManager cm;
+   ColladaManagerPtr cm(new ColladaManager());
    DEBUG_A("Loading '%s'...", filename.c_str());
-   shared_ptr<Collada> collada(cm.getCollada(filename));
+   ColladaPtr collada(cm->getCollada(filename));
    DEBUG_A("Scrubbing Collada docs...");
-   cm.scrub();
+   cm->scrub();
 
    shared_ptr<Position> position = shared_ptr<Position>(new Position);
    position->setX(0.0f);
@@ -52,6 +52,7 @@ int main(int argc, char* argv[]) {
 
    //ViewWindowSDL vw(800, 600);
    ViewWindowQT vw(800, 600);
+   vw.setColladaManager(cm);
    vw.setCollada(collada);
    vw.setTitle(filename);
    vw.setCamera(camera);

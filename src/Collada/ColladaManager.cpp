@@ -5,6 +5,10 @@
 #include "../Collada/Scene.hpp"
 #include "../Collada/VisualScene.hpp"
 
+ColladaManager::ColladaManager() {
+   colladaDocManager_.setColladaManager(this);
+}
+
 /**
  * Gets a Collada object from a URL.
  * @param url No remote urls, only 'file://somedir/file.dae' or '/somedir/file.dae'.
@@ -18,10 +22,15 @@ shared_ptr<Collada> ColladaManager::getCollada(const string& url) {
    }
 
    shared_ptr<ColladaDoc> colladaDoc(colladaDocManager_.getColladaDoc(url));
-   shared_ptr<Collada> collada(colladaDoc->getCollada());
+   ColladaPtr collada(colladaDoc->getCollada());
+   addCollada(url, collada);
    
-   colladas_.insert(ColladaMapPair(url, collada));
+   
    return collada;
+}
+
+void ColladaManager::addCollada(const string& url, ColladaPtr collada) {
+   colladas_.insert(ColladaMapPair(url, collada));
 }
 
 /**
@@ -30,4 +39,26 @@ shared_ptr<Collada> ColladaManager::getCollada(const string& url) {
  */
 void ColladaManager::scrub() {
    colladaDocManager_.unloadColladaDocs();
+}
+
+/**
+ * Get the COLLADA based on its index number.
+ * I assume this isn't 'safe' for unsorted_map's as they don't seem to
+ * include retrevial by index, but its just for the editor GUI.
+ */
+ColladaMapIterator ColladaManager::getColladaNum(const int& num) {
+   if(num > (int)colladas_.size() || num < 0) {
+      return colladas_.end();
+   }
+
+   ColladaMapIterator cmapIter = colladas_.begin();
+   int i = 0;
+   while(cmapIter != colladas_.end()) {
+      if(i == num) {
+         return cmapIter;
+      }
+      i++;
+      cmapIter++;
+   }
+   return colladas_.end();
 }

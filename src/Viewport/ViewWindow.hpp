@@ -9,6 +9,7 @@ using namespace std;
 
 #include "../GameData/SmartPointers.hpp"
 #include "../Render/ColladaRenderer.hpp"
+#include "../Collada/ColladaManager.hpp"
 
 /**
  * A Simple window for viewing models in.
@@ -17,8 +18,8 @@ class ViewWindow {
    public:
       ViewWindow();
       ViewWindow(const int width, const int height);
-      virtual void setCollada(shared_ptr<Collada> collada);
-      shared_ptr<Collada> getCollada();
+      virtual void setCollada(ColladaPtr collada);
+      ColladaPtr getCollada();
       virtual void setTitle(const string title) = 0;
       virtual void mainLoop() = 0;
       virtual void setSize(const int width, const int height);
@@ -27,11 +28,14 @@ class ViewWindow {
       virtual ColladaRenderer* getRenderer() = 0;
       virtual void setCamera(shared_ptr<Camera> camera);
       virtual shared_ptr<Camera> getCamera();
+      virtual void setColladaManager(ColladaManagerPtr cm) { cm_ = cm; }
+      virtual ColladaManagerPtr getColladaManager() { return cm_; }
 
    private:
       int width_;
       int height_;
-      shared_ptr<Collada> collada_;
+      ColladaPtr collada_;
+      ColladaManagerPtr cm_;
       shared_ptr<Camera> camera_;
 };
 
