@@ -26,4 +26,4 @@ tmp/*
 colladatest
 build/*
 *.swp
-.*
+core
