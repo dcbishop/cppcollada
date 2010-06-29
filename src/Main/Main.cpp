@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
    //string filename = "/home/hegemon/tmp/monkeyhead.dae";
    //string filename = "/home/hegemon/tmp/cubeuvmap.dae";
    string filename = "/home/hegemon/tmp/externtest.dae";
+   //string filename = "/home/hegemon/tmp/cubestack.dae";
    //string filename = "/home/hegemon/tmp/planetest.dae";
    //string filename = "/home/hegemon/tmp/materialtest.dae";
 
