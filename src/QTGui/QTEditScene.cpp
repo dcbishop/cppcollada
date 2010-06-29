@@ -3,7 +3,7 @@
 
 #include "../Debug/console.h"
 
-QTEditScene::QTEditScene(shared_ptr<Scene> scene) {
+QTEditScene::QTEditScene(ScenePtr scene) {
    scene_ = scene_;
 
    editButton = new QPushButton("Edit VisualScene");

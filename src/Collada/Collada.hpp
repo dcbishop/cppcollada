@@ -18,6 +18,7 @@ using namespace std;
 #include "../Collada/VisualScene.hpp"
 #include "../Collada/ColladaCamera.hpp"
 #include "../Collada/ColladaLight.hpp"
+#include "../Collada/Scene.hpp"
 
 class Scene;
 
@@ -31,8 +32,8 @@ class Collada : public Renderable, public ColladaObject {
       #warning ['TODO']: Asset information?... created by and so on...
       void setFilename(const string filename);
       string getFilename();
-      void setScene(shared_ptr<Scene> scene);
-      shared_ptr<Scene> getScene();
+      void setScene(ScenePtr scene);
+      ScenePtr getScene();
       COLLADA_RENDER_FUNCTION
       void addId(const string id, ColladaObjectPtr object);
       ColladaObjectPtr getId(const string id);
@@ -49,7 +50,7 @@ class Collada : public Renderable, public ColladaObject {
       //void addLibraryPhysicsScene(PhysicsScenePtr physicsScene) { libraryPhysicsScens_.push_back(physicsScene); }
 
    private:
-      shared_ptr<Scene> scene_; /** The Scene of this Collada object. */
+      ScenePtr scene_; /** The Scene of this Collada object. */
       string filename_; /** The .dae filename of this Collada object. */
       IdMap ids_; /** A list of IDs contained in this Collada object. */
       vector<ColladaCameraPtr> libraryCameras_;

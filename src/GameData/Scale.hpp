@@ -8,6 +8,10 @@
  */
 class Scale: public Renderable {
    public:
+      Scale() {
+            setScaleXYZ(1.0f, 1.0f, 1.0f);
+      }
+
       virtual void setScaleXYZ(const float sx, const float sy, const float sz);
       virtual float getScaleX() const;
       virtual float getScaleY() const;

@@ -21,6 +21,8 @@
 
 #include "../Debug/console.h"
 #include "../GameData/RotationGL.hpp"
+#include "../Debug/TestRenderable.hpp"
+#include "../Collada/Scene.hpp"
 
 using namespace std;
 using namespace xercesc;
@@ -51,10 +53,19 @@ int main(int argc, char* argv[]) {
    camera->setTarget(position);
    camera->setZoom(10.0f);
 
+   ColladaPtr testCollada(new Collada());
+   ScenePtr testScene(new Scene());
+   VisualScenePtr testVisualScene(new VisualScene);
+   TestRenderablePtr testRenderable(new TestRenderable);
+   
+   testCollada->setScene(testScene);
+   testScene->addVisualScene(testVisualScene);
+   testVisualScene->addColladaNode(testRenderable);  
+
    //ViewWindowSDL vw(800, 600);
    ViewWindowQT vw(800, 600);
    vw.setColladaManager(cm);
-   vw.setCollada(collada);
+   vw.setCollada(testCollada);
    vw.setTitle(filename);
    vw.setCamera(camera);
    vw.mainLoop();

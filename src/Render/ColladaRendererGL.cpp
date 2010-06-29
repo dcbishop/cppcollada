@@ -17,6 +17,7 @@
 #include "../GameData/Grid.hpp"
 
 #include "../Debug/console.h"
+#include "../Debug/TestRenderable.hpp"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -533,6 +534,75 @@ void ColladaRendererGL::render(Material* material) {
       }
    }
 }
+
+void ColladaRendererGL::render(TestRenderable* tr) {
+   DEBUG_H("void ");
+   tr->ColladaNode::render();
+   renderCube_(tr->getScaleX());
+}
+
+void ColladaRendererGL::renderCube_(float size) {
+   float hsize = size/2;
+
+   /* Front faces */
+   float left_front_bottom[] = {-hsize, -hsize, -hsize};
+   float right_front_bottom[] = {hsize, -hsize, -hsize};
+   float left_back_bottom[] = {-hsize, hsize, -hsize};
+   float right_back_bottom[] = {hsize, hsize, -hsize};
+
+   /* Back faces */
+   float right_back_top[] = {hsize, hsize, hsize};
+   float left_back_top[] = {-hsize, hsize, hsize};
+   float left_front_top[] = {-hsize, -hsize, hsize};
+   float right_front_top[] = {hsize, -hsize, hsize};
+
+   setRenderMode_();
+   glBegin(GL_QUADS);
+      /* Front face */
+      glNormal3f(0.0, -1.0, 0.0);
+      glVertex3fv(left_front_bottom);
+      glVertex3fv(right_front_bottom);
+      glVertex3fv(right_front_top);
+      glVertex3fv(left_front_top);
+
+      /* Back face */
+      glNormal3f(0.0, 1.0, 0.0);
+      glVertex3fv(left_back_top);
+      glVertex3fv(right_back_top);
+      glVertex3fv(right_back_bottom);
+      glVertex3fv(left_back_bottom);
+
+      /* Top face */
+      glNormal3f(0.0, 0.0, 1.0);
+      glVertex3fv(left_front_top);
+      glVertex3fv(right_front_top);
+      glVertex3fv(right_back_top);
+      glVertex3fv(left_back_top);
+
+      /* Bottom face */
+      glNormal3f(0.0, 0.0, -1.0);
+      glVertex3fv(left_back_bottom);
+      glVertex3fv(right_back_bottom);
+      glVertex3fv(right_front_bottom);
+      glVertex3fv(left_front_bottom);
+      
+      /* Right face */
+      glNormal3f(1.0, 0.0, 0.0);
+      glVertex3fv(right_front_bottom);
+      glVertex3fv(right_back_bottom);
+      glVertex3fv(right_back_top);
+      glVertex3fv(right_front_top);
+
+      /* Left face */
+      glNormal3f(-1.0, 0.0, 0.0);
+      glVertex3fv(left_front_top);
+      glVertex3fv(left_back_top);
+      glVertex3fv(left_back_bottom);
+      glVertex3fv(left_front_bottom);
+   glEnd();
+
+}
+
 
 void ColladaRendererGL::setRenderMode_() {
    glDisable(GL_COLOR_MATERIAL);

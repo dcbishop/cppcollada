@@ -9,13 +9,13 @@ class QTEditScene : public QTEditGeneric {
    Q_OBJECT
 
    public:
-      QTEditScene(shared_ptr<Scene> scene);
+      QTEditScene(ScenePtr scene);
 
    public slots:
       void edit();
 
    private:
-      shared_ptr<Scene> scene_;
+      ScenePtr scene_;
       QPushButton* editButton;
       QVBoxLayout *layout;
 };

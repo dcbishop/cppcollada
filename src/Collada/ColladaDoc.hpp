@@ -117,7 +117,7 @@ class ColladaDoc {
       ElementIdMap idMap_;
       ColladaObjectMap objectMap_;
       shared_ptr<Collada> collada_;
-      shared_ptr<Scene> scene_;
+      ScenePtr scene_;
 };
 
 #endif /* COLLADACPP_COLLADADOC_HPP_ */

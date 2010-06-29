@@ -17,14 +17,14 @@ string Collada::getFilename() {
 /**
  * Sets the Collada's Scene objcet.
  */
-void Collada::setScene(shared_ptr<Scene> scene) {
+void Collada::setScene(ScenePtr scene) {
    scene_ = scene;
 }
 
 /**
  * Gets the Collada's Scene object.
  */
-shared_ptr<Scene> Collada::getScene() {
+ScenePtr Collada::getScene() {
    return scene_;
 }
 
