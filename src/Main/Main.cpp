@@ -15,7 +15,7 @@
 
 #include "../GameData/SmartPointers.hpp"
 
-#include "../GameData/Camera.hpp"
+#include "../GameObjects/Camera.hpp"
 
 //#include "../Unused/NetworkedSensor.hpp"
 
@@ -23,6 +23,9 @@
 #include "../GameData/RotationGL.hpp"
 #include "../Debug/TestRenderable.hpp"
 #include "../Collada/Scene.hpp"
+
+#include "../GameObjects/Area.hpp"
+#include "../GameObjects/ColladaMesh.hpp"
 
 using namespace std;
 using namespace xercesc;
@@ -49,23 +52,36 @@ int main(int argc, char* argv[]) {
    position->setY(0.0f);
    position->setZ(0.0f);
 
-   shared_ptr<Camera> camera = shared_ptr<Camera>(new Camera);
+   CameraPtr camera = CameraPtr(new Camera);
    camera->setTarget(position);
    camera->setZoom(10.0f);
 
-   ColladaPtr testCollada(new Collada());
+   /*ColladaPtr testCollada(new Collada());
    ScenePtr testScene(new Scene());
    VisualScenePtr testVisualScene(new VisualScene);
    TestRenderablePtr testRenderable(new TestRenderable);
    
    testCollada->setScene(testScene);
    testScene->addVisualScene(testVisualScene);
-   testVisualScene->addColladaNode(testRenderable);  
+   testVisualScene->addColladaNode(testRenderable);*/
 
    //ViewWindowSDL vw(800, 600);
+   
+   ColladaMeshPtr colladaMesh = ColladaMeshPtr(new ColladaMesh);
+   colladaMesh->setCollada(collada);
+   ColladaMeshPtr colladaMesh2 = ColladaMeshPtr(new ColladaMesh);
+   colladaMesh2->setCollada(collada);
+
+   AreaPtr area(new Area());
+   area->addObject(camera);
+   area->addObject(colladaMesh);
+   area->addObject(colladaMesh2);
+   colladaMesh->setXYZ(2.0, 0.0, 0.0);
+   colladaMesh2->setXYZ(-2.0, 0.0, 0.0);
+
    ViewWindowQT vw(800, 600);
-   vw.setColladaManager(cm);
-   vw.setCollada(testCollada);
+   /*vw.setColladaManager(cm);
+   vw.setCollada(collada);*/
    vw.setTitle(filename);
    vw.setCamera(camera);
    vw.mainLoop();

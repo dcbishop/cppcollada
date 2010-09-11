@@ -1,11 +1,11 @@
 #include "ViewWindow.hpp"
 #include "../Collada/Collada.hpp"
-#include "../GameData/Camera.hpp"
+#include "../GameObjects/Camera.hpp"
 
 #include "../Debug/console.h"
 
 ViewWindow::ViewWindow(const int width, const int height) {
-   camera_ = shared_ptr<Camera>();
+   camera_ = CameraPtr();
    setSize(width, height);
 }
 
@@ -22,15 +22,16 @@ int ViewWindow::getHeight() {
    return height_;
 }
 
-void ViewWindow::setCamera(shared_ptr<Camera> camera) {
+void ViewWindow::setCamera(CameraPtr camera) {
    camera_ = camera;
    camera_->setRenderer(getRenderer());
 }
 
-shared_ptr<Camera> ViewWindow::getCamera() {
+CameraPtr ViewWindow::getCamera() {
    return camera_;
 }
 
+#if 0 // ['TODO']: Remove me!
 void ViewWindow::setCollada(shared_ptr<Collada> collada) {
    collada_ = collada;
    collada_->setRenderer(getRenderer());
@@ -43,3 +44,4 @@ void ViewWindow::setCollada(shared_ptr<Collada> collada) {
 shared_ptr<Collada> ViewWindow::getCollada() {
    return collada_;
 }
+#endif

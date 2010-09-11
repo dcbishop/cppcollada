@@ -7,7 +7,6 @@
 #include "../GameData/Position.hpp"
 #include "../GameData/RotationGL.hpp"
 #include "../Render/Renderable.hpp"
-#include "../GameData/Camera.hpp"
 #include "../Collada/Triangles.hpp"
 #include "../Collada/Geometry.hpp"
 #include "../Collada/InstanceGeometry.hpp"
@@ -15,6 +14,11 @@
 #include "../Collada/Phong.hpp"
 #include "../Collada/Effect.hpp"
 #include "../GameData/Grid.hpp"
+
+#include "../GameObjects/GameObject.hpp"
+#include "../GameObjects/ColladaMesh.hpp"
+#include "../GameObjects/Area.hpp"
+#include "../GameObjects/Camera.hpp"
 
 #include "../Debug/console.h"
 #include "../Debug/TestRenderable.hpp"
@@ -100,6 +104,28 @@ void ColladaRendererGL::fixAxis_(const Collada* collada) {
 
 }
 
+void ColladaRendererGL::render(Area* area) {
+   GameObjectIterator goi = area->getFirstGameObject();
+   GameObjectIterator goie = area->getEndGameObject();
+
+   while(goi != goie) {
+      (*goi)->render();
+      goi++;
+   }
+}
+
+void ColladaRendererGL::render(GameObject* gameObject) {
+   gameObject->Position::render();
+   gameObject->RotationGL::render();
+   gameObject->Scale::render();
+}
+
+void ColladaRendererGL::render(ColladaMesh* colladaMesh) {
+   glPushMatrix();
+      colladaMesh->GameObject::render();
+      colladaMesh->getCollada()->render();
+   glPopMatrix();
+}
 void ColladaRendererGL::render(Collada* collada) {
    DEBUG_H("ColladaRendererGL::render(Collada* collada)");
 
@@ -161,6 +187,9 @@ void ColladaRendererGL::render(ColladaNode* node) {
    glPopMatrix();
 }
 
+/**
+ * Renders a devutting axis.
+ */
 void ColladaRendererGL::renderAxis_() {
    DEBUG_H("void ColladaRendererGL::renderAxis_()");
    // Draw debug axis...
@@ -180,11 +209,17 @@ void ColladaRendererGL::renderAxis_() {
    glColor3f(1.0, 1.0, 1.0);
 }
 
+/**
+ * Applies transformation.
+ */
 void ColladaRendererGL::render(Position* position) {
    DEBUG_H("ColladaRendererGL::render(Position* position)");
    glTranslatef(position->getX(), position->getY(), position->getZ());
 }
 
+/**
+ * Applies rotation.
+ */
 void ColladaRendererGL::render(RotationGL* rotation) {
    DEBUG_H("ColladaRendererGL::render(RotationGL* rotation)");
    float angle, x, y, z;
@@ -194,21 +229,37 @@ void ColladaRendererGL::render(RotationGL* rotation) {
    }
 }
 
+/**
+ * Applies scale.
+ */
 void ColladaRendererGL::render(Scale* scale) {
    DEBUG_H("ColladaRendererGL::render(Scale* scale)");
    glScalef(scale->getScaleX(), scale->getScaleY(), scale->getScaleZ());
 }
 
-
+/**
+ * The render function for the base render class (shouldn't be called...).
+ */
 void ColladaRendererGL::render(Renderable* renderable) {
    DEBUG_H("ColladaRendererGL::render(Renderable* renderable)");
    //renderable->render();
 }
 
 /**
- * Positions the camera for OpenGL.
+ * Renders a visible camera (For debugging).
  */
 void ColladaRendererGL::render(Camera* camera) {
+   DEBUG_H("void ColladaRendererGL::render(Camera* camera)");
+   glPushMatrix();
+      camera->GameObject::render();
+      renderAxis_();
+   glPopMatrix();
+}
+
+/**
+ * Positions the camera for OpenGL.
+ */
+void ColladaRendererGL::setCamera(Camera* camera) {
    DEBUG_H("void ColladaRendererGL::render(Camera* camera)");
    float cx = 0.0f;
    float cy = 0.0f;
@@ -223,6 +274,7 @@ void ColladaRendererGL::render(Camera* camera) {
 
    gluLookAt( camera->getX()+cx, camera->getY()+cy, camera->getZ()+cz, cx, cy, cz, 0.0f, 10.0f, 0.0f );
 }
+
 
 void ColladaRendererGL::render(Grid* grid) {
    DEBUG_H("void ColladaRendererGL::render(Grid* grid)");

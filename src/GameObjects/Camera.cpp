@@ -1,4 +1,4 @@
-#include "../GameData/Camera.hpp"
+#include "../GameObjects/Camera.hpp"
 
 #include <iostream>
 using namespace std;

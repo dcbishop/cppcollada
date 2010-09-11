@@ -20,9 +20,16 @@ class Material;
 class Phong;
 class TestRenderable;
 
+class GameObject;
+class Area;
+class ColladaMesh;
+
 class ColladaRenderer {
    public:
       virtual void render(Renderable* renderable) = 0;
+      virtual void render(GameObject* gameObject) = 0;
+      virtual void render(ColladaMesh* colladaMesh) = 0;
+      virtual void render(Area* area) = 0;
       virtual void render(Collada* collada) = 0;
       virtual void render(ColladaObject* colladaObject) = 0;
       virtual void render(Scene* scene) = 0;
@@ -32,6 +39,7 @@ class ColladaRenderer {
       virtual void render(RotationGL* rotation) = 0;
       virtual void render(Scale* scale) = 0;
       virtual void render(Camera* camera) = 0;
+      virtual void setCamera(Camera* camera) = 0;
       virtual void render(Grid* grid) = 0;
       virtual void render(Geometry* geometry) = 0;
       virtual void render(InstanceGeometry* ig) = 0;

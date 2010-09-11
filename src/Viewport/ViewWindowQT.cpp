@@ -5,12 +5,13 @@
 #include "../Debug/console.h"
 
 #include "../GameData/Grid.hpp"
-#include "../GameData/Camera.hpp"
+#include "../GameObjects/Camera.hpp"
 #include "../Collada/Collada.hpp"
 #include "../Render/ColladaRendererGL.hpp"
 
 #include "../QTGui/QTEditScene.hpp"
 #include "../QTGui/QTEditGeneric.hpp"
+#include "../GameObjects/Area.hpp"
 
 OpenGLScene::OpenGLScene(ViewWindowQT* vwqt) {
    grid_ = shared_ptr<Grid>(new Grid);
@@ -34,8 +35,9 @@ OpenGLScene::OpenGLScene(ViewWindowQT* vwqt) {
 
 void OpenGLScene::editCollada() {
    DEBUG_A("Oh boy!, PANCAKES!");
-   newEditColladas = new QTEditColladas(vwqt_->getColladaManager());
-   addOverlayedWidget((QWidget*)newEditColladas);
+   #warning ['TODO']: Update me for new game object based render system...
+   /*newEditColladas = new QTEditColladas(vwqt_->getColladaManager());
+   addOverlayedWidget((QWidget*)newEditColladas);*/
 }
 
 void OpenGLScene::addOverlayedWidget(QWidget* widget) {
@@ -104,16 +106,26 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
 
    renderer_.preFrame();
 
-   if(vwqt_->getCamera() != shared_ptr<Camera>()) {
-      vwqt_->getCamera()->render();
+   CameraPtr camera = vwqt_->getCamera();
+   shared_ptr<Area> area;
+
+   if(camera != CameraPtr()) {
+      camera->setCamera();
+      area = camera->getArea();
+   }
+   
+   if(area != shared_ptr<Area>()) {
+      area->render();
    }
 
    grid_->render();
 
-   shared_ptr<Collada> collada = vwqt_->getCollada();
+   #warning ['TODO']: Update me for new game object based render system...
+   /*shared_ptr<Collada> collada = vwqt_->getCollada();
    if(collada) {
       collada->render();
-   }
+   }*/
+   
 
    renderer_.postFrame();
 
@@ -203,8 +215,8 @@ void ViewWidget::mouseMoveEvent(QMouseEvent *event) {
 
    event->accept();
 
-   shared_ptr<Camera> camera = vwqt_->getCamera();  
-   if(camera == shared_ptr<Camera>()) {
+   CameraPtr camera = vwqt_->getCamera();  
+   if(camera == CameraPtr()) {
       WARNING("NO CAMERA!");
       return;
    }
@@ -254,7 +266,7 @@ void ViewWidget::wheelEvent(QWheelEvent * event) {
    if(event->orientation() == Qt::Horizontal) {
       // left/right scrolling...
    } else {
-      shared_ptr<Camera> camera = vwqt_->getCamera();
+      CameraPtr camera = vwqt_->getCamera();
       camera->setZoom(camera->getZoomTarget() + ZOOM_STEP * -numSteps);
    }
    event->accept();

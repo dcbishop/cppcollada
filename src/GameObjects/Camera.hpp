@@ -1,5 +1,5 @@
-#ifndef COLLADACPP_CAMERA_HPP_
-#define COLLADACPP_CAMERA_HPP_
+#ifndef GAMEOBJECTS_CAMERA_HPP_
+#define GAMEOBJECTS_CAMERA_HPP_
 
 //#include "Object.hpp"
 //#include "DynamicFloat.hpp"
@@ -15,14 +15,13 @@ const float ZOOM_MAX = 20.0f;
 const float ZOOM_SPEED = 3.0f;
 const float ZOOM_THRESHOLD = 0.001f;
 
-#include "../GameData/SmartPointers.hpp"
-#include "../GameData/Position.hpp"
+#include "../GameObjects/GameObject.hpp"
 
 /**
  * A camera.
  */
 #warning ['TODO']: Quicky dummy class, orbital camera only. Set from node?
-class Camera : public Position, public Renderable {
+class Camera : public GameObject {
    public:
       Camera();
       ~Camera();
@@ -45,6 +44,7 @@ class Camera : public Position, public Renderable {
       float getZ() const;
 
       COLLADA_RENDER_FUNCTION
+      virtual inline void setCamera() { getRenderer()->setCamera(this); }
 
    private:
       weak_ptr<Position> target_;
@@ -53,5 +53,6 @@ class Camera : public Position, public Renderable {
       float rx_;
       float ry_;
 };
+typedef shared_ptr<Camera> CameraPtr;
 
-#endif /* TX_CAMERA_HPP */
+#endif /* GAMEOBJECTS_CAMERA_HPP_ */

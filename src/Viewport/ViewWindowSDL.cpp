@@ -11,7 +11,7 @@ using namespace std;
 #include "../Debug/console.h"
 
 #include "../Render/Renderable.hpp"
-#include "../GameData/Camera.hpp"
+#include "../GameObjects/Camera.hpp"
 #include "../Collada/Collada.hpp"
 #include "../Render/ColladaRendererGL.hpp"
 #include "../Render/ColladaRenderer.hpp"
@@ -75,13 +75,14 @@ void ViewWindowSDL::draw_() {
 
    renderer_.preFrame();
 
-   getCamera()->render();
+   getCamera()->setCamera();
    grid_->render();
 
-   shared_ptr<Collada> collada = getCollada();
+   /*shared_ptr<Collada> collada = getCollada();
    if(collada) {
       collada->render();
-   }
+   }*/
+   // TODO: Render stuff here!
 
    renderer_.postFrame();
    SDL_GL_SwapBuffers();
