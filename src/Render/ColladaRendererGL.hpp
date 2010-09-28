@@ -29,6 +29,7 @@ class ColladaRendererGL : public ColladaRenderer {
       virtual void render(Material* material);
       virtual void render(Phong* phong);
       virtual void render(TestRenderable* tr);
+      virtual void render(Octree* octree);
       virtual void preFrame();
       virtual void postFrame();
       virtual void init();
@@ -39,12 +40,15 @@ class ColladaRendererGL : public ColladaRenderer {
       void renderDefaultMaterial_();
       void fixAxis_(const Collada* collada);
       void renderAxis_();
-      void renderCube_(float size);
+      void renderCube_(const float size);
       void setPerspective_();
       void setPolygonMode_();
+      void setWireframeMode_();
       void setRenderMode_();
       void setUnlitMode_();
       void setLights_();
+      void renderOctreeNode_(Octree* octree);
+
 
 
       Phong defaultMaterial_;

@@ -26,6 +26,7 @@
 
 #include "../GameObjects/Area.hpp"
 #include "../GameObjects/ColladaMesh.hpp"
+#include "../GameObjects/Octree.hpp"
 
 using namespace std;
 using namespace xercesc;
@@ -52,10 +53,6 @@ int main(int argc, char* argv[]) {
    position->setY(0.0f);
    position->setZ(0.0f);
 
-   CameraPtr camera = CameraPtr(new Camera);
-   camera->setTarget(position);
-   camera->setZoom(10.0f);
-
    /*ColladaPtr testCollada(new Collada());
    ScenePtr testScene(new Scene());
    VisualScenePtr testVisualScene(new VisualScene);
@@ -72,11 +69,22 @@ int main(int argc, char* argv[]) {
    ColladaMeshPtr colladaMesh2 = ColladaMeshPtr(new ColladaMesh);
    colladaMesh2->setCollada(collada);
 
+
+
+   OctreePtr octreeTest = OctreePtr(new Octree);
+   octreeTest->setScaleXYZ(10, 10, 10);
+   octreeTest->debug();
+
+   CameraPtr camera = CameraPtr(new Camera);
+   camera->setTarget(octreeTest);
+   camera->setZoom(10.0f);
+
    AreaPtr area(new Area());
    area->addObject(camera);
-   area->addObject(colladaMesh);
-   area->addObject(colladaMesh2);
-   colladaMesh->setXYZ(2.0, 0.0, 0.0);
+   //area->addObject(colladaMesh);
+   //area->addObject(colladaMesh2);
+   area->addObject(octreeTest);
+   colladaMesh->setXYZ(2.0, -2.0, 0.0);
    colladaMesh2->setXYZ(-2.0, 0.0, 0.0);
 
    ViewWindowQT vw(800, 600);
@@ -85,13 +93,12 @@ int main(int argc, char* argv[]) {
    vw.setTitle(filename);
    vw.setCamera(camera);
    vw.mainLoop();
-   
-   
+
    //DEBUG_A("Entering main loop...");
-   
+
    /*shared_ptr<RotationGL> rotation(new RotationGL);
    collada->debugRotationHack = rotation;
-   
+
    NetworkedSensor ns;
    ns.setOrientationTarget(rotation);
    ns.start();*/

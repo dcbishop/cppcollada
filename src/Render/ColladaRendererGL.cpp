@@ -19,6 +19,7 @@
 #include "../GameObjects/ColladaMesh.hpp"
 #include "../GameObjects/Area.hpp"
 #include "../GameObjects/Camera.hpp"
+#include "../GameObjects/Octree.hpp"
 
 #include "../Debug/console.h"
 #include "../Debug/TestRenderable.hpp"
@@ -52,6 +53,8 @@ void ColladaRendererGL::preFrame() {
  * OpenGL stuff to run after each drawing of the frame.
  */
 void ColladaRendererGL::postFrame() {
+   setRenderMode_();
+   setPolygonMode_();
    glDisable(GL_CULL_FACE); //Cullface interfears with Qt for some reason
    glFlush();
 }
@@ -593,7 +596,7 @@ void ColladaRendererGL::render(TestRenderable* tr) {
    renderCube_(tr->getScaleX());
 }
 
-void ColladaRendererGL::renderCube_(float size) {
+void ColladaRendererGL::renderCube_(const float size) {
    float hsize = size/2;
 
    /* Front faces */
@@ -660,6 +663,7 @@ void ColladaRendererGL::setRenderMode_() {
    glDisable(GL_COLOR_MATERIAL);
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
+   glEnable(GL_DEPTH_TEST);
 }
 
 void ColladaRendererGL::setUnlitMode_() {
@@ -671,6 +675,12 @@ void ColladaRendererGL::setPolygonMode_() {
    glFrontFace(GL_CCW);
    glCullFace(GL_BACK);
    glEnable(GL_CULL_FACE);
+}
+
+void ColladaRendererGL::setWireframeMode_() {
+   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   setUnlitMode_();
+   glDisable(GL_CULL_FACE);
 }
 
 /**
@@ -734,4 +744,57 @@ void ColladaRendererGL::render(Phong* phong) {
    } else {
       glBindTexture( GL_TEXTURE_2D, NULL); //TODO: C++0x nullptr
    }
+}
+
+void ColladaRendererGL::renderOctreeNode_(Octree* octree) {
+   if(octree->getIsSolid()) {
+      //setPolygonMode_();
+      renderCube_(1.0);
+   } /*else {
+      setWireframeMode_();
+   }*/
+   
+}
+
+void ColladaRendererGL::render(Octree* octree) {
+   glPushMatrix();
+
+   octree->GameObject::render();
+
+   if(octree->getHasChildren()) {
+      for(int i = 0; i < 8; i++) {
+         OctreePtr child = octree->getChild(i);
+         if(child != OctreePtr()) {
+            glPushMatrix();
+            glScalef(0.5, 0.5, 0.5);
+
+            // Left/Right offset
+            if(i == 0 || i == 2 || i == 4 || i == 6) {
+               glTranslatef(0.5, 0.0, 0.0);
+            } else {
+               glTranslatef(-0.5, 0.0, 0.0);
+            }
+
+            // Up/Down
+            if(i == 0 || i == 1 || i == 4 || i == 5) {
+               glTranslatef(0.0, -0.5, 0.0);
+            } else {
+               glTranslatef(0.0, 0.5, 0.0);
+            }
+
+            // Front/Back
+            if(i >= 4) {
+               glTranslatef(0.0, 0.0, 0.5);
+            } else {
+               glTranslatef(0.0, 0.0, -0.5);
+            }
+
+            child->render();
+            glPopMatrix();
+         }
+      }
+   }
+   renderOctreeNode_(octree);
+
+   glPopMatrix();
 }

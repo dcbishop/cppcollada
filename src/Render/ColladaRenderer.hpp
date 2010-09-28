@@ -23,6 +23,7 @@ class TestRenderable;
 class GameObject;
 class Area;
 class ColladaMesh;
+class Octree;
 
 class ColladaRenderer {
    public:
@@ -48,6 +49,7 @@ class ColladaRenderer {
       virtual void render(Material* material) = 0;
       virtual void render(Phong* phong) = 0;
       virtual void render(TestRenderable* tr) = 0;
+      virtual void render(Octree* octree) = 0;
       virtual void setSize(const int width, const int height) = 0;
       virtual void preFrame() = 0;
       virtual void postFrame() = 0;
