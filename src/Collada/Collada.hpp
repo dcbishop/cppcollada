@@ -2,7 +2,6 @@
 #define COLLADACPP_COLLADA_HPP_
 
 #include <iostream>
-#include <unordered_map>
 using namespace std;
 
 #include "../GameData/SmartPointers.hpp"

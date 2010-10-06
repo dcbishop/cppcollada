@@ -24,9 +24,9 @@ using namespace xercesc;
 class VisualScene;
 class ColladaDocManager;
 
-typedef map<string, shared_ptr<Collada>> ColladaMap;
+typedef map< string, shared_ptr<Collada> > ColladaMap;
 typedef ColladaMap::iterator ColladaMapIterator;
-typedef pair<string, shared_ptr<Collada>> ColladaMapPair;
+typedef pair< string, shared_ptr<Collada> > ColladaMapPair;
 
 class ColladaManager : public ColladaObject {
    public:

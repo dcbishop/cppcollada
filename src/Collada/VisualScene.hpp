@@ -13,7 +13,7 @@ using namespace std;
 
 class ColladaNode;
 
-typedef vector<shared_ptr<ColladaNode>> ColladaNodeVector;
+typedef vector< shared_ptr<ColladaNode> > ColladaNodeVector;
 typedef ColladaNodeVector::iterator ColladaNodeIterator;
 
 #warning ['TODO']: Keep a map of the nodes/ids...

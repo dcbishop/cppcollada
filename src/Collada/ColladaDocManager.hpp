@@ -1,7 +1,6 @@
 #ifndef COLLADACPP_COLLADADOCMANAGER_HPP_
 #define COLLADACPP_COLLADADOCMANAGER_HPP_
 
-#include <unordered_map>
 #include <string>
 using namespace std;
 
@@ -14,6 +13,7 @@ using namespace std;
 #include <xercesc/util/PlatformUtils.hpp>
 using namespace xercesc;
 
+#include "../GameData/SmartPointers.hpp"
 #include "../Collada/ColladaObject.hpp"
 
 class VisualScene;
@@ -22,9 +22,9 @@ class Scene;
 class ColladaObject;
 class ColladaManager;
 
-typedef unordered_map<string, shared_ptr<ColladaDoc>> ColladaDocMap;
+typedef unordered_map< string, shared_ptr<ColladaDoc> > ColladaDocMap;
 typedef ColladaDocMap::iterator ColladaDocMapIterator;
-typedef pair<string, shared_ptr<ColladaDoc>> ColladaDocMapPair;
+typedef pair< string, shared_ptr<ColladaDoc> > ColladaDocMapPair;
 
 /**
  * 

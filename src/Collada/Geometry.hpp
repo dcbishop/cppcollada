@@ -6,7 +6,7 @@ using namespace std;
 
 #include "../Collada/ColladaObject.hpp"
 
-typedef vector<shared_ptr<GeometricPrimitive>> GeoPrimVector;
+typedef vector< shared_ptr<GeometricPrimitive> > GeoPrimVector;
 typedef GeoPrimVector::iterator GeoPrimIterator;
 
 class Geometry : public ColladaObject {

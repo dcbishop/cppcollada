@@ -6,10 +6,8 @@ class Collada;
 class ColladaDocManager;
 class VisualScene;
 
-
 #include <iostream>
 #include <string>
-#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -18,6 +16,9 @@ using namespace std;
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
+
+#include "../GameData/SmartPointers.hpp"
+
 using namespace xercesc;
 
 class ColladaObject;
@@ -65,7 +66,7 @@ class ColladaDoc {
       ColladaObjectPtr getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
-      shared_ptr<vector<float>> getFloats(string text);
+      shared_ptr< vector<float> > getFloats(string text);
       ColladaObjectPtr loadColladaObject(const DOMElement* element);
       string getAttribute(const DOMElement* element, string attribute);
       void loadId(const DOMElement* element, Id* id);
@@ -97,7 +98,7 @@ class ColladaDoc {
       shared_ptr<VisualScene> getVisualScene(const string& url);
       ColladaObjectPtr getColladaObjectByUrl(const string& url);
       shared_ptr<Input> loadInput(const DOMElement* element);
-      shared_ptr<vector<int>> loadPrimitives(const DOMElement* element);
+      shared_ptr< vector<int> > loadPrimitives(const DOMElement* element);
       shared_ptr<Effect> loadEffect(const DOMElement* element);
       ColladaObjectPtr loadNewparam(const DOMElement* profileCommon, const DOMElement* node);
       ColladaObjectPtr loadSurface(const DOMElement* element);

@@ -15,6 +15,7 @@ const float ZOOM_MAX = 20.0f;
 const float ZOOM_SPEED = 3.0f;
 const float ZOOM_THRESHOLD = 0.001f;
 
+#include "../GameData/SmartPointers.hpp"
 #include "../GameObjects/GameObject.hpp"
 
 /**

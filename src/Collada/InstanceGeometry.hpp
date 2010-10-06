@@ -2,15 +2,15 @@
 #define COLLADACPP_INSTANCEGEOMETRY_HPP_
 
 #include <string>
-#include <unordered_map>
 using namespace std;
 
+#include "../GameData/SmartPointers.hpp"
 #include "../Collada/ColladaObject.hpp"
 #include "../Collada/Material.hpp"
 
-typedef unordered_map<string, shared_ptr<Material>> MaterialMap;
+typedef unordered_map< string, shared_ptr<Material> > MaterialMap;
 typedef MaterialMap::iterator MaterialMapIterator;
-typedef pair<string, shared_ptr<Material>> MaterialMapPair;
+typedef pair< string, shared_ptr<Material> > MaterialMapPair;
 
 class InstanceGeometry : public ColladaObject {
    public:

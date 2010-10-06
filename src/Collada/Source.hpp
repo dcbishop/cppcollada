@@ -8,7 +8,7 @@
 
 class Source: public ColladaObject {
    public:
-      void setFloats(shared_ptr<vector<float>> floats) {
+      void setFloats(shared_ptr< vector<float> > floats) {
          floats_ = floats;
          if(!floats_) {
             WARNING("Setting of floats screwed up");
@@ -31,7 +31,7 @@ class Source: public ColladaObject {
       inline virtual float getTPos(const int& num) const { return floats_->at(tOffset_ + (num * getStride())); }
 
    private:
-      shared_ptr<vector<float>> floats_;
+      shared_ptr< vector<float> > floats_;
       int xOffset_;
       int yOffset_;
       int zOffset_;

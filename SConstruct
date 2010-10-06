@@ -9,6 +9,8 @@ sources += glob('src/*/*.cpp')
 env = Environment(build_dir='build')
 win32 = ARGUMENTS.get('win32', 0)
 debug_flag = ARGUMENTS.get('debug', 0)
+clang_flag = ARGUMENTS.get('clang', 0)
+boost_flag = ARGUMENTS.get('boost', 0)
 
 env.Tool('colourful', toolpath=['scons-tools'])
 #env.AppendUnique(LIBS=['m', 'IL', 'mxml', 'rcbc', 'luabind'])
@@ -50,10 +52,18 @@ if int(debug_flag):
 	env.Append(CCFLAGS = ['-g'])
 	env.Append(CPPDEFINES=['_DEBUG'])
 
+# clang also needs boost as it doesn't seem to work with c++0x
+if int(clang_flag):
+	env['CXX'] = 'clang++'
+	env.Append(CCFLAGS = ['-fcolor-diagnostics'])
+
 env.Append(CCFLAGS = ['-Wall'])
 
-# For shared_ptr, other wise try  -D_TR1PTR or -D_BOOSTPTR
-env.Append(CCFLAGS = ['-std=c++0x'])
+# Also there's untested D_TR1PTR 
+if int(boost_flag):
+	env.Append(CCFLAGS = ['-D_BOOSTPTR'])
+else:
+	env.Append(CCFLAGS = ['-std=c++0x'])
 
 objects = env.Object(sources)
 target = env.Program(target = prog_target, source=objects)
