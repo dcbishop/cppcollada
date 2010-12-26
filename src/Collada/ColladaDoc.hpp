@@ -66,7 +66,7 @@ class ColladaDoc {
       ColladaObjectPtr getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
-      shared_ptr< vector<float> > getFloats(string text);
+      shared_ptr< vector<float> > getFloatsVector(string text);
       ColladaObjectPtr loadColladaObject(const DOMElement* element);
       string getAttribute(const DOMElement* element, string attribute);
       void loadId(const DOMElement* element, Id* id);

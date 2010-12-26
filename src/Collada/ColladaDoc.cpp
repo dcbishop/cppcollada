@@ -562,7 +562,7 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
 
          const XMLCh* data_x = data->getTextContent();
          char* data_c = XMLString::transcode(data_x);
-         shared_ptr< vector<float> > floats = getFloats(data_c);
+         shared_ptr< vector<float> > floats = getFloatsVector(data_c);
          XMLString::release(&data_c);
 
          if(isString_(tagName, "emission")) {
@@ -797,7 +797,7 @@ shared_ptr<Source> ColladaDoc::loadSource(const DOMElement* element) {
          if(isString_(tagName, "float_array")) {
             const XMLCh* data_x = currentElement->getTextContent();
             char* data_c = XMLString::transcode(data_x);
-            shared_ptr< vector<float> > floats(getFloats(data_c));
+            shared_ptr< vector<float> > floats(getFloatsVector(data_c));
             source->setFloats(floats);
             XMLString::release(&data_c);
          } else if (isString_(tagName, "technique_common")) {
@@ -966,11 +966,11 @@ shared_ptr<VisualScene> ColladaDoc::loadVisualScene(const DOMElement* element) {
 }
 
 /**
- * Turns a string containing floats, into a float array.
- * @param text A string containing a float array.
+ * Turns a string containing floats, into a float vector.
+ * @param text A string containing a float vector.
  * @param floats A vector of floats.
  */
-shared_ptr< vector<float> > ColladaDoc::getFloats(string text) {
+shared_ptr< vector<float> > ColladaDoc::getFloatsVector(string text) {
    DEBUG_M("Entering function...");
 
    shared_ptr< vector<float> > floats(new vector<float>);
@@ -1009,7 +1009,7 @@ void ColladaDoc::loadTranslation(const DOMElement* element, Position* position) 
       const XMLCh* data_x = current->getTextContent();
       char* data_c = XMLString::transcode(data_x);
 
-      shared_ptr< vector<float> > floats(getFloats(data_c));
+      shared_ptr< vector<float> > floats(getFloatsVector(data_c));
 
       position->setX(floats->at(0));
       position->setY(floats->at(1));
@@ -1037,7 +1037,7 @@ void ColladaDoc::loadScale(const DOMElement* element, Scale* scale) {
       const XMLCh* data_x = current->getTextContent();
       char* data_c = XMLString::transcode(data_x);
 
-      shared_ptr< vector<float> > floats(getFloats(data_c));
+      shared_ptr< vector<float> > floats(getFloatsVector(data_c));
 
       scale->setScaleXYZ(floats->at(0), floats->at(1), floats->at(2));
 
@@ -1055,7 +1055,7 @@ void ColladaDoc::loadRotation(const DOMElement* element, RotationGL* rotation, i
    const XMLCh* data_x = element->getTextContent();
    char* data_c = XMLString::transcode(data_x);
 
-   shared_ptr< vector<float> > floats(getFloats(data_c));
+   shared_ptr< vector<float> > floats(getFloatsVector(data_c));
 
    rotation->setRotationGL(number, floats->at(0), floats->at(1), floats->at(2), floats->at(3));
 

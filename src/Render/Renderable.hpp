@@ -14,7 +14,7 @@ class Renderable {
       COLLADA_PURE_RENDER_FUNCTION
 
    private:
-         static ColladaRenderer* renderer_;
+		static ColladaRenderer* renderer_;
 };
 
 
