@@ -7,6 +7,17 @@ enum { INDEX_RED, INDEX_GREEN, INDEX_BLUE, INDEX_ALPHA };
 
 class ColorRGBA {
    public:
+      ColorRGBA() {
+		  setColor(1.0f, 1.0f, 1.0f, 1.0f);
+	  }
+
+      ColorRGBA(const float& red, const float& green, const float& blue, const float& alpha) {
+	      setColor(red, green, blue, alpha);
+	  }
+	  ColorRGBA(const float& red, const float& green, const float& blue) {
+         setColor(red, green, blue);
+      }
+      
       inline void setRed(const float& red) { rgba[INDEX_RED] = red; }
       inline void setGreen(const float& green) { rgba[INDEX_GREEN] = green; }
       inline void setBlue(const float& blue) { rgba[INDEX_BLUE] = blue; }
@@ -23,5 +34,7 @@ class ColorRGBA {
    private:
       float rgba[4];
 };
+
+typedef shared_ptr<ColorRGBA> ColorRGBAPtr;
 
 #endif /* COLLADACPP_COLORRGBA_HPP_ */

@@ -1,6 +1,11 @@
 #ifndef COLLADACPP_COLLADARENDERERGL_HPP_
 #define COLLADACPP_COLLADARENDERERGL_HPP_
 
+#include <GL/glew.h>
+#include <GL/glu.h>
+//#include <GL/glut.h>
+#include <GL/gl.h>
+
 #include "../Render/ColladaRenderer.hpp"
 #include "../Collada/Phong.hpp"
 #include "../Render/ColladaRendererGL_DevIL.hpp"
@@ -54,6 +59,7 @@ class ColladaRendererGL : public ColladaRenderer {
       Phong defaultMaterial_;
       int width_;
       int height_;
+      bool glewInit_;
       ColladaRendererGL_DevIL imageLoader_;
 };
 

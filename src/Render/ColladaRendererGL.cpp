@@ -24,17 +24,20 @@
 #include "../Debug/console.h"
 #include "../Debug/TestRenderable.hpp"
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+
+
 
 #include <iostream>
 
 void ColladaRendererGL::init() {
    LOG("Initilizing OpenGL renderer...");
+   glewInit_ = false;
    defaultMaterial_.setRenderer(this);
    debugPrimDraw = -1;
    imageLoader_.init();
    glEnable(GL_MULTISAMPLE);
+  // glutInit();
+
    LOG("Initilized OpenGL renderer...");
 }
 
@@ -42,11 +45,22 @@ void ColladaRendererGL::init() {
  * OpenGL stuff to run prior to each drawing of the frame.
  */
 void ColladaRendererGL::preFrame() {
+	if(glewInit_ == false) {
+		GLenum err = glewInit();
+		if (GLEW_OK != err)
+		{
+			ERROR("%s", glewGetErrorString(err));
+		}
+		DEBUG_M("GLEW inited version %s", glewGetString(GLEW_VERSION));
+		glewInit_ = true;
+	}
    setPerspective_();
    glLoadIdentity();
    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
    glClearDepth(10000.0f);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   setPolygonMode_();
+   setRenderMode_();
 }
 
 /**
@@ -597,15 +611,62 @@ void ColladaRendererGL::render(TestRenderable* tr) {
 }
 
 void ColladaRendererGL::renderCube_(const float size) {
+	// Render a cube from a VBO
+	static GLuint cubeid = 0;
+	static int offset = 0;
+	if(cubeid == 0) {
+		GLfloat vertices[] = {1,1,1,		-1,1,1,		-1,-1,1,		1,-1,1, //BACK OR FRONT
+									 1,1,1,		1,-1,1,		1,-1,-1,  	1,1,-1, //LEFT
+                            1,1,1,		1,1,-1,		-1,1,-1,  	-1,1,1, //TOP
+                            -1,1,1,		-1,1,-1,		-1,-1,-1,  	-1,-1,1, // RIGHT
+                            -1,-1,-1,	1,-1,-1,		1,-1,1,		-1,-1,1, // BOTTOM
+                            1,-1,-1,	-1,-1,-1,	-1,1,-1, 	 1,1,-1 //FRONT
+                            };
+
+		GLfloat normals[] = {0,0,1,	0,0,1,   0,0,1,   0,0,1,
+                           1,0,0,   1,0,0,   1,0,0,	1,0,0,
+                           0,1,0,   0,1,0,   0,1,0,	0,1,0,
+                           -1,0,0,  -1,0,0,	-1,0,0,  -1,0,0,
+                           0,-1,0,  0,-1,0,  0,-1,0,  0,-1,0,
+                           0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1
+                           };
+                           
+		offset = sizeof(vertices);
+      
+      //cubeid = 1;               
+		DEBUG_M("Initilizing cube VBO.");
+		glGenBuffers(1, &cubeid);
+		glBindBuffer(GL_ARRAY_BUFFER, cubeid);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), 0, GL_STATIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	//setPolygonMode_();
+	glBindBuffer(GL_ARRAY_BUFFER, cubeid);
+	
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+
+	glVertexPointer(3, GL_FLOAT, 0, 0);
+	glNormalPointer(GL_FLOAT, 0, (void*)offset);
+	
+	glDrawArrays(GL_QUADS, 0, 24);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	/* Lazy cube
    float hsize = size/2;
 
-   /* Front faces */
+   // Front faces
    float left_front_bottom[] = {-hsize, -hsize, -hsize};
    float right_front_bottom[] = {hsize, -hsize, -hsize};
    float left_back_bottom[] = {-hsize, hsize, -hsize};
    float right_back_bottom[] = {hsize, hsize, -hsize};
 
-   /* Back faces */
+   // Back faces 
    float right_back_top[] = {hsize, hsize, hsize};
    float left_back_top[] = {-hsize, hsize, hsize};
    float left_front_top[] = {-hsize, -hsize, hsize};
@@ -613,49 +674,49 @@ void ColladaRendererGL::renderCube_(const float size) {
 
    setRenderMode_();
    glBegin(GL_QUADS);
-      /* Front face */
+      // Front face
       glNormal3f(0.0, -1.0, 0.0);
       glVertex3fv(left_front_bottom);
       glVertex3fv(right_front_bottom);
       glVertex3fv(right_front_top);
       glVertex3fv(left_front_top);
 
-      /* Back face */
+      // Back face
       glNormal3f(0.0, 1.0, 0.0);
       glVertex3fv(left_back_top);
       glVertex3fv(right_back_top);
       glVertex3fv(right_back_bottom);
       glVertex3fv(left_back_bottom);
 
-      /* Top face */
+      // Top face
       glNormal3f(0.0, 0.0, 1.0);
       glVertex3fv(left_front_top);
       glVertex3fv(right_front_top);
       glVertex3fv(right_back_top);
       glVertex3fv(left_back_top);
 
-      /* Bottom face */
+      // Bottom face
       glNormal3f(0.0, 0.0, -1.0);
       glVertex3fv(left_back_bottom);
       glVertex3fv(right_back_bottom);
       glVertex3fv(right_front_bottom);
       glVertex3fv(left_front_bottom);
       
-      /* Right face */
+      // Right face
       glNormal3f(1.0, 0.0, 0.0);
       glVertex3fv(right_front_bottom);
       glVertex3fv(right_back_bottom);
       glVertex3fv(right_back_top);
       glVertex3fv(right_front_top);
 
-      /* Left face */
+      // Left face
       glNormal3f(-1.0, 0.0, 0.0);
       glVertex3fv(left_front_top);
       glVertex3fv(left_back_top);
       glVertex3fv(left_back_bottom);
       glVertex3fv(left_front_bottom);
    glEnd();
-
+	*/
 }
 
 
@@ -675,6 +736,7 @@ void ColladaRendererGL::setPolygonMode_() {
    glFrontFace(GL_CCW);
    glCullFace(GL_BACK);
    glEnable(GL_CULL_FACE);
+   glEnable(GL_DEPTH_TEST);
 }
 
 void ColladaRendererGL::setWireframeMode_() {
@@ -747,20 +809,26 @@ void ColladaRendererGL::render(Phong* phong) {
 }
 
 void ColladaRendererGL::renderOctreeNode_(Octree* octree) {
+   glEnable(GL_COLOR_MATERIAL);
    if(octree->getIsSolid()) {
       //setPolygonMode_();
+      //glColor3f(0.0f, 1.0f, 0.0f);
+      ColorRGBAPtr thecolor = octree->getColor();
+      glColor3f(thecolor->getRed(), thecolor->getGreen(), thecolor->getBlue());
       renderCube_(1.0);
    } /*else {
       setWireframeMode_();
    }*/
-   
+   glDisable(GL_COLOR_MATERIAL);
+
 }
 
 void ColladaRendererGL::render(Octree* octree) {
    glPushMatrix();
 
+	setPolygonMode_();
    octree->GameObject::render();
-
+   
    if(octree->getHasChildren()) {
       for(int i = 0; i < 8; i++) {
          OctreePtr child = octree->getChild(i);

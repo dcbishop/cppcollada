@@ -2,6 +2,7 @@
 #define GAMEOBJECTS_OCTREE_HPP_
 
 #include "../GameObjects/GameObject.hpp"
+#include "../GameData/ColorRGBA.hpp"
 #include "../Debug/console.h"
 
 class Octree;
@@ -46,6 +47,10 @@ class Octree : public GameObject {
       bool getIsSolid() {
          return solid_;
       }
+      
+      ColorRGBAPtr getColor() { return color_; }
+      void setColor(ColorRGBAPtr color) { color_ = color; }
+      
 
       void setChild(int num, OctreePtr octree) { branches_[num] = octree; octree->setParent(OctreePtr(this)); children_ = true; }
       void setFrontTopLeft(OctreePtr octree) { setChild(0, octree); }
@@ -69,6 +74,7 @@ class Octree : public GameObject {
 
       OctreePtr digCell(const int x, const int y, const int z);
 
+		void generateRandomOctree(Octree* octree);
 
       bool getHasChildren() { return children_; }
 
@@ -85,6 +91,7 @@ class Octree : public GameObject {
       int height_;
       int depth_;
       bool solid_;
+      ColorRGBAPtr color_;
 };
 
 #endif /* GAMEOBJECTS_OCTREE_HPP_ */

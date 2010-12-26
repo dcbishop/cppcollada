@@ -15,7 +15,7 @@ boost_flag = ARGUMENTS.get('boost', 0)
 env.Tool('colourful', toolpath=['scons-tools'])
 #env.AppendUnique(LIBS=['m', 'IL', 'mxml', 'rcbc', 'luabind'])
 env.Tool('qt')
-env.AppendUnique(LIBS=['xerces-c', 'GL', 'GLU', 'IL'])#, 'boost_thread', 'libboost_system'])
+env.AppendUnique(LIBS=['xerces-c', 'GL', 'GLU', 'GLEW', 'IL', 'noise'])#, 'boost_thread', 'libboost_system'])
 env.AppendUnique(CCFLAGS=['-llibboost_system', '-llibboost_thread'])
 env['QTDIR'] = '/usr'
 env['QT_LIB'] = 'QtGui'

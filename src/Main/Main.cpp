@@ -36,10 +36,11 @@ int main(int argc, char* argv[]) {
    //DEBUG_A("Starting...");
    //string filename = "/home/hegemon/tmp/monkeyhead.dae";
    //string filename = "/home/hegemon/tmp/cubeuvmap.dae";
-   string filename = "/home/hegemon/tmp/externtest.dae";
+   //string filename = "/home/hegemon/tmp/externtest.dae";
    //string filename = "/home/hegemon/tmp/cubestack.dae";
    //string filename = "/home/hegemon/tmp/planetest.dae";
    //string filename = "/home/hegemon/tmp/materialtest.dae";
+   string filename = "/home/hegemon/Documents/Media/DAEtest/Blender/monkey-untextured.dae";
 
    DEBUG_A("Spawning ColladaManager...");
    ColladaManagerPtr cm(new ColladaManager());
@@ -53,14 +54,14 @@ int main(int argc, char* argv[]) {
    position->setY(0.0f);
    position->setZ(0.0f);
 
-   /*ColladaPtr testCollada(new Collada());
+   ColladaPtr testCollada(new Collada());
    ScenePtr testScene(new Scene());
    VisualScenePtr testVisualScene(new VisualScene);
    TestRenderablePtr testRenderable(new TestRenderable);
    
    testCollada->setScene(testScene);
    testScene->addVisualScene(testVisualScene);
-   testVisualScene->addColladaNode(testRenderable);*/
+   testVisualScene->addColladaNode(testRenderable);
 
    //ViewWindowSDL vw(800, 600);
    
@@ -71,25 +72,26 @@ int main(int argc, char* argv[]) {
 
 
 
-   OctreePtr octreeTest = OctreePtr(new Octree);
+   /*OctreePtr octreeTest = OctreePtr(new Octree);
    octreeTest->setScaleXYZ(10, 10, 10);
-   octreeTest->debug();
+   octreeTest->debug();*/
 
    CameraPtr camera = CameraPtr(new Camera);
-   camera->setTarget(octreeTest);
+   //camera->setTarget(octreeTest);
+   camera->setTarget(colladaMesh);
    camera->setZoom(10.0f);
 
    AreaPtr area(new Area());
    area->addObject(camera);
-   //area->addObject(colladaMesh);
+   area->addObject(colladaMesh);
    //area->addObject(colladaMesh2);
-   area->addObject(octreeTest);
-   colladaMesh->setXYZ(2.0, -2.0, 0.0);
-   colladaMesh2->setXYZ(-2.0, 0.0, 0.0);
+   //area->addObject(octreeTest);
+   //colladaMesh->setXYZ(2.0, -2.0, 0.0);
+   //colladaMesh2->setXYZ(-2.0, 0.0, 0.0);
 
    ViewWindowQT vw(800, 600);
-   /*vw.setColladaManager(cm);
-   vw.setCollada(collada);*/
+   //vw.setColladaManager(cm);
+   //vw.setCollada(collada);
    vw.setTitle(filename);
    vw.setCamera(camera);
    vw.mainLoop();
