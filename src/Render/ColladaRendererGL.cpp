@@ -71,6 +71,13 @@ void ColladaRendererGL::postFrame() {
    setPolygonMode_();
    glDisable(GL_CULL_FACE); //Cullface interfears with Qt for some reason
    glFlush();
+   
+   // Log any OpenGL errors.
+   int glerrno = glGetError();
+   if(glerrno) {
+		const GLubyte *glerr = gluErrorString(glerrno);
+		ERROR("OpenGL Error #%d: %s!", glerrno, glerr);
+	}
 }
 
 /**
@@ -97,7 +104,6 @@ void ColladaRendererGL::render(ColladaObject* colladaObject) {
       WARNING("Tried to render raw ColladaObject '%s'", colladaObject->getId().c_str());
       nospam = true;
    }
-   //colladaObject->render();
 }
 
 void ColladaRendererGL::fixAxis_(const Collada* collada) {
@@ -106,7 +112,7 @@ void ColladaRendererGL::fixAxis_(const Collada* collada) {
    static const int X_UP = 1;
    static const int Y_UP = 2;
 
-   #warning ['TODO']: Store and query axis!
+   #warning ['TODO']: Store and query axis from DAE file!
    int upAxis = Z_UP;
 
    if(upAxis == Z_UP) {

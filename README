@@ -1,0 +1,29 @@
+cppcollada is a program for rendering COLLADA dae files.
+
+Currently only basic features are supported and there is no optimization. Simple triangle based meshes with textures work.
+
+Building
+========
+
+cppcollada uses the scons build system
+apt-get install scons
+
+To make:
+scons
+
+To install:
+scons install
+
+To compile debug version:
+scons debug=1
+
+To compile using llvm:
+scons clang=1 boost=1
+
+The folowing libraries are used:
+libglew1.5-dev - OpenGL extentions.
+libdevil-dev - For texture loading.
+libxerces-c2-dev - XML parsing.
+libqt4-dev - For the QT interface.
+libnoise-dev - Use for an experiment using noise for random level generation.
+
