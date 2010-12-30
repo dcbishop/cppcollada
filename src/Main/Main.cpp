@@ -33,14 +33,15 @@ using namespace xercesc;
 
 int main(int argc, char* argv[]) {
    LOG("Starting main...");
-   //DEBUG_A("Starting...");
-   //string filename = "/home/hegemon/tmp/monkeyhead.dae";
-   //string filename = "/home/hegemon/tmp/cubeuvmap.dae";
-   //string filename = "/home/hegemon/tmp/externtest.dae";
-   //string filename = "/home/hegemon/tmp/cubestack.dae";
-   //string filename = "/home/hegemon/tmp/planetest.dae";
-   //string filename = "/home/hegemon/tmp/materialtest.dae";
-   string filename = "/home/hegemon/Documents/Media/DAEtest/Blender/monkey-untextured.dae";
+	string filename;
+
+	// Assume the last arg is the uri to open if it doesn't start with a '-'.
+   if(argv[argc-1][0] != '-' && argc > 1) {
+      filename = argv[argc-1];
+   } else {
+		ERROR("No filename specified.");
+		return 1;
+	}
 
    DEBUG_A("Spawning ColladaManager...");
    ColladaManagerPtr cm(new ColladaManager());
@@ -49,54 +50,28 @@ int main(int argc, char* argv[]) {
    DEBUG_A("Scrubbing Collada docs...");
    cm->scrub();
 
-   shared_ptr<Position> position = shared_ptr<Position>(new Position);
-   position->setX(0.0f);
-   position->setY(0.0f);
-   position->setZ(0.0f);
-
-   ColladaPtr testCollada(new Collada());
-   ScenePtr testScene(new Scene());
-   VisualScenePtr testVisualScene(new VisualScene);
-   TestRenderablePtr testRenderable(new TestRenderable);
-   
-   testCollada->setScene(testScene);
-   testScene->addVisualScene(testVisualScene);
-   testVisualScene->addColladaNode(testRenderable);
-
-   //ViewWindowSDL vw(800, 600);
-   
    ColladaMeshPtr colladaMesh = ColladaMeshPtr(new ColladaMesh);
    colladaMesh->setCollada(collada);
-   ColladaMeshPtr colladaMesh2 = ColladaMeshPtr(new ColladaMesh);
-   colladaMesh2->setCollada(collada);
-
-
 
    /*OctreePtr octreeTest = OctreePtr(new Octree);
    octreeTest->setScaleXYZ(10, 10, 10);
    octreeTest->debug();*/
 
    CameraPtr camera = CameraPtr(new Camera);
-   //camera->setTarget(octreeTest);
    camera->setTarget(colladaMesh);
+   //camera->setTarget(octreeTest);
    camera->setZoom(10.0f);
 
    AreaPtr area(new Area());
    area->addObject(camera);
    area->addObject(colladaMesh);
-   //area->addObject(colladaMesh2);
    //area->addObject(octreeTest);
-   //colladaMesh->setXYZ(2.0, -2.0, 0.0);
-   //colladaMesh2->setXYZ(-2.0, 0.0, 0.0);
 
    ViewWindowQT vw(800, 600);
-   //vw.setColladaManager(cm);
-   //vw.setCollada(collada);
+   //ViewWindowSDL vw(800, 600);
    vw.setTitle(filename);
    vw.setCamera(camera);
    vw.mainLoop();
-
-   //DEBUG_A("Entering main loop...");
 
    /*shared_ptr<RotationGL> rotation(new RotationGL);
    collada->debugRotationHack = rotation;
