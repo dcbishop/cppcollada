@@ -7,17 +7,28 @@ using namespace std;
 #include "../Collada/Input.hpp"
 
 typedef vector<int> PrimVector;
+typedef shared_ptr<PrimVector> PrimVectorPtr;
 typedef PrimVector::iterator PrimIterator;
 
 class GeometricPrimitive : public Renderable {
    public:
+      GeometricPrimitive(): count_(0), inputCount_(0) {}
       void setVertex(shared_ptr<Input> input) { vertex_ = input; }
       void setNormal(shared_ptr<Input> input) { normal_ = input; }
       void setTexCoord(shared_ptr<Input> input) { texCoord_ = input; }
       void setPrimitives(shared_ptr<PrimVector> primitives) { primitives_ = primitives; }
       void setInputCount(const int& count) { inputCount_ = count; }
       int getInputCount() const { return inputCount_; }
-      int getVertexCount() const { return primitives_->size()/getInputCount(); }
+      int getVertexCount() const { 
+         if(primitives_.get() !=  NULL) {
+            return primitives_->size()/getInputCount();
+         }
+         return 0;
+      }
+      
+      int getVertexOffset() { return vertex_->getOffset(); }
+      int getNormalOffset() { return normal_->getOffset(); }
+      int getTexCoordOffset() { return texCoord_->getOffset(); }
 
       float getX(const int& num) const;
       float getY(const int& num) const;
@@ -45,7 +56,7 @@ class GeometricPrimitive : public Renderable {
       shared_ptr<Input> vertex_;
       shared_ptr<Input> normal_;
       shared_ptr<Input> texCoord_;
-      shared_ptr<PrimVector> primitives_;
+      PrimVectorPtr primitives_;
       int count_;
       int inputCount_;
       string material_;

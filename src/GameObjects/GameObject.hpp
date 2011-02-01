@@ -13,6 +13,8 @@ class Area;
 
 class GameObject : public Id, public Name, public Renderable, public Position, public RotationGL, public Scale {
    public:
+      GameObject(): area_(shared_ptr<Area>()) {}
+      ~GameObject();
       void setArea(shared_ptr<Area> area);
       shared_ptr<Area> getArea() const;
       COLLADA_RENDER_FUNCTION

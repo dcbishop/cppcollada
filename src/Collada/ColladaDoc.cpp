@@ -376,12 +376,21 @@ shared_ptr<Mesh> ColladaDoc::loadMesh(const DOMElement* element) {
          } else if(isString_(tagName, "linestripes")) {
             WARNING("linestripes not yet supported.");
          } else if(isString_(tagName, "polygons")) {
-            WARNING("polygons not yet supported.");
+            shared_ptr<Triangles> polygons = loadPolygons(currentElement);
+            if(polygons != shared_ptr<Triangles>()) {
+					mesh->addPrimitive(polygons);
+				}
          } else if(isString_(tagName, "polylist")) {
             WARNING("polylist not yet supported.");
+            shared_ptr<Triangles> polylist = loadPolylist(currentElement);
+            if(polylist != shared_ptr<Triangles>()) {
+					mesh->addPrimitive(polylist);
+				}
          } else if(isString_(tagName, "triangles")) {
             shared_ptr<Triangles> triangles = loadTriangles(currentElement);
-            mesh->addPrimitive(triangles);
+            if(triangles != shared_ptr<Triangles>()) {
+					mesh->addPrimitive(triangles);
+				}
          } else if(isString_(tagName, "trifans")) {
             WARNING("trifans not yet supported.");
          } else if(isString_(tagName, "tristrips")) {
@@ -393,15 +402,31 @@ shared_ptr<Mesh> ColladaDoc::loadMesh(const DOMElement* element) {
    return mesh;
 }
 
+void ColladaDoc::loadGeometricPrimitiveInput(GeometricPrimitivePtr gp, const DOMElement* element) {
+   gp->setInputCount(gp->getInputCount()+1);
+
+   shared_ptr<Input> input = loadInput(element);
+   string semantic = getAttribute(element, "semantic");
+
+   if(semantic.compare("VERTEX") == 0) {
+      gp->setVertex(input);
+   } else if(semantic.compare("NORMAL") == 0) {
+      gp->setNormal(input);
+   } else if(semantic.compare("TEXCOORD") == 0) {
+      gp->setTexCoord(input);
+   } else {
+      WARNING("Unhandled semantic '%s' in geometric primitive", semantic.c_str());
+   }
+}
+
 shared_ptr<Triangles> ColladaDoc::loadTriangles(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    shared_ptr<Triangles> triangles(new Triangles);
+	VectorOfIntsPtr primitives;
 
    string count = getAttribute(element, "count");
    triangles->setCount(atoi(count.c_str()));
-
-   int numInputs = 0;
 
    DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
@@ -413,45 +438,141 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(const DOMElement* element) {
          const XMLCh* tagName = currentElement->getTagName();
 
          if(isString_(tagName, "input")) {
-            numInputs++;
-            shared_ptr<Input> input = loadInput(currentElement);
-            string semantic = getAttribute(currentElement, "semantic");
-
-            if(semantic.compare("VERTEX") == 0) {
-               triangles->setVertex(input);
-            } else if(semantic.compare("NORMAL") == 0) {
-               triangles->setNormal(input);
-            } else if(semantic.compare("TEXCOORD") == 0) {
-               triangles->setTexCoord(input);
-            } else {
-               WARNING("Unhandled semantic '%s' in <Triangles>", semantic.c_str());
-            }
+            loadGeometricPrimitiveInput(triangles, currentElement);
          } else if(isString_(tagName, "p")) {
-            shared_ptr< vector<int> > primitives = loadPrimitives(currentElement);
+            primitives = loadPrimitives(currentElement);
             triangles->setPrimitives(primitives);
          }
       }
    }
-   triangles->setInputCount(numInputs);
 
    string material = getAttribute(element, "material");
-   /*if(materialUrl.length() > 0) {
-      ColladaObjectPtr colladaObject(getColladaObjectById(materialUrl));
-      //shared_ptr<Material> material(dynamic_pointer_cast<Material>(colladaObject));
-      //triangles->setMaterial(material);
-   }*/
    triangles->setMaterial(material);
 
    return triangles;
 }
 
-shared_ptr< vector<int> > ColladaDoc::loadPrimitives(const DOMElement* element) {
+/**
+ * Loads polygons (Will convert them to Triangles).
+ */
+shared_ptr<Triangles> ColladaDoc::loadPolygons(const DOMElement* element) {
+   DEBUG_M("Entering function...");
+   WARNING("Stub function...");
+   return shared_ptr<Triangles>();
+}
+
+shared_ptr<Triangles> ColladaDoc::loadPolylist(const DOMElement* element) {
+   DEBUG_M("Entering function...");
+   WARNING("Unfinished function...");
+
+   shared_ptr<Triangles> triangles(new Triangles);
+	VectorOfIntsPtr polyprims;
+   VectorOfIntsPtr vcount;
+
+   string count = getAttribute(element, "count");
+   triangles->setCount(atoi(count.c_str()));
+
+   DOMNodeList* children = element->getChildNodes();
+   int length = children->getLength();
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         const XMLCh* tagName = currentElement->getTagName();
+
+         if(isString_(tagName, "input")) {
+            loadGeometricPrimitiveInput(triangles, currentElement);
+         } else if(isString_(tagName, "vcount")) {
+            vcount = loadPrimitives(currentElement);
+         } else if(isString_(tagName, "p")) {
+            polyprims = loadPrimitives(currentElement);
+         }
+      }
+   }
+
+   // TODO: Check we actually got vcount and p
+   if(vcount.get() == NULL or vcount->size() <= 0) {
+      WARNING("Could not find polylist <vcount> entry.");
+      return shared_ptr<Triangles>();
+   }
+   
+   if(polyprims.get() == NULL or polyprims->size() <= 0) {
+      WARNING("Could not find polylist <p> entry.");
+      return shared_ptr<Triangles>();
+   }
+
+   VectorOfIntsPtr triprims(new VectorOfInts);
+   int ppos = 0; // The current index in the list of polygon vertexes (max polyprims.size)
+   int polynum = 0; // The poly we are on in vcount (max vcount.size)
+   int pvtx = 0; // The current vertex in the polygon (max vcount[polynum])
+
+   int numInputs = triangles->getInputCount();
+   int *bases = new int[numInputs]; // The first vertex in a polygon is the first vertex for every triangle that follow
+   int *lasts = new int[numInputs];
+   int *nexts = new int[numInputs];
+   int *temp;
+   while(ppos < polyprims->size()) {
+      if(pvtx == 0) {
+         //Set base vertex (includes pos, text, and other)
+         for(int i = 0; i < numInputs; i++) {
+            bases[i] = polyprims->at(ppos++);
+         }
+         // Set the initial last vertex for this polygon...
+         for(int i = 0; i < numInputs; i++) {
+            lasts[i] = polyprims->at(ppos++);
+         }
+         pvtx+=2;
+      }
+
+      // Read in the next vertex
+      for(int i = 0; i < numInputs; i++) {
+         nexts[i] = polyprims->at(ppos++);
+      }
+      pvtx++;
+
+      // Push the actual vertexes onto the vector
+      // All the inputs for the first vertex in the triangle
+      for(int i = 0; i < numInputs; i++) {
+         triprims->push_back(bases[i]);
+      }
+      for(int i = 0; i < numInputs; i++) { // 2nd vertex in triangle
+         triprims->push_back(lasts[i]);
+      }
+      for(int i = 0; i < numInputs; i++) { // 3rd vertex in triangle
+         triprims->push_back(nexts[i]);
+      }
+      
+      // Our nexts become the lasts...
+      temp = lasts;
+      lasts = nexts;
+      nexts = temp;
+      
+      if(pvtx == vcount->at(polynum)) {
+         pvtx = 0;
+         polynum++;
+      }
+      
+   }
+   delete [] bases;
+   delete [] lasts;
+   delete [] nexts;
+
+   triangles->setPrimitives(VectorOfIntsPtr(triprims));
+
+   string material = getAttribute(element, "material");
+   triangles->setMaterial(material);
+
+   return triangles;
+}
+
+VectorOfIntsPtr ColladaDoc::loadPrimitives(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    const XMLCh* data_x = element->getTextContent();
    char* data_c = XMLString::transcode(data_x);
 
-   shared_ptr< vector<int> > primitives(new vector<int>);
+   VectorOfIntsPtr primitives(new VectorOfInts);
 
    //TODO: Do this in a C++ way... or at least look at using strtok_r...
    int i = 0;

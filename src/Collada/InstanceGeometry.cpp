@@ -5,5 +5,9 @@ void InstanceGeometry::addInstanceMaterial(string symbol, shared_ptr<Material> m
 }
 
 shared_ptr<Material> InstanceGeometry::getInstanceMaterial(string symbol) {
-   return materials_.find(symbol)->second;
+   MaterialMap::iterator it = materials_.find(symbol);
+   if(it == materials_.end()) {
+      return shared_ptr<Material>();
+   }
+   return it->second;
 }

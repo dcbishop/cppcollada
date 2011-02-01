@@ -46,6 +46,7 @@ class Image;
 #include "../GameData/SmartPointers.hpp"
 #include "../Collada/ColladaObject.hpp"
 #include "../Collada/Scene.hpp"
+#include "../Collada/GeometricPrimitive.hpp"
 
 typedef unordered_map<string, DOMElement*> ElementIdMap;
 typedef ElementIdMap::iterator ElementIdMapIterator;
@@ -54,6 +55,10 @@ typedef pair<string, DOMElement*> ElementIdMapPair;
 typedef unordered_map<string, ColladaObjectPtr> ColladaObjectMap;
 typedef ColladaObjectMap::iterator ColladaObjectMapIterator;
 typedef pair<string, ColladaObjectPtr> ColladaObjectMapPair;
+
+typedef vector<int> VectorOfInts;
+typedef shared_ptr<VectorOfInts> VectorOfIntsPtr;
+
 
 class ColladaDoc {
    public:
@@ -74,6 +79,7 @@ class ColladaDoc {
       shared_ptr<VisualScene> loadVisualScene(const DOMElement* element);
       shared_ptr<ColladaNode> loadColladaNode(const DOMElement* element);
       shared_ptr<Geometry> loadGeometry(const DOMElement* element);
+      void loadGeometricPrimitiveInput(GeometricPrimitivePtr gp, const DOMElement* element);
       void loadTranslation(const DOMElement* element, Position* position);
       void loadRotation(const DOMElement* element, RotationGL* rotation, int number);
       void loadRotations(const DOMElement* element, RotationGL* rotation);
@@ -86,6 +92,8 @@ class ColladaDoc {
       shared_ptr<Mesh> loadMesh(const DOMElement* element);
       shared_ptr<Vertices> loadVertices(const DOMElement* element);
       shared_ptr<Triangles> loadTriangles(const DOMElement* element);
+      shared_ptr<Triangles> loadPolygons(const DOMElement* element);
+      shared_ptr<Triangles> loadPolylist(const DOMElement* element);
       shared_ptr<Source> loadSource(const DOMElement* element);
       shared_ptr<Material> loadMaterial(const DOMElement* element);
       ColladaObjectPtr loadSampler2D(const DOMElement* profileCommon, const DOMElement* element);
@@ -98,7 +106,7 @@ class ColladaDoc {
       shared_ptr<VisualScene> getVisualScene(const string& url);
       ColladaObjectPtr getColladaObjectByUrl(const string& url);
       shared_ptr<Input> loadInput(const DOMElement* element);
-      shared_ptr< vector<int> > loadPrimitives(const DOMElement* element);
+      VectorOfIntsPtr loadPrimitives(const DOMElement* element);
       shared_ptr<Effect> loadEffect(const DOMElement* element);
       ColladaObjectPtr loadNewparam(const DOMElement* profileCommon, const DOMElement* node);
       ColladaObjectPtr loadSurface(const DOMElement* element);

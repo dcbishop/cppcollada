@@ -62,13 +62,13 @@ int main(int argc, char* argv[]) {
    //camera->setTarget(octreeTest);
    camera->setZoom(10.0f);
 
-   AreaPtr area(new Area());
+   AreaPtr area = AreaPtr(new Area());
    area->addObject(camera);
    area->addObject(colladaMesh);
    //area->addObject(octreeTest);
 
-   ViewWindowQT vw(800, 600);
    //ViewWindowSDL vw(800, 600);
+   ViewWindowQT vw(800, 600);
    vw.setTitle(filename);
    vw.setCamera(camera);
    vw.mainLoop();

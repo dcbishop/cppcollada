@@ -1,7 +1,7 @@
 #ifndef GAMEOBJECTS_AREA_HPP_
 #define GAMEOBJECTS_AREA_HPP_
 
-#include <vector>
+#include <set>
 using namespace std;
 
 #include "../GameData/Id.hpp"
@@ -10,13 +10,15 @@ using namespace std;
 #include "../GameData/SmartPointers.hpp"
 #include "../GameObjects/GameObject.hpp"
 
-typedef vector<GameObjectPtr> GameObjectsVector;
+typedef set<GameObjectPtr> GameObjectsVector;
 typedef GameObjectsVector::iterator GameObjectIterator;
 
 class Area : public GameObject {
    public:
+      ~Area();
       void addObject(GameObjectPtr object);
       void removeObject(GameObjectPtr object);
+      void removeAllObjects_();
       GameObjectIterator getFirstGameObject() { return objects_.begin(); }
       GameObjectIterator getEndGameObject() { return objects_.end(); }
       COLLADA_RENDER_FUNCTION
