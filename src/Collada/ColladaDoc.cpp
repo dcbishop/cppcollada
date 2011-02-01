@@ -1,5 +1,10 @@
 #include "../Collada/ColladaDoc.hpp"
 
+#include <istream>
+#include <sstream>
+#include <iterator>
+
+
 #include "../Collada/ColladaManager.hpp"
 #include "../Collada/ColladaDocManager.hpp"
 #include "../Collada/ColladaUrl.hpp"
@@ -376,19 +381,18 @@ shared_ptr<Mesh> ColladaDoc::loadMesh(const DOMElement* element) {
          } else if(isString_(tagName, "linestripes")) {
             WARNING("linestripes not yet supported.");
          } else if(isString_(tagName, "polygons")) {
-            shared_ptr<Triangles> polygons = loadPolygons(currentElement);
-            if(polygons != shared_ptr<Triangles>()) {
+            TrianglesPtr polygons = loadPolygons(currentElement);
+            if(polygons != TrianglesPtr()) {
 					mesh->addPrimitive(polygons);
 				}
          } else if(isString_(tagName, "polylist")) {
-            WARNING("polylist not yet supported.");
-            shared_ptr<Triangles> polylist = loadPolylist(currentElement);
-            if(polylist != shared_ptr<Triangles>()) {
+            TrianglesPtr polylist = loadPolylist(currentElement);
+            if(polylist != TrianglesPtr()) {
 					mesh->addPrimitive(polylist);
 				}
          } else if(isString_(tagName, "triangles")) {
-            shared_ptr<Triangles> triangles = loadTriangles(currentElement);
-            if(triangles != shared_ptr<Triangles>()) {
+            TrianglesPtr triangles = loadTriangles(currentElement);
+            if(triangles != TrianglesPtr()) {
 					mesh->addPrimitive(triangles);
 				}
          } else if(isString_(tagName, "trifans")) {
@@ -419,10 +423,10 @@ void ColladaDoc::loadGeometricPrimitiveInput(GeometricPrimitivePtr gp, const DOM
    }
 }
 
-shared_ptr<Triangles> ColladaDoc::loadTriangles(const DOMElement* element) {
+TrianglesPtr ColladaDoc::loadTriangles(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
-   shared_ptr<Triangles> triangles(new Triangles);
+   TrianglesPtr triangles(new Triangles);
 	VectorOfIntsPtr primitives;
 
    string count = getAttribute(element, "count");
@@ -455,17 +459,16 @@ shared_ptr<Triangles> ColladaDoc::loadTriangles(const DOMElement* element) {
 /**
  * Loads polygons (Will convert them to Triangles).
  */
-shared_ptr<Triangles> ColladaDoc::loadPolygons(const DOMElement* element) {
+TrianglesPtr ColladaDoc::loadPolygons(const DOMElement* element) {
    DEBUG_M("Entering function...");
    WARNING("Stub function...");
-   return shared_ptr<Triangles>();
+   return TrianglesPtr();
 }
 
-shared_ptr<Triangles> ColladaDoc::loadPolylist(const DOMElement* element) {
+TrianglesPtr ColladaDoc::loadPolylist(const DOMElement* element) {
    DEBUG_M("Entering function...");
-   WARNING("Unfinished function...");
 
-   shared_ptr<Triangles> triangles(new Triangles);
+   TrianglesPtr triangles(new Triangles);
 	VectorOfIntsPtr polyprims;
    VectorOfIntsPtr vcount;
 
@@ -494,18 +497,18 @@ shared_ptr<Triangles> ColladaDoc::loadPolylist(const DOMElement* element) {
    // TODO: Check we actually got vcount and p
    if(vcount.get() == NULL or vcount->size() <= 0) {
       WARNING("Could not find polylist <vcount> entry.");
-      return shared_ptr<Triangles>();
+      return TrianglesPtr();
    }
    
    if(polyprims.get() == NULL or polyprims->size() <= 0) {
       WARNING("Could not find polylist <p> entry.");
-      return shared_ptr<Triangles>();
+      return TrianglesPtr();
    }
 
    VectorOfIntsPtr triprims(new VectorOfInts);
-   int ppos = 0; // The current index in the list of polygon vertexes (max polyprims.size)
-   int polynum = 0; // The poly we are on in vcount (max vcount.size)
-   int pvtx = 0; // The current vertex in the polygon (max vcount[polynum])
+   unsigned int ppos = 0; // The current index in the list of polygon vertexes (max polyprims.size)
+   unsigned int polynum = 0; // The poly we are on in vcount (max vcount.size)
+   unsigned int pvtx = 0; // The current vertex in the polygon (max vcount[polynum])
 
    int numInputs = triangles->getInputCount();
    int *bases = new int[numInputs]; // The first vertex in a polygon is the first vertex for every triangle that follow
@@ -548,7 +551,7 @@ shared_ptr<Triangles> ColladaDoc::loadPolylist(const DOMElement* element) {
       lasts = nexts;
       nexts = temp;
       
-      if(pvtx == vcount->at(polynum)) {
+      if(pvtx == (unsigned)vcount->at(polynum)) {
          pvtx = 0;
          polynum++;
       }
@@ -629,19 +632,54 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
       WARNING("No technique in effect.");
       return shared_ptr<Effect>();
    }
+   
+   shared_ptr<Effect> effect;
+   
+   DOMNodeList* children = technique->getChildNodes();
+   int length = children->getLength();
+   for(int i = 0; i < length; i++) {
+      DOMNode* currentNode = children->item(i);
+      if(currentNode->getNodeType() && currentNode->getNodeType() == DOMNode::ELEMENT_NODE) {
 
-   #warning ['TODO']: Handle other type (blinn).
-   DOMElement* phongElement = getElementByTagName(element, "phong");
-   if(!phongElement) {
-      WARNING("No phong in effect.");
-      return shared_ptr<Effect>();
+         DOMElement* currentElement = dynamic_cast<xercesc::DOMElement*>(currentNode);
+         const XMLCh* tagName = currentElement->getTagName();
+         
+         if(isString_(tagName, "phong")) {
+            PhongPtr phong = loadPhong_(currentElement, profileCommon);
+            effect = phong;
+         } else if (isString_(tagName, "lambert")) {
+            LambertPtr lambert = loadLambert_(currentElement, profileCommon);
+            effect = lambert;
+         } else if (isString_(tagName, "blinn")) {
+            WARNING("Blinn not yet supported...");
+            shared_ptr<Effect> effect();
+         } else if (isString_(tagName, "constant")) {
+            WARNING("Constant not yet supported...");
+            shared_ptr<Effect> effect();
+         }
+      }
    }
 
-   shared_ptr<Phong> phong(new Phong);
-   shared_ptr<Effect> effect(phong);
+   return effect;
+}
 
-   // loadPhong
-   DOMNodeList* children = phongElement->getChildNodes();
+PhongPtr ColladaDoc::loadPhong_(const DOMElement* element, const DOMElement* texturehack) {
+   PhongPtr phong(new Phong);
+   loadShaderAttributes_(phong, element, texturehack);
+   return phong;
+}
+
+LambertPtr ColladaDoc::loadLambert_(const DOMElement* element, const DOMElement* texturehack) {
+   LambertPtr lambert(new Lambert);
+   loadShaderAttributes_(lambert, element, texturehack);
+   return lambert;
+}
+
+void ColladaDoc::loadShaderAttributes_(shared_ptr<ColladaShader> shader, const DOMElement* element, const DOMElement* texturehack) {
+   ColladaLitShaderPtr lit = dynamic_pointer_cast<ColladaLitShader, ColladaShader>(shader);
+   PhongPtr phong = dynamic_pointer_cast<Phong, ColladaShader>(shader);
+
+   DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
    for(int i = 0; i < length; i++) {
       DOMNode* currentNode = children->item(i);
@@ -653,7 +691,6 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
          DOMElement* data = getElementByTagName(currentElement, "color");
          if(!data) {
             data = getElementByTagName(currentElement, "float");
-            //DEBUG_M("It's a float...");
          }
          if(!data) {
             data = getElementByTagName(currentElement, "texture");
@@ -662,12 +699,12 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
                WARNING("Textures not yet handled correctly!");
                string texcoord = getAttribute(data, "texcoord");
                string texture = getAttribute(data, "texture");
-               ColladaObjectPtr co = loadEffectNewparamBySid_(profileCommon, texture);
+               ColladaObjectPtr co = loadEffectNewparamBySid_(texturehack, texture);
                ImagePtr image = dynamic_pointer_cast<Image, ColladaObject>(co);
                if(image) {
                   DEBUG_M("Binding image to texture hack...");
-                  phong->setTextureHack(image);
-                  phong->setTexCoordHack(texcoord);
+                  shader->setTextureHack(image);
+                  shader->setTexCoordHack(texcoord);
                } else {
                   WARNING("Was expecting an Image. Got something else...");
                   //DEBUG_M("Something: '%s', '%s'", co->getId().c_str(), co->getName().c_str());
@@ -685,31 +722,41 @@ shared_ptr<Effect> ColladaDoc::loadEffect(const DOMElement* element) {
          char* data_c = XMLString::transcode(data_x);
          shared_ptr< vector<float> > floats = getFloatsVector(data_c);
          XMLString::release(&data_c);
-
+         
          if(isString_(tagName, "emission")) {
-            phong->setEmission(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
-         } else if(isString_(tagName, "diffuse")) {
-            phong->setDiffuse(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
-         } else if(isString_(tagName, "ambient")) {
-            phong->setAmbient(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
-         } else if(isString_(tagName, "specular")) {
-            phong->setSpecular(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
-         } else if(isString_(tagName, "shininess")) {
-            phong->setShininess(floats->at(0));
+            shader->setEmission(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
          } else if(isString_(tagName, "reflective")) {
-            phong->setReflective(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+            shader->setReflective(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
          } else if(isString_(tagName, "reflectivity")) {
-            phong->setReflectivity(floats->at(0));
+            shader->setReflectivity(floats->at(0));
          } else if(isString_(tagName, "transparent")) {
-            phong->setTransparent(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+            shader->setTransparent(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
          } else if(isString_(tagName, "transparency")) {
-            phong->setTransparency(floats->at(0));
+            shader->setTransparency(floats->at(0));
+         } else if(isString_(tagName, "index_of_refraction")) {
+            shader->setIndexOfRefraction(floats->at(0));
          }
+
+         if(lit.get() != NULL) {
+            if(isString_(tagName, "diffuse")) {
+               lit->setDiffuse(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+            } else if(isString_(tagName, "ambient")) {
+               lit->setAmbient(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+            } 
+         }
+
+         if(phong.get() != NULL) {
+            if(phong.get() != NULL && isString_(tagName, "specular")) {
+               phong->setSpecular(floats->at(0), floats->at(1), floats->at(2), floats->at(3));
+            } else if(phong.get() != NULL && isString_(tagName, "shininess")) {
+               phong->setShininess(floats->at(0));
+            } 
+         }
+
       }
    }
-
-   return effect;
 }
+
 
 /**
  * Finds a <newparam> tag in a DOMElement from it's sid.
@@ -1091,14 +1138,13 @@ shared_ptr<VisualScene> ColladaDoc::loadVisualScene(const DOMElement* element) {
  * @param text A string containing a float vector.
  * @param floats A vector of floats.
  */
-shared_ptr< vector<float> > ColladaDoc::getFloatsVector(string text) {
+shared_ptr< vector<float> > ColladaDoc::getFloatsVector(const string& text) {
    DEBUG_M("Entering function...");
 
    shared_ptr< vector<float> > floats(new vector<float>);
 
    char* data_clone = (char*)text.c_str();
 
-   //TODO: Do this in a C++ way... or at least look at using strtok_r...
    int i = 0;
    char* token = strtok(data_clone, " ");
 
@@ -1108,6 +1154,20 @@ shared_ptr< vector<float> > ColladaDoc::getFloatsVector(string text) {
       i++;
       token = strtok(NULL, " ");
    }
+
+   // The C++ way...
+   /*stringstream strstr(text.c_str());
+   istream_iterator<string> it(strstr);
+   istream_iterator<string> end;
+   float temp;
+   while(it != end) {
+      stringstream ss;
+      ss << (*it);
+      ss >> temp;
+      floats->push_back(temp);
+      it++;
+   }*/
+
    DEBUG_M("Exiting function...");
    return floats;
 }
@@ -1317,6 +1377,7 @@ void ColladaDoc::loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry>
    string symbol = getAttribute(ime, "symbol");
    string target = getAttribute(ime, "target");
 
+   /* TODO: Is this needed? Some Collada versions might might use it...
    DOMElement* bvie = getElementByTagName(ime, "bind_vertex_input");
    if(!bvie) {
       WARNING("No <bind_vertex_input> in <instance_material>.");
@@ -1325,7 +1386,7 @@ void ColladaDoc::loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry>
 
    string input_semantic = getAttribute(bvie, "input_semantic");
    string input_set = getAttribute(bvie, "input_set");
-   string semantic = getAttribute(bvie, "semantic");
+   string semantic = getAttribute(bvie, "semantic");*/
    
    ColladaObjectPtr colladaObject = getColladaObjectByUrl(target);
    shared_ptr<Material> material(static_pointer_cast<Material, ColladaObject>(colladaObject));
@@ -1395,12 +1456,6 @@ ColladaObjectPtr ColladaDoc::loadInstance(const DOMElement* element, ColladaNode
    //return colladaObject;
 }
 
-// instance_camera x
-// instance_controller +
-// instance_geometry +
-// instance_light x
-// instance_node x
-
 /**
  * Returns the first child element that matches the tag.
  * @param element The root element to search.
@@ -1414,10 +1469,11 @@ DOMElement* ColladaDoc::getElementByTagName(const DOMElement* element, string ta
       return NULL;
    }
    
+   /* This happens sometimes, for example a <extra> tag can contain it's own <technique> element
    if(elements->getLength() > 1) {
-      ERROR("Multiple node's found when expecting 1...");
+      ERROR("Multiple node's found with tag '%s' when expecting 1...", tag.c_str());
       return NULL;
-   }
+   }*/
 
    DOMNode* node = elements->item(0);
    if(!node) {
@@ -1496,7 +1552,6 @@ ColladaObjectPtr ColladaDoc::getColladaObjectByUrl(const string& url) {
       return ColladaObjectPtr();
    }
 
-   #warning ['TODO']: The only real reason to preload the 
    // Stupidly preload the whole collada file
    if(!collada_) {
       getCollada();

@@ -46,7 +46,11 @@ class Image;
 #include "../GameData/SmartPointers.hpp"
 #include "../Collada/ColladaObject.hpp"
 #include "../Collada/Scene.hpp"
+#include "../Collada/Phong.hpp"
+#include "../Collada/Lambert.hpp"
+#include "../Collada/ColladaShader.hpp"
 #include "../Collada/GeometricPrimitive.hpp"
+#include "../Collada/Triangles.hpp"
 
 typedef unordered_map<string, DOMElement*> ElementIdMap;
 typedef ElementIdMap::iterator ElementIdMapIterator;
@@ -71,7 +75,7 @@ class ColladaDoc {
       ColladaObjectPtr getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
-      shared_ptr< vector<float> > getFloatsVector(string text);
+      shared_ptr< vector<float> > getFloatsVector(const string& text);
       ColladaObjectPtr loadColladaObject(const DOMElement* element);
       string getAttribute(const DOMElement* element, string attribute);
       void loadId(const DOMElement* element, Id* id);
@@ -91,9 +95,9 @@ class ColladaDoc {
       shared_ptr<ColladaCamera> loadColladaCamera(const DOMElement* element);
       shared_ptr<Mesh> loadMesh(const DOMElement* element);
       shared_ptr<Vertices> loadVertices(const DOMElement* element);
-      shared_ptr<Triangles> loadTriangles(const DOMElement* element);
-      shared_ptr<Triangles> loadPolygons(const DOMElement* element);
-      shared_ptr<Triangles> loadPolylist(const DOMElement* element);
+      TrianglesPtr loadTriangles(const DOMElement* element);
+      TrianglesPtr loadPolygons(const DOMElement* element);
+      TrianglesPtr loadPolylist(const DOMElement* element);
       shared_ptr<Source> loadSource(const DOMElement* element);
       shared_ptr<Material> loadMaterial(const DOMElement* element);
       ColladaObjectPtr loadSampler2D(const DOMElement* profileCommon, const DOMElement* element);
@@ -118,6 +122,10 @@ class ColladaDoc {
       void loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
       bool isString_(const XMLCh* tag1, string tag2);
       ColladaObjectPtr loadEffectNewparamBySid_(const DOMElement* profileCommon, string sid);
+      void loadShaderAttributes_(ColladaShaderPtr shader, const DOMElement* element, const DOMElement* texturehack);
+      PhongPtr loadPhong_(const DOMElement* element, const DOMElement* texturehack);
+      LambertPtr loadLambert_(const DOMElement* element, const DOMElement* texturehack);
+
 
       string url_;
       XercesDOMParser* parser_;

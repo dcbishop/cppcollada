@@ -3,7 +3,6 @@
 
 #include <GL/glew.h>
 #include <GL/glu.h>
-//#include <GL/glut.h>
 #include <GL/gl.h>
 
 #include "../Render/ColladaRenderer.hpp"
@@ -25,19 +24,21 @@ class ColladaRendererGL : public ColladaRenderer {
       virtual void render(RotationGL* rotation);
       virtual void render(Scale* scale);
       virtual void render(Camera* camera);
-      virtual void setCamera(Camera* camera);
       virtual void render(Grid* grid);
       virtual void render(Geometry* geometry);
       virtual void render(InstanceGeometry* ig);
       virtual void render(GeometricPrimitive* geometry);
       virtual void render(Triangles* triangles);
       virtual void render(Material* material);
+      virtual void render(ColladaLitShader* lit);
       virtual void render(Phong* phong);
+      virtual void render(Lambert* lambert);
       virtual void render(TestRenderable* tr);
       virtual void render(Octree* octree);
       virtual void preFrame();
       virtual void postFrame();
       virtual void init();
+      virtual void setCamera(Camera* camera);
       virtual void setSize(const int width, const int height);
       int debugPrimDraw;
 
@@ -53,8 +54,6 @@ class ColladaRendererGL : public ColladaRenderer {
       void setUnlitMode_();
       void setLights_();
       void renderOctreeNode_(Octree* octree);
-
-
 
       Phong defaultMaterial_;
       int width_;

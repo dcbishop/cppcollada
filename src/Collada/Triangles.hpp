@@ -10,5 +10,6 @@ class Triangles : public GeometricPrimitive {
    public:
       COLLADA_RENDER_FUNCTION
 };
+typedef shared_ptr<Triangles> TrianglesPtr;
 
 #endif /* COLLADACPP_TRIANGLES_HPP_ */

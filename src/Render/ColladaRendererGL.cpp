@@ -11,7 +11,9 @@
 #include "../Collada/Geometry.hpp"
 #include "../Collada/InstanceGeometry.hpp"
 #include "../Collada/Material.hpp"
+#include "../Collada/ColladaLitShader.hpp"
 #include "../Collada/Phong.hpp"
+#include "../Collada/Lambert.hpp"
 #include "../Collada/Effect.hpp"
 #include "../GameData/Grid.hpp"
 
@@ -499,7 +501,7 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       iter+=inputCount;
    }*/
-   glEnable(GL_NORMALIZE);
+
    int prim_num = 0;
    while(iter != geometry->getEndPrimitive()) {
       //glNormal3f(geometry->getNX(prim_num), geometry->getNY(prim_num), geometry->getNZ(prim_num));
@@ -731,6 +733,7 @@ void ColladaRendererGL::setRenderMode_() {
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
    glEnable(GL_DEPTH_TEST);
+   glEnable(GL_NORMALIZE);
 }
 
 void ColladaRendererGL::setUnlitMode_() {
@@ -775,31 +778,27 @@ void ColladaRendererGL::setLights_() {
    glLightfv(GL_LIGHT0,GL_POSITION,light_pos);
 }
 
-void ColladaRendererGL::render(Phong* phong) {
+void ColladaRendererGL::render(ColladaLitShader* lit) {
    DEBUG_H("void ColladaRendererGL::render(Phong* phong)");
 
    setRenderMode_();
 
-   const float (&ambient)[4] = phong->getAmbient().getArray();
-   const float (&diffuse)[4] = phong->getDiffuse().getArray();
-   const float (&specular)[4] = phong->getSpecular().getArray();
-   const float (&emission)[4] = phong->getEmission().getArray();
-   float shininess[1] = {phong->getShininess()};
+   const float (&ambient)[4] = lit->getAmbient().getArray();
+   const float (&diffuse)[4] = lit->getDiffuse().getArray();
+   const float (&emission)[4] = lit->getEmission().getArray();
 
    #warning ['TODO']: Apply per-pixel Phong shader...
 
    glColor4f(diffuse[0], diffuse[1], diffuse[2], diffuse[3]);
    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
-   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emission);
-   glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 
-   if(phong->getTextureHack()) {
-      int texid = phong->getTextureHackId();
+   if(lit->getTextureHack()) {
+      int texid = lit->getTextureHackId();
       if(!texid) {
-         texid = imageLoader_.loadImage(phong->getTextureHack());
-         phong->setTextureHackId(texid);
+         texid = imageLoader_.loadImage(lit->getTextureHack());
+         lit->setTextureHackId(texid);
       }
       if(texid > 0) {
          glBindTexture(GL_TEXTURE_2D, texid);
@@ -810,8 +809,22 @@ void ColladaRendererGL::render(Phong* phong) {
          glDisable(GL_TEXTURE_2D);
       }
    } else {
-      glBindTexture( GL_TEXTURE_2D, NULL); //TODO: C++0x nullptr
+      glBindTexture(GL_TEXTURE_2D, NULL); //TODO: C++0x nullptr
    }
+}
+
+void ColladaRendererGL::render(Phong* phong) {
+   const float (&specular)[4] = phong->getSpecular().getArray();
+   float shininess[1] = {phong->getShininess()};
+
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+
+   phong->ColladaLitShader::render();
+}
+
+void ColladaRendererGL::render(Lambert* lambert) {
+   lambert->ColladaLitShader::render();
 }
 
 void ColladaRendererGL::renderOctreeNode_(Octree* octree) {

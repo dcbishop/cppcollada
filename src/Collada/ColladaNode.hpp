@@ -29,7 +29,7 @@ class ColladaNode : public ColladaObject, public Position, public RotationGL, pu
       
    private:
       string layer_;
-      vector<ColladaObjectPtr> instances_;
+      InstanceVector instances_;
 };
 typedef shared_ptr<ColladaNode> ColladaNodePtr;
 
