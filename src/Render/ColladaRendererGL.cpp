@@ -777,7 +777,7 @@ void ColladaRendererGL::setLights_() {
 }
 
 void ColladaRendererGL::render(ColladaLitShader* lit) {
-   DEBUG_H("void ColladaRendererGL::render(Phong* phong)");
+   DEBUG_H("void ColladaRendererGL::render(ColladaLitShader* lit)");
 
    setRenderMode_();
 
@@ -822,7 +822,7 @@ void ColladaRendererGL::render(Phong* phong) {
 }
 
 void ColladaRendererGL::render(Lambert* lambert) {
-   lambert->ColladaLitShader::render();
+   shader_manager_.getLambert()->begin();
 }
 
 void ColladaRendererGL::renderOctreeNode_(Octree* octree) {

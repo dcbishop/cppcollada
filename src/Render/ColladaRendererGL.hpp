@@ -7,6 +7,7 @@
 #include "../Collada/Phong.hpp"
 #include "../Render/ColladaRendererGL_DevIL.hpp"
 #include "../Render/GLMatrixStack.hpp"
+#include "../Render/GLSLShaderManager.hpp"
 
 class ColladaRendererGL : public ColladaRenderer {
    public:
@@ -60,6 +61,7 @@ class ColladaRendererGL : public ColladaRenderer {
       bool glewInit_;
       ColladaRendererGL_DevIL imageLoader_;
       GLMatrixStack stack_;
+      GLSLShaderManager shader_manager_;
 };
 
 #endif /* COLLADACPP_COLLADARENDERERGL_HPP_ */

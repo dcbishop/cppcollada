@@ -26,6 +26,7 @@ class GameObject;
 class Area;
 class ColladaMesh;
 class Octree;
+class GLSLShader;
 
 class ColladaRenderer {
    public:
