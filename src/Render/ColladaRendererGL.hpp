@@ -2,12 +2,11 @@
 #define COLLADACPP_COLLADARENDERERGL_HPP_
 
 #include <GL/glew.h>
-#include <GL/glu.h>
-#include <GL/gl.h>
 
 #include "../Render/ColladaRenderer.hpp"
 #include "../Collada/Phong.hpp"
 #include "../Render/ColladaRendererGL_DevIL.hpp"
+#include "../Render/GLMatrixStack.hpp"
 
 class ColladaRendererGL : public ColladaRenderer {
    public:
@@ -60,6 +59,7 @@ class ColladaRendererGL : public ColladaRenderer {
       int height_;
       bool glewInit_;
       ColladaRendererGL_DevIL imageLoader_;
+      GLMatrixStack stack_;
 };
 
 #endif /* COLLADACPP_COLLADARENDERERGL_HPP_ */

@@ -1,5 +1,7 @@
 #include "../Render/ColladaRendererGL_DevIL.hpp"
 
+#include <GL/gl.h>
+
 #include <IL/il.h>
 #include "../Debug/console.h"
 

@@ -19,17 +19,17 @@
 
 #include "../GameObjects/GameObject.hpp"
 #include "../GameObjects/ColladaMesh.hpp"
-#include "../GameObjects/Area.hpp"
+#include "../GameObjects/Area.hpp"f
 #include "../GameObjects/Camera.hpp"
 #include "../GameObjects/Octree.hpp"
 
 #include "../Debug/console.h"
 #include "../Debug/TestRenderable.hpp"
 
-
-
-
 #include <iostream>
+
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 void ColladaRendererGL::init() {
    LOG("Initilizing OpenGL renderer...");
@@ -38,7 +38,6 @@ void ColladaRendererGL::init() {
    debugPrimDraw = -1;
    imageLoader_.init();
    glEnable(GL_MULTISAMPLE);
-  // glutInit();
 
    LOG("Initilized OpenGL renderer...");
 }
@@ -119,8 +118,8 @@ void ColladaRendererGL::fixAxis_(const Collada* collada) {
 
    if(upAxis == Z_UP) {
       //This seems to work for Z-Axis up
-      glRotatef(90.f, -1.0f, 0.0f, 0.0f);
-      glScalef(-1.0f, -1.0f, 1.0f);
+      stack_.rotate(90.f, -1.0f, 0.0f, 0.0f);
+      stack_.scale(-1.0f, -1.0f, 1.0f);
    } else if(upAxis == Y_UP) {
       
    } else {
@@ -146,15 +145,15 @@ void ColladaRendererGL::render(GameObject* gameObject) {
 }
 
 void ColladaRendererGL::render(ColladaMesh* colladaMesh) {
-   glPushMatrix();
+   stack_.pushMatrix();
       colladaMesh->GameObject::render();
       colladaMesh->getCollada()->render();
-   glPopMatrix();
+   stack_.popMatrix();
 }
 void ColladaRendererGL::render(Collada* collada) {
    DEBUG_H("ColladaRendererGL::render(Collada* collada)");
 
-   glPushMatrix();
+   stack_.pushMatrix();
    fixAxis_(collada);
 
    glEnable(GL_DEPTH_TEST);
@@ -165,7 +164,7 @@ void ColladaRendererGL::render(Collada* collada) {
 
 
    collada->getScene()->render();
-   glPopMatrix();
+   stack_.popMatrix();
 }
 
 void ColladaRendererGL::render(Scene* scene) {
@@ -191,7 +190,7 @@ void ColladaRendererGL::render(VisualScene* vs) {
 void ColladaRendererGL::render(ColladaNode* node) {
    DEBUG_H("ColladaRendererGL::render(ColladaNode* node)");
 
-   glPushMatrix();
+   stack_.pushMatrix();
    
    node->Position::render();
 
@@ -209,7 +208,7 @@ void ColladaRendererGL::render(ColladaNode* node) {
 
    renderAxis_(); // DEBUG
 
-   glPopMatrix();
+   stack_.popMatrix();
 }
 
 /**
@@ -239,7 +238,7 @@ void ColladaRendererGL::renderAxis_() {
  */
 void ColladaRendererGL::render(Position* position) {
    DEBUG_H("ColladaRendererGL::render(Position* position)");
-   glTranslatef(position->getX(), position->getY(), position->getZ());
+   stack_.translate(position->getX(), position->getY(), position->getZ());
 }
 
 /**
@@ -250,7 +249,7 @@ void ColladaRendererGL::render(RotationGL* rotation) {
    float angle, x, y, z;
    for(int i = 0; i < 3; i++) {
       rotation->getRotationGL(i, x, y, z, angle);
-      glRotatef(angle, x, y, z);
+      stack_.rotate(angle, x, y, z);
    }
 }
 
@@ -259,7 +258,7 @@ void ColladaRendererGL::render(RotationGL* rotation) {
  */
 void ColladaRendererGL::render(Scale* scale) {
    DEBUG_H("ColladaRendererGL::render(Scale* scale)");
-   glScalef(scale->getScaleX(), scale->getScaleY(), scale->getScaleZ());
+   stack_.scale(scale->getScaleX(), scale->getScaleY(), scale->getScaleZ());
 }
 
 /**
@@ -275,10 +274,10 @@ void ColladaRendererGL::render(Renderable* renderable) {
  */
 void ColladaRendererGL::render(Camera* camera) {
    DEBUG_H("void ColladaRendererGL::render(Camera* camera)");
-   glPushMatrix();
+   stack_.pushMatrix();
       camera->GameObject::render();
       renderAxis_();
-   glPopMatrix();
+   stack_.popMatrix();
 }
 
 /**
@@ -458,7 +457,6 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       
       // DEBUG DRAW NORMAL LINES!
       if(num != debugPrimDraw) {continue;}; //DEBUG: Draw a specific prim number...
-      //continue;
       iter-=inputCount*3;
       setUnlitMode_();
       glEnable(GL_COLOR_MATERIAL);
@@ -763,16 +761,16 @@ void ColladaRendererGL::setLights_() {
    //static float debugPos = 1.0f;
    //debugPos+=0.01;
    glDisable(GL_LIGHTING);
-   glPushMatrix();
+   stack_.pushMatrix();
 
    float lx = -2.0;
    float ly = -2.0;
    float lz = 2.0;
    //float lz = debugPos;
    
-   glTranslatef(lx, ly, lz);
+   stack_.translate(lx, ly, lz);
    renderAxis_();
-   glPopMatrix();
+   stack_.popMatrix();
 
    float light_pos[] = {lx, ly, lz, 1.0};
    glLightfv(GL_LIGHT0,GL_POSITION,light_pos);
@@ -843,7 +841,7 @@ void ColladaRendererGL::renderOctreeNode_(Octree* octree) {
 }
 
 void ColladaRendererGL::render(Octree* octree) {
-   glPushMatrix();
+   stack_.pushMatrix();
 
 	setPolygonMode_();
    octree->GameObject::render();
@@ -852,36 +850,36 @@ void ColladaRendererGL::render(Octree* octree) {
       for(int i = 0; i < 8; i++) {
          OctreePtr child = octree->getChild(i);
          if(child != OctreePtr()) {
-            glPushMatrix();
-            glScalef(0.5, 0.5, 0.5);
+            stack_.pushMatrix();
+            stack_.scale(0.5, 0.5, 0.5);
 
             // Left/Right offset
             if(i == 0 || i == 2 || i == 4 || i == 6) {
-               glTranslatef(0.5, 0.0, 0.0);
+               stack_.translate(0.5, 0.0, 0.0);
             } else {
-               glTranslatef(-0.5, 0.0, 0.0);
+               stack_.translate(-0.5, 0.0, 0.0);
             }
 
             // Up/Down
             if(i == 0 || i == 1 || i == 4 || i == 5) {
-               glTranslatef(0.0, -0.5, 0.0);
+               stack_.translate(0.0, -0.5, 0.0);
             } else {
-               glTranslatef(0.0, 0.5, 0.0);
+               stack_.translate(0.0, 0.5, 0.0);
             }
 
             // Front/Back
             if(i >= 4) {
-               glTranslatef(0.0, 0.0, 0.5);
+               stack_.translate(0.0, 0.0, 0.5);
             } else {
-               glTranslatef(0.0, 0.0, -0.5);
+               stack_.translate(0.0, 0.0, -0.5);
             }
 
             child->render();
-            glPopMatrix();
+            stack_.popMatrix();
          }
       }
    }
    renderOctreeNode_(octree);
 
-   glPopMatrix();
+   stack_.popMatrix();
 }
