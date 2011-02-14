@@ -15,6 +15,12 @@ using namespace std;
 GLSLShaderPtr GLSLShaderManager::blinn_phong_;
 
 GLSLShaderPtr GLSLShaderManager::getLambert() {
+   // TODO
+   return getBlinnPhong();
+}
+
+GLSLShaderPtr GLSLShaderManager::getPhong() {
+   // TODO
    return getBlinnPhong();
 }
 

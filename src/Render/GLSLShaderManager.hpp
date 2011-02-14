@@ -10,6 +10,7 @@ class GLSLShaderManager {
    public:
       GLSLShaderPtr getLambert();
       GLSLShaderPtr getBlinnPhong();
+      GLSLShaderPtr getPhong();
       GLSLShaderPtr loadShaders(const string& vertex, const string& fragment);
       void displayInfoLog(const int& id);
 

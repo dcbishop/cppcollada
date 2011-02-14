@@ -54,6 +54,8 @@ class ColladaRendererGL : public ColladaRenderer {
       void setUnlitMode_();
       void setLights_();
       void renderOctreeNode_(Octree* octree);
+      void bindModelviewMatrix_();
+      void bindProjectionMatrix_();
 
       Phong defaultMaterial_;
       int width_;
@@ -61,6 +63,7 @@ class ColladaRendererGL : public ColladaRenderer {
       bool glewInit_;
       ColladaRendererGL_DevIL imageLoader_;
       GLMatrixStack stack_;
+      glm::mat4 projection_matrix_;
       GLSLShaderManager shader_manager_;
 };
 

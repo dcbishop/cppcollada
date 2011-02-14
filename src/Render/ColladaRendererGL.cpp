@@ -56,7 +56,7 @@ void ColladaRendererGL::preFrame() {
 		glewInit_ = true;
 	}
    setPerspective_();
-   glLoadIdentity();
+   stack_.loadIdentity();
    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
    glClearDepth(10000.0f);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -92,9 +92,18 @@ void ColladaRendererGL::setSize(const int width, const int height) {
 }
 
 void ColladaRendererGL::setPerspective_() {
+   projection_matrix_ = glm::perspective(90.0f, (float)1.0 * width_ / height_, 0.1f, 10000.0f);
+   bindProjectionMatrix_();
+}
+
+void ColladaRendererGL::bindModelviewMatrix_() {
+   glMatrixMode(GL_MODELVIEW);
+   glLoadMatrixf(stack_.getOpenGLMatrix());
+}
+
+void ColladaRendererGL::bindProjectionMatrix_() {
    glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   gluPerspective(90.0f, 1.0 * width_ / height_, 0.1f, 10000.0f);
+   glLoadMatrixf(&projection_matrix_[0][0]);
    glMatrixMode(GL_MODELVIEW);
 }
 
@@ -125,7 +134,6 @@ void ColladaRendererGL::fixAxis_(const Collada* collada) {
    } else {
       
    }
-
 }
 
 void ColladaRendererGL::render(Area* area) {
@@ -146,10 +154,11 @@ void ColladaRendererGL::render(GameObject* gameObject) {
 
 void ColladaRendererGL::render(ColladaMesh* colladaMesh) {
    stack_.pushMatrix();
-      colladaMesh->GameObject::render();
-      colladaMesh->getCollada()->render();
+   colladaMesh->GameObject::render();
+   colladaMesh->getCollada()->render();
    stack_.popMatrix();
 }
+
 void ColladaRendererGL::render(Collada* collada) {
    DEBUG_H("ColladaRendererGL::render(Collada* collada)");
 
@@ -161,7 +170,6 @@ void ColladaRendererGL::render(Collada* collada) {
    setPolygonMode_();
 
    setLights_();
-
 
    collada->getScene()->render();
    stack_.popMatrix();
@@ -182,8 +190,10 @@ void ColladaRendererGL::render(VisualScene* vs) {
    DEBUG_H("ColladaRendererGL::render(VisualScene* vs)");
    ColladaNodeIterator ni = vs->getFirstColladaNode();
    while(ni != vs->getEndColladaNode()) {
+      stack_.pushMatrix();
       (*ni)->render();
       ni++;
+      stack_.popMatrix();
    }
 }
 
@@ -217,6 +227,7 @@ void ColladaRendererGL::render(ColladaNode* node) {
 void ColladaRendererGL::renderAxis_() {
    DEBUG_H("void ColladaRendererGL::renderAxis_()");
    // Draw debug axis...
+   bindModelviewMatrix_();
    glBegin(GL_LINES);
       glColor3f(1.0f, 0.0f, 0.0f);
       glVertex3f(0.0, 0.0, 0.0);
@@ -296,7 +307,9 @@ void ColladaRendererGL::setCamera(Camera* camera) {
       cz = target->getZ();
    }
 
-   gluLookAt( camera->getX()+cx, camera->getY()+cy, camera->getZ()+cz, cx, cy, cz, 0.0f, 10.0f, 0.0f );
+   setPerspective_();
+   projection_matrix_ *= glm::lookAt(glm::vec3(camera->getX()+cx, camera->getY()+cy, camera->getZ()+cz), glm::vec3(cx, cy, cz), glm::vec3(0.0f, 10.0f, 0.0f));
+   bindProjectionMatrix_();
 }
 
 
@@ -313,6 +326,7 @@ void ColladaRendererGL::render(Grid* grid) {
 
    // TODO: This is a stupid way of drawing grid. Add Z grid.
    glColor3f(grid->getRed(), grid->getGreen(), grid->getBlue());
+   bindModelviewMatrix_();
    glBegin(GL_LINES);
    for(int y = 0; y < size_y; y++) {
       float y1 = y * spacing;
@@ -375,7 +389,6 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
    //static int debugfun = -1;
    //debugfun++;
 
-   
    int vertexCount = geometry->getVertexCount();
    for(int i = 0; i < vertexCount; i++) {
       glTexCoord2f(geometry->getS(i), geometry->getT(i));
@@ -412,9 +425,9 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
    int inputCount = geometry->getInputCount();
    while(iter != geometry->getEndPrimitive()) {
       num++;
-      
+
       //if(num != debugfun) {iter+=inputCount*3; continue;}; //DEBUG: Draw a specific prim number...
-      
+
       /*int primNum = geometry->getVertexNum(*iter);
       DEBUG_H("%d %d x=%f. y=%f, z=%f", *iter, primNum, geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       glNormal3f(geometry->getNX(*iter), geometry->getNY(*iter), geometry->getNZ(*iter));
@@ -423,45 +436,31 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       //int vertexNum = geometry->getVertexNum(*iter);
       //int normalNum = geometry->getNormalNum(*iter+1);
       #warning ['TODO']: Plus input offset not +1...
-      
+
       glBegin(GL_TRIANGLES);
-      //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
       glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
       glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      
-      //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
-      iter++;
-      
-      //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
-      glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
-      glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      
-      
-      //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
       iter++;
 
-      //DEBUG_M("%d VTX: %d, NML: %d", num, *iter, *(iter+1));
       glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
       glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
+      iter++;
 
-      //DEBUG_M("X: %f, Y: %f, Z: %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      //DEBUG_M("NX: %f, NY: %f, NZ: %f", geometry->getNX(*(iter+1)), geometry->getNY(*(iter+1)), geometry->getNZ(*(iter+1)));
+      glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
+      glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
+      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       glEnd();
       iter++;
 
-      
       // DEBUG DRAW NORMAL LINES!
       if(num != debugPrimDraw) {continue;}; //DEBUG: Draw a specific prim number...
       iter-=inputCount*3;
       setUnlitMode_();
       glEnable(GL_COLOR_MATERIAL);
       glColor3f(1.0,0,0);
-      
+
       glBegin(GL_LINES);
       glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
       glVertex3f(geometry->getX(*iter)+geometry->getNX(*(iter+1)),
@@ -486,7 +485,6 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
 
       glDisable(GL_COLOR_MATERIAL);
       setRenderMode_();
-
    }
 }
 #if 0
@@ -636,10 +634,9 @@ void ColladaRendererGL::renderCube_(const float size) {
                            0,-1,0,  0,-1,0,  0,-1,0,  0,-1,0,
                            0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1
                            };
-                           
+
 		offset = sizeof(vertices);
-      
-      //cubeid = 1;               
+
 		DEBUG_M("Initilizing cube VBO.");
 		glGenBuffers(1, &cubeid);
 		glBindBuffer(GL_ARRAY_BUFFER, cubeid);
@@ -651,13 +648,13 @@ void ColladaRendererGL::renderCube_(const float size) {
 
 	//setPolygonMode_();
 	glBindBuffer(GL_ARRAY_BUFFER, cubeid);
-	
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 
 	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glNormalPointer(GL_FLOAT, 0, (void*)offset);
-	
+
 	glDrawArrays(GL_QUADS, 0, 24);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
@@ -761,14 +758,15 @@ void ColladaRendererGL::setLights_() {
    //static float debugPos = 1.0f;
    //debugPos+=0.01;
    glDisable(GL_LIGHTING);
-   stack_.pushMatrix();
 
    float lx = -2.0;
    float ly = -2.0;
    float lz = 2.0;
    //float lz = debugPos;
    
+   stack_.pushMatrix();
    stack_.translate(lx, ly, lz);
+   bindModelviewMatrix_();
    renderAxis_();
    stack_.popMatrix();
 
@@ -807,18 +805,19 @@ void ColladaRendererGL::render(ColladaLitShader* lit) {
          glDisable(GL_TEXTURE_2D);
       }
    } else {
-      glBindTexture(GL_TEXTURE_2D, NULL); //TODO: C++0x nullptr
+      glBindTexture(GL_TEXTURE_2D, NULL);
    }
 }
 
 void ColladaRendererGL::render(Phong* phong) {
-   const float (&specular)[4] = phong->getSpecular().getArray();
+   /*const float (&specular)[4] = phong->getSpecular().getArray();
    float shininess[1] = {phong->getShininess()};
 
    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 
-   phong->ColladaLitShader::render();
+   phong->ColladaLitShader::render();*/
+   shader_manager_.getPhong()->begin();
 }
 
 void ColladaRendererGL::render(Lambert* lambert) {
@@ -826,22 +825,22 @@ void ColladaRendererGL::render(Lambert* lambert) {
 }
 
 void ColladaRendererGL::renderOctreeNode_(Octree* octree) {
-   glEnable(GL_COLOR_MATERIAL);
+   /*glEnable(GL_COLOR_MATERIAL);
    if(octree->getIsSolid()) {
       //setPolygonMode_();
       //glColor3f(0.0f, 1.0f, 0.0f);
       ColorRGBAPtr thecolor = octree->getColor();
       glColor3f(thecolor->getRed(), thecolor->getGreen(), thecolor->getBlue());
       renderCube_(1.0);
-   } /*else {
-      setWireframeMode_();
-   }*/
-   glDisable(GL_COLOR_MATERIAL);
+   } //else {
+     // setWireframeMode_();
+   //}
+   glDisable(GL_COLOR_MATERIAL);*/
 
 }
 
 void ColladaRendererGL::render(Octree* octree) {
-   stack_.pushMatrix();
+   /*stack_.pushMatrix();
 
 	setPolygonMode_();
    octree->GameObject::render();
@@ -881,5 +880,5 @@ void ColladaRendererGL::render(Octree* octree) {
    }
    renderOctreeNode_(octree);
 
-   stack_.popMatrix();
+   stack_.popMatrix();*/
 }

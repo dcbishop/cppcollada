@@ -28,6 +28,8 @@
 #include "../GameObjects/ColladaMesh.hpp"
 #include "../GameObjects/Octree.hpp"
 
+#include "../Render/GLMatrixStack.hpp"
+
 using namespace std;
 using namespace xercesc;
 
@@ -53,9 +55,9 @@ int main(int argc, char* argv[]) {
    ColladaMeshPtr colladaMesh = ColladaMeshPtr(new ColladaMesh);
    colladaMesh->setCollada(collada);
 
-   /*OctreePtr octreeTest = OctreePtr(new Octree);
-   octreeTest->setScaleXYZ(10, 10, 10);
-   octreeTest->debug();*/
+   //OctreePtr octreeTest = OctreePtr(new Octree);
+   //octreeTest->setScaleXYZ(10, 10, 10);
+   //octreeTest->debug();
 
    CameraPtr camera = CameraPtr(new Camera);
    camera->setTarget(colladaMesh);
@@ -68,6 +70,7 @@ int main(int argc, char* argv[]) {
    //area->addObject(octreeTest);
 
    //ViewWindowSDL vw(800, 600);
+   
    ViewWindowQT vw(800, 600);
    vw.setTitle(filename);
    vw.setCamera(camera);
@@ -79,6 +82,17 @@ int main(int argc, char* argv[]) {
    NetworkedSensor ns;
    ns.setOrientationTarget(rotation);
    ns.start();*/
+   
+   /*GLMatrixStack teststack;
+   printMatrix(teststack.getMatrix());
+   teststack.pushMatrix();
+   teststack.translate(2.0, 3.0, 4.0);
+   teststack.translate(1.0, 1.0, 1.0);
+   teststack.popMatrix();
+   //teststack.rotate(45.0, 1.0, 0, 0);
+   teststack.scale(2.0, 2.0, 2.0);
+   printMatrix(teststack.getMatrix());*/
+   
 
    LOG("Goodbye...");
 }
