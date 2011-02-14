@@ -228,6 +228,9 @@ void ColladaRendererGL::renderAxis_() {
    DEBUG_H("void ColladaRendererGL::renderAxis_()");
    // Draw debug axis...
    bindModelviewMatrix_();
+
+   shader_manager_.getFlat()->begin();
+   
    glBegin(GL_LINES);
       glColor3f(1.0f, 0.0f, 0.0f);
       glVertex3f(0.0, 0.0, 0.0);
@@ -732,6 +735,7 @@ void ColladaRendererGL::setRenderMode_() {
 }
 
 void ColladaRendererGL::setUnlitMode_() {
+   shader_manager_.getFlat()->begin();
    glDisable(GL_LIGHTING);
 }
 
@@ -810,14 +814,16 @@ void ColladaRendererGL::render(ColladaLitShader* lit) {
 }
 
 void ColladaRendererGL::render(Phong* phong) {
-   /*const float (&specular)[4] = phong->getSpecular().getArray();
+   const float (&specular)[4] = phong->getSpecular().getArray();
    float shininess[1] = {phong->getShininess()};
 
    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 
-   phong->ColladaLitShader::render();*/
+   phong->ColladaLitShader::render();
    shader_manager_.getPhong()->begin();
+   shader_manager_.getPhong()->bindModelviewMatrix(stack_.getMatrix());
+   shader_manager_.getPhong()->bindModelviewProjectionMatrix(projection_matrix_ * stack_.getMatrix());
 }
 
 void ColladaRendererGL::render(Lambert* lambert) {

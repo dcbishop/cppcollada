@@ -24,6 +24,11 @@ GLSLShaderPtr GLSLShaderManager::getPhong() {
    return getBlinnPhong();
 }
 
+GLSLShaderPtr GLSLShaderManager::getFlat() {
+   // TODO
+   return getBlinnPhong();
+}
+
 GLSLShaderPtr GLSLShaderManager::getBlinnPhong() {
    if(blinn_phong_.get() == NULL) {
       DEBUG_M("Loading blinn phong shader...");
