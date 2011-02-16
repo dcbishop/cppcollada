@@ -16,6 +16,8 @@ using namespace std;
 #include "../Render/ColladaRendererGL.hpp"
 #include "../Render/ColladaRenderer.hpp"
 #include "../GameData/Grid.hpp"
+#include "../GameObjects/Area.hpp"
+
 
 ViewWindowSDL::ViewWindowSDL(const int width, const int height): ViewWindow(width, height) {
    DEBUG_M("ViewWindowSDL spawning...");
@@ -75,19 +77,42 @@ void ViewWindowSDL::draw_() {
 
    renderer_.preFrame();
 
-   getCamera()->setCamera();
-   grid_->render();
+   CameraPtr camera = getCamera();
+   shared_ptr<Area> area;
 
-   /*shared_ptr<Collada> collada = getCollada();
-   if(collada) {
-      collada->render();
-   }*/
-   // TODO: Render stuff here!
+   if(camera != CameraPtr()) {
+      camera->setCamera();
+      area = camera->getArea();
+   }
+
+   if(area != shared_ptr<Area>()) {
+      area->render();
+   }
+
+   grid_->render();
 
    renderer_.postFrame();
    SDL_GL_SwapBuffers();
 
    mpf_ = getComputerTime_() - current_time;
+}
+
+void ViewWindowSDL::handleKeyUp_(const SDL_Event& event) {
+   static bool fullscreen = false;
+   switch(event.key.keysym.sym) {
+      case(SDLK_f):
+         fullscreen = !fullscreen;
+         DEBUG_M("Toggling fullscreen...");
+         if(fullscreen) {
+            SDL_SetVideoMode(640, 480, 0, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL | SDL_FULLSCREEN);
+         } else {
+            SDL_SetVideoMode(getWidth(), getHeight(), 0, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL | SDL_RESIZABLE);
+         }
+         break;
+      default:
+         DEBUG_M("Unknown key pressed.");
+         break;
+   }
 }
 
 /**
@@ -102,10 +127,10 @@ void ViewWindowSDL::checkEvents_() {
             break;
          case SDL_KEYDOWN:
             //handleKeyDown_(event);
-            finished_ = true;
+            //finished_ = true;
             break;
          case SDL_KEYUP:
-            //handleKeyUp_(event);
+            handleKeyUp_(event);
             break;
          case SDL_MOUSEMOTION:
             mx_ = event.motion.x;
@@ -119,7 +144,7 @@ void ViewWindowSDL::checkEvents_() {
          case SDL_MOUSEBUTTONDOWN:
             DEBUG_L("Mouse button %d down at (%d, %d)", event.button.button, event.button.x, event.button.y);
 
-            if(event.button.button == 3) {
+            if(event.button.button == 1) {
                cam_move_ = true;
             }
             break;
@@ -128,12 +153,12 @@ void ViewWindowSDL::checkEvents_() {
             switch(event.button.button) {
                case 1:
                   //handleMouse1_(event);
+                  cam_move_ = false;
                   break;
                case 2:
                   //handleMouse3_(event);
                   break;
                case 3:
-                  cam_move_ = false;
                   break;
                case 5:
                   getCamera()->setZoom(getCamera()->getZoomTarget() + ZOOM_STEP);
@@ -144,8 +169,8 @@ void ViewWindowSDL::checkEvents_() {
             }
             break;
          case SDL_VIDEORESIZE:
-            setSize(event.resize.w, event.resize.h);
             DEBUG_M("SDL_VIDEORESIZE %d %d", getWidth(), getHeight());
+            setSize(event.resize.w, event.resize.h);
             SDL_SetVideoMode(getWidth(), getHeight(), 0, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL | SDL_RESIZABLE);
             renderer_.setSize(getWidth(), getHeight());
             break;

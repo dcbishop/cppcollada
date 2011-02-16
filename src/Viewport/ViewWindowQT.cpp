@@ -120,13 +120,6 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
 
    grid_->render();
 
-   #warning ['TODO']: Update me for new game object based render system...
-   /*shared_ptr<Collada> collada = vwqt_->getCollada();
-   if(collada) {
-      collada->render();
-   }*/
-   
-
    renderer_.postFrame();
 
    painter->endNativePainting();

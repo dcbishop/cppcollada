@@ -37,7 +37,7 @@ void ColladaRendererGL::init() {
    defaultMaterial_.setRenderer(this);
    debugPrimDraw = -1;
    imageLoader_.init();
-   glEnable(GL_MULTISAMPLE);
+   //glEnable(GL_MULTISAMPLE);
 
    LOG("Initilized OpenGL renderer...");
 }

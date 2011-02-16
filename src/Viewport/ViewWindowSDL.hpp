@@ -1,12 +1,13 @@
 #ifndef COLLADACPP_VIEWWINDOWSDL_HPP_
 #define COLLADACPP_VIEWWINDOWSDL_HPP_
 
+#include "ViewWindow.hpp"
 class Collada;
 
 #include <string>
 using namespace std;
 
-#include "ViewWindow.hpp"
+#include "SDL.h"
 
 #include "../GameData/SmartPointers.hpp"
 #include "../Render/ColladaRendererGL.hpp"
@@ -27,7 +28,8 @@ class ViewWindowSDL: public ViewWindow {
       int getComputerTime_();
       void draw_();
       void checkEvents_();
-      void drawGrid_();
+      void handleKeyUp_(const SDL_Event& event);
+
       bool finished_;
       ColladaRendererGL renderer_;
       int mx_, my_;
