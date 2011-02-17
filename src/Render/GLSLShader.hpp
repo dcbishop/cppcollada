@@ -30,6 +30,10 @@ class GLSLShader {
          }
          glUniformMatrix4fv(loc, 1, GL_FALSE, &matrix[0][0]);
       }
+      void bindAttributes() {
+         glBindAttribLocation(program_id_, 0, "mcVertex");
+         glBindAttribLocation(program_id_, 1, "mcNormal");
+      }
       
    private:
       string getProgramInfoLog_() {

@@ -69,9 +69,9 @@ int main(int argc, char* argv[]) {
    area->addObject(colladaMesh);
    //area->addObject(octreeTest);
 
-   ViewWindowSDL vw(800, 600);
+   //ViewWindowSDL vw(800, 600);
    
-   //ViewWindowQT vw(800, 600);
+   ViewWindowQT vw(800, 600);
    vw.setTitle(filename);
    vw.setCamera(camera);
    vw.mainLoop();

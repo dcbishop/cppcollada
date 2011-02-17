@@ -109,6 +109,10 @@ void ViewWindowSDL::handleKeyUp_(const SDL_Event& event) {
             SDL_SetVideoMode(getWidth(), getHeight(), 0, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL | SDL_RESIZABLE);
          }
          break;
+      case(SDLK_q):
+         DEBUG_M("Quitting...");
+         finished_ = true;
+         break;
       default:
          DEBUG_M("Unknown key pressed.");
          break;
@@ -152,11 +156,9 @@ void ViewWindowSDL::checkEvents_() {
             DEBUG_L("Mouse button %d up at (%d, %d)", event.button.button, event.button.x, event.button.y);
             switch(event.button.button) {
                case 1:
-                  //handleMouse1_(event);
                   cam_move_ = false;
                   break;
                case 2:
-                  //handleMouse3_(event);
                   break;
                case 3:
                   break;

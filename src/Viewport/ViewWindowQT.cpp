@@ -113,7 +113,7 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
       camera->setCamera();
       area = camera->getArea();
    }
-   
+
    if(area != shared_ptr<Area>()) {
       area->render();
    }

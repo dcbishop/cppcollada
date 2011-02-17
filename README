@@ -22,8 +22,10 @@ scons clang=1 boost=1
 
 The folowing libraries are used:
 libglew1.5-dev - OpenGL extentions.
+glm - For OpenGL Matrix functions.
 libdevil-dev - For texture loading.
-libxerces-c2-dev - XML parsing.
+libxerces-c-dev - XML parsing.
 libqt4-dev - For the QT interface.
+libqt4-opengl-dev
 libnoise-dev - Use for an experiment using noise for random level generation.
 

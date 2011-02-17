@@ -227,9 +227,41 @@ void ColladaRendererGL::render(ColladaNode* node) {
 void ColladaRendererGL::renderAxis_() {
    DEBUG_H("void ColladaRendererGL::renderAxis_()");
    // Draw debug axis...
-   bindModelviewMatrix_();
+   /*bindModelviewMatrix_();
 
    shader_manager_.getFlat()->begin();
+   
+   static bool inited = false;
+   static GLuint vid = -1;
+   static GLuint iid = -1;
+   static int count = 0;
+   if(inited == false) {
+      
+      static GLfloat vertices[] = {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+      static GLubyte indicies[] = {0, 1, 0, 2, 0, 3};
+      count = sizeof(indicies);
+      
+      glGenBuffers(1, &vid);
+      glBindBuffer(GL_ARRAY_BUFFER, vid);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+      glGenBuffers(1, &iid);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iid);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), &indicies, GL_STATIC_DRAW);
+   } else {
+      glBindBuffer(GL_ARRAY_BUFFER, vid);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iid);
+   }
+
+   glDrawElements(GL_LINES, count, GL_UNSIGNED_BYTE, 0);
+   
+   glBindBuffer(GL_ARRAY_BUFFER,0);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);*/
+
+   //glDisableClientState(GL_VERTEX_ARRAY);
+
+   /*glEnableClientState(GL_VERTEX_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, verticies);
+   glDrawElements(GL_LINES, 3, 0, verticies);*/
    
    glBegin(GL_LINES);
       glColor3f(1.0f, 0.0f, 0.0f);
@@ -618,7 +650,58 @@ void ColladaRendererGL::render(TestRenderable* tr) {
 }
 
 void ColladaRendererGL::renderCube_(const float size) {
-	// Render a cube from a VBO
+	// Render a cube from a VAO
+   static GLuint vao = 0;
+   static GLuint cube_buf_id = 0;
+	static int offset = 0;
+	if(vao == 0) {
+      glGenVertexArrays(1, &vao);
+      glBindVertexArray(vao);
+		GLfloat vertices[] = {1,1,1,		-1,1,1,		-1,-1,1,		1,-1,1, //BACK OR FRONT
+									 1,1,1,		1,-1,1,		1,-1,-1,  	1,1,-1, //LEFT
+                            1,1,1,		1,1,-1,		-1,1,-1,  	-1,1,1, //TOP
+                            -1,1,1,		-1,1,-1,		-1,-1,-1,  	-1,-1,1, // RIGHT
+                            -1,-1,-1,	1,-1,-1,		1,-1,1,		-1,-1,1, // BOTTOM
+                            1,-1,-1,	-1,-1,-1,	-1,1,-1, 	 1,1,-1 //FRONT
+                            };
+
+		GLfloat normals[] = {0,0,1,	0,0,1,   0,0,1,   0,0,1,
+                           1,0,0,   1,0,0,   1,0,0,	1,0,0,
+                           0,1,0,   0,1,0,   0,1,0,	0,1,0,
+                           -1,0,0,  -1,0,0,	-1,0,0,  -1,0,0,
+                           0,-1,0,  0,-1,0,  0,-1,0,  0,-1,0,
+                           0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1
+                           };
+
+		offset = sizeof(vertices);
+
+		DEBUG_M("Initilizing cube Vertex Array Object.");
+		glGenBuffers(1, &cube_buf_id);
+		glBindBuffer(GL_ARRAY_BUFFER, cube_buf_id);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), 0, GL_STATIC_DRAW);
+		
+      glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
+		
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+      glEnableVertexAttribArray(0);
+      glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)sizeof(vertices));
+      glEnableVertexAttribArray(1);
+      glBindVertexArray(0);
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+      
+	}
+
+   stack_.pushMatrix();
+   stack_.scale(size, size, size);
+   glBindVertexArray(vao);
+   glDrawArrays(GL_QUADS, 0, 24);
+   glBindVertexArray(0);
+   stack_.popMatrix();
+
+   // TODO: Delete cube buffers on exit!
+
+/*  
 	static GLuint cubeid = 0;
 	static int offset = 0;
 	if(cubeid == 0) {
@@ -661,7 +744,7 @@ void ColladaRendererGL::renderCube_(const float size) {
 	glDrawArrays(GL_QUADS, 0, 24);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 
 	/* Lazy cube
    float hsize = size/2;
@@ -772,10 +855,14 @@ void ColladaRendererGL::setLights_() {
    stack_.translate(lx, ly, lz);
    bindModelviewMatrix_();
    renderAxis_();
+   renderCube_(0.1f);
+   stack_.rotate(45.0, 1.0f, 0.0f, 0.0f);
+   stack_.rotate(45.0, 0.0f, 1.0f, 0.0f);
+   renderCube_(0.1f);
    stack_.popMatrix();
 
    float light_pos[] = {lx, ly, lz, 1.0};
-   glLightfv(GL_LIGHT0,GL_POSITION,light_pos);
+   glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 }
 
 void ColladaRendererGL::render(ColladaLitShader* lit) {
@@ -824,6 +911,7 @@ void ColladaRendererGL::render(Phong* phong) {
    shader_manager_.getPhong()->begin();
    shader_manager_.getPhong()->bindModelviewMatrix(stack_.getMatrix());
    shader_manager_.getPhong()->bindModelviewProjectionMatrix(projection_matrix_ * stack_.getMatrix());
+   shader_manager_.getPhong()->bindAttributes();
 }
 
 void ColladaRendererGL::render(Lambert* lambert) {
