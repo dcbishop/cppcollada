@@ -99,18 +99,9 @@ inline glm::mat4& GLMatrixStack::getMatrix() {
 }
 
 inline glm::mat3 GLMatrixStack::getNormalMatrix(const bool normalized = true) {
-   glm::mat4& matrix = matricies_.top();
-   glm::mat3 normal_matrix;
-   normal_matrix[0][0] = matrix[0][0];
-   normal_matrix[0][1] = matrix[0][1];
-   normal_matrix[0][2] = matrix[0][2];
-   normal_matrix[1][0] = matrix[1][0];
-   normal_matrix[1][1] = matrix[1][1];
-   normal_matrix[1][2] = matrix[1][2];
-   normal_matrix[2][0] = matrix[2][0];
-   normal_matrix[2][1] = matrix[2][1];
-   normal_matrix[2][2] = matrix[2][2];
-   return glm::mat3();
+   // We should be able to just use the upper 3x3 portion of the matrix unless there is nonuniform scaling...
+   //return glm::mat3x3(matricies_.top());
+   return glm::transpose(glm::inverse(glm::mat3x3(matricies_.top())));
 }
 
 #endif /* COLLADACPP_COLLADARENDERERGL_MATRIXSTACK_HPP_ */

@@ -4,7 +4,6 @@
 /**
  * This is for getting a shared_ptr
  */
-
 // -std=c++0x
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
    #include <memory>
@@ -29,5 +28,14 @@
    using boost::dynamic_pointer_cast;
    using boost::static_pointer_cast;
 #endif
+
+#include <vector>
+using std::vector;
+
+typedef vector<int> VectorOfInts;
+typedef shared_ptr<VectorOfInts> VectorOfIntsPtr;
+
+typedef vector<float> VectorOfFloats;
+typedef shared_ptr<VectorOfFloats> VectorOfFloatsPtr;
 
 #endif /* COLLADACPP_SMARTPOINTERS_HPP_ */

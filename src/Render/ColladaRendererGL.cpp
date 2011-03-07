@@ -59,6 +59,7 @@ void ColladaRendererGL::preFrame() {
    stack_.loadIdentity();
    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
    glClearDepth(10000.0f);
+   glShadeModel(GL_SMOOTH);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    setPolygonMode_();
    setRenderMode_();
@@ -262,7 +263,7 @@ void ColladaRendererGL::renderAxis_() {
    /*glEnableClientState(GL_VERTEX_ARRAY);
    glVertexPointer(3, GL_FLOAT, 0, verticies);
    glDrawElements(GL_LINES, 3, 0, verticies);*/
-   
+   setUnlitMode_();
    glBegin(GL_LINES);
       glColor3f(1.0f, 0.0f, 0.0f);
       glVertex3f(0.0, 0.0, 0.0);
@@ -354,8 +355,8 @@ void ColladaRendererGL::render(Grid* grid) {
    setUnlitMode_();
    
    int size_x = grid->getSizeX();
-   int size_y = grid->getSizeY();
-   //int size_z = grid->getSizeZ();
+   int size_z = grid->getSizeZ();
+   //int size_y = grid->getSizeY();
 
    float spacing = grid->getSpacing();
 
@@ -363,32 +364,32 @@ void ColladaRendererGL::render(Grid* grid) {
    glColor3f(grid->getRed(), grid->getGreen(), grid->getBlue());
    bindModelviewMatrix_();
    glBegin(GL_LINES);
-   for(int y = 0; y < size_y; y++) {
-      float y1 = y * spacing;
-      float y2 = y1 + spacing;
+   for(int z = 0; z < size_z; z++) {
+      float z1 = z * spacing;
+      float z2 = z1 + spacing;
       for(int x = 0; x < size_x; x++) {
          float x1 = x * spacing;
          float x2 = x1 + spacing;
 
-         glVertex3f(x1, 0.0, y1);
-         glVertex3f(x2, 0.0, y1);
-         glVertex3f(x1, 0.0, y1);
-         glVertex3f(x1, 0.0, y2);
+         glVertex3f(x1, 0.0, z1);
+         glVertex3f(x2, 0.0, z1);
+         glVertex3f(x1, 0.0, z1);
+         glVertex3f(x1, 0.0, z2);
 
-         glVertex3f(x1, 0.0, -y1);
-         glVertex3f(x2, 0.0, -y1);
-         glVertex3f(x1, 0.0, -y1);
-         glVertex3f(x1, 0.0, -y2);
+         glVertex3f(x1, 0.0, -z1);
+         glVertex3f(x2, 0.0, -z1);
+         glVertex3f(x1, 0.0, -z1);
+         glVertex3f(x1, 0.0, -z2);
 
-         glVertex3f(-x1, 0.0, y1);
-         glVertex3f(-x2, 0.0, y1);
-         glVertex3f(-x1, 0.0, y1);
-         glVertex3f(-x1, 0.0, y2);
+         glVertex3f(-x1, 0.0, z1);
+         glVertex3f(-x2, 0.0, z1);
+         glVertex3f(-x1, 0.0, z1);
+         glVertex3f(-x1, 0.0, z2);
 
-         glVertex3f(-x1, 0.0, -y1);
-         glVertex3f(-x2, 0.0, -y1);
-         glVertex3f(-x1, 0.0, -y1);
-         glVertex3f(-x1, 0.0, -y2);
+         glVertex3f(-x1, 0.0, -z1);
+         glVertex3f(-x2, 0.0, -z1);
+         glVertex3f(-x1, 0.0, -z1);
+         glVertex3f(-x1, 0.0, -z2);
       }
    }
    glEnd();
@@ -420,185 +421,13 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
       nospam = 1;
    }
 
-   // DEBUG: debugfun used to filter used to draw on a specific polygon number for testing purposes
-   //static int debugfun = -1;
-   //debugfun++;
-
    int vertexCount = geometry->getVertexCount();
    for(int i = 0; i < vertexCount; i++) {
       glTexCoord2f(geometry->getS(i), geometry->getT(i));
       glNormal3f(geometry->getNX(i), geometry->getNY(i), geometry->getNZ(i));
       glVertex3f(geometry->getX(i), geometry->getY(i), geometry->getZ(i));
    }
-
-   // TODO: Move this bool somewhere else...
-   bool renderNormals = false;
-   if(!renderNormals) {
-      return;
-   }
-
-   setUnlitMode_();
-   glEnd();
-   glEnable(GL_COLOR_MATERIAL);
-   glColor4f(1.0, 0.0, 0.0, 1.0);
-   glDisable(GL_TEXTURE_2D);
-   glBegin(GL_LINES);
-   //Render Normals
-   for(int i = 0; i < vertexCount; i++) {
-      glVertex3f(geometry->getX(i), geometry->getY(i), geometry->getZ(i));
-      glVertex3f(geometry->getX(i) + geometry->getNX(i),
-         geometry->getY(i)+geometry->getNY(i),
-         geometry->getZ(i)+geometry->getNZ(i));
-   }
-   setLights_();
-   setRenderMode_();
-   return;
-
-   //glEnd();
-   int num = -1;
-   PrimIterator iter = geometry->getFirstPrimitive();
-   int inputCount = geometry->getInputCount();
-   while(iter != geometry->getEndPrimitive()) {
-      num++;
-
-      //if(num != debugfun) {iter+=inputCount*3; continue;}; //DEBUG: Draw a specific prim number...
-
-      /*int primNum = geometry->getVertexNum(*iter);
-      DEBUG_H("%d %d x=%f. y=%f, z=%f", *iter, primNum, geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      glNormal3f(geometry->getNX(*iter), geometry->getNY(*iter), geometry->getNZ(*iter));
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      iter+=inputCount;*/
-      //int vertexNum = geometry->getVertexNum(*iter);
-      //int normalNum = geometry->getNormalNum(*iter+1);
-      #warning ['TODO']: Plus input offset not +1...
-
-      glBegin(GL_TRIANGLES);
-      glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
-      glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      iter++;
-
-      glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
-      glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      iter++;
-
-      glTexCoord2f(geometry->getS(*iter), geometry->getT(*iter));
-      glNormal3f(geometry->getNX(*(iter)), geometry->getNY(*(iter)), geometry->getNZ(*(iter)));
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      glEnd();
-      iter++;
-
-      // DEBUG DRAW NORMAL LINES!
-      if(num != debugPrimDraw) {continue;}; //DEBUG: Draw a specific prim number...
-      iter-=inputCount*3;
-      setUnlitMode_();
-      glEnable(GL_COLOR_MATERIAL);
-      glColor3f(1.0,0,0);
-
-      glBegin(GL_LINES);
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      glVertex3f(geometry->getX(*iter)+geometry->getNX(*(iter+1)),
-               geometry->getY(*iter)+geometry->getNY(*(iter+1)),
-               geometry->getZ(*iter)+geometry->getNZ(*(iter+1)));
-      glEnd();
-      iter+=inputCount;
-      glBegin(GL_LINES);
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      glVertex3f(geometry->getX(*iter)+geometry->getNX(*(iter+1)),
-               geometry->getY(*iter)+geometry->getNY(*(iter+1)),
-               geometry->getZ(*iter)+geometry->getNZ(*(iter+1)));
-      glEnd();
-      iter+=inputCount;
-      glBegin(GL_LINES);
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      glVertex3f(geometry->getX(*iter)+geometry->getNX(*(iter+1)),
-               geometry->getY(*iter)+geometry->getNY(*(iter+1)),
-               geometry->getZ(*iter)+geometry->getNZ(*(iter+1)));
-      glEnd();
-      iter+=inputCount;
-
-      glDisable(GL_COLOR_MATERIAL);
-      setRenderMode_();
-   }
 }
-#if 0
-   PrimIterator iter = geometry->getFirstPrimitive();
-   int inputCount = geometry->getInputCount();
-   /*while(iter != geometry->getEndPrimitive()) {
-      int primNum = geometry->getVertexNum(*iter);
-      DEBUG_H("%d %d x=%f. y=%f, z=%f", *iter, primNum, geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      glNormal3f(geometry->getNX(*iter), geometry->getNY(*iter), geometry->getNZ(*iter));
-      glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-      iter+=inputCount;
-   }*/
-
-   int prim_num = 0;
-   while(iter != geometry->getEndPrimitive()) {
-      //glNormal3f(geometry->getNX(prim_num), geometry->getNY(prim_num), geometry->getNZ(prim_num));
-
-      /*for(int i = 0; (i < inputCount) || (iter==geometry->getEndPrimitive()); i++) {
-         DEBUG_M("%d", inputCount);
-         glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-         iter++;
-      }*/
-      float x[3], y[3], z[3];
-      
-      
-      float nx = geometry->getNX(*iter);
-      float ny = geometry->getNY(*iter);
-      float nz = geometry->getNZ(*iter);
-      /*nx = 0.0;
-      ny = 1.0;
-      nz = 0.0;*/
-      
-      glNormal3f(nx, ny, nz);
-      glBegin(GL_TRIANGLES);
-      for(int i = 0; i < 3; i++) {
-         x[i] = geometry->getX(*iter);
-         y[i] = geometry->getY(*iter);
-         z[i] = geometry->getZ(*iter);
-         
-         glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-         iter+=inputCount;
-      }
-      glEnd();
-      
-      
-      //glDisable(GL_LIGHTING);
-      //glDisable(GL_DEPTH_TEST);
-      iter-=inputCount;
-      
-#if 0
-      //glEnable(GL_COLOR_MATERIAL);
-      //for(int i = 0; i < 3; i++) {
-         glBegin(GL_LINES);
-            glColor3f(0.0, 1.0, 0.0);
-            glVertex3f(x[i], y[i], z[i]);
-            glColor3f(0.0, 0.0, 1.0);
-            glVertex3f(x[i]+nx, y[i]+ny, z[i]+nz);
-            
-            /*glVertex3f(geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-            glVertex3f(geometry->getX(*iter)+geometry->getNX(*iter),
-               geometry->getY(*iter)+geometry->getNY(*iter),
-               geometry->getZ(*iter)+geometry->getNZ(*iter));*/
-               
-            /*DEBUG_H("A: %f %f %f", geometry->getX(*iter), geometry->getY(*iter), geometry->getZ(*iter));
-            DEBUG_H("N: %f %f %f", geometry->getNX(*iter), geometry->getNY(*iter), geometry->getNZ(*iter));
-            DEBUG_H("X: %f %f %f", geometry->getX(*iter)+geometry->getNX(*iter),
-               geometry->getY(*iter)+geometry->getNY(*iter),
-               geometry->getZ(*iter)+geometry->getNZ(*iter));*/
-         glEnd();
-      }
-      //glEnable(GL_DEPTH_TEST);
-
-#endif
-      iter+=inputCount;
-      //glEnable(GL_LIGHTING);
-
-   }
-}
-#endif
 
 void ColladaRendererGL::render(InstanceGeometry* ig) {
    DEBUG_H("void ColladaRendererGL::render(InstanceGeometry* ig) {");
@@ -649,7 +478,7 @@ void ColladaRendererGL::render(TestRenderable* tr) {
    renderCube_(tr->getScaleX());
 }
 
-void ColladaRendererGL::renderCube_(const float size) {
+void ColladaRendererGL::renderCube_(const float& size) {
 	// Render a cube from a VAO
    static GLuint vao = 0;
    static GLuint cube_buf_id = 0;
@@ -673,27 +502,39 @@ void ColladaRendererGL::renderCube_(const float size) {
                            0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1
                            };
 
+      GLfloat colors[] = {1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           };
+
 		offset = sizeof(vertices);
 
 		DEBUG_M("Initilizing cube Vertex Array Object.");
 		glGenBuffers(1, &cube_buf_id);
 		glBindBuffer(GL_ARRAY_BUFFER, cube_buf_id);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), 0, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals)+sizeof(colors), 0, GL_STATIC_DRAW);
 		
       glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 		glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
+      glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(normals), sizeof(colors), colors);
 		
-      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
-      glEnableVertexAttribArray(0);
-      glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)sizeof(vertices));
-      glEnableVertexAttribArray(1);
+      glVertexAttribPointer(shader_manager_.getVertexAttribId(), 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+      glEnableVertexAttribArray(shader_manager_.getVertexAttribId());
+      glVertexAttribPointer(shader_manager_.getNormalAttribId(), 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)sizeof(vertices));
+      glEnableVertexAttribArray(shader_manager_.getNormalAttribId());
+      glVertexAttribPointer(shader_manager_.getColorAttribId(), 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vertices)+sizeof(normals)));
+      glEnableVertexAttribArray(shader_manager_.getColorAttribId());
+      glDisableVertexAttribArray(shader_manager_.getTextureAttribId());
       glBindVertexArray(0);
       glBindBuffer(GL_ARRAY_BUFFER, 0);
-      
 	}
 
    stack_.pushMatrix();
    stack_.scale(size, size, size);
+   bindShader_(shader_manager_.getFlat());
    glBindVertexArray(vao);
    glDrawArrays(GL_QUADS, 0, 24);
    glBindVertexArray(0);
@@ -811,15 +652,15 @@ void ColladaRendererGL::renderCube_(const float size) {
 
 void ColladaRendererGL::setRenderMode_() {
    glDisable(GL_COLOR_MATERIAL);
-   glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
+   /*glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHT0);*/
    glEnable(GL_DEPTH_TEST);
    glEnable(GL_NORMALIZE);
 }
 
 void ColladaRendererGL::setUnlitMode_() {
-   shader_manager_.getFlat()->begin();
-   glDisable(GL_LIGHTING);
+   bindShader_(shader_manager_.getFlat());
+   /*glDisable(GL_LIGHTING);*/
 }
 
 void ColladaRendererGL::setPolygonMode_() {
@@ -842,18 +683,30 @@ void ColladaRendererGL::setWireframeMode_() {
 #warning ['TODO']: Use actual lights...
 void ColladaRendererGL::setLights_() {
    // DEBUG: Move the light up, render some axis
-   //static float debugPos = 1.0f;
-   //debugPos+=0.01;
-   glDisable(GL_LIGHTING);
+   static float debugPos = 1.0f;
+   static float debugPos2 = 1.0f;
 
-   float lx = -2.0;
-   float ly = -2.0;
-   float lz = 2.0;
-   //float lz = debugPos;
+   static float debugMod = 0.01;
    
+   //debugPos+=debugMod;
+   if(debugPos >= 2.0f) {
+      debugMod=-0.01f;
+   } else if(debugPos <= -2.0f) {
+      debugMod=0.01f;
+   }
+   
+   debugPos2+=0.01;
+   
+   //glDisable(GL_LIGHTING);
+
+   float lx = cos(debugPos2)*10;
+   float ly = debugPos;
+   float lz = sin(debugPos2)*10;
+   //float lz = 2.0;
+
    stack_.pushMatrix();
-   stack_.translate(lx, ly, lz);
-   bindModelviewMatrix_();
+   stack_.translate(-lx, lz, ly); //TODO: The light coords are screwed, figure out why...
+   lights_[0].position = glm::vec4(lx, ly, lz, 0.0f);
    renderAxis_();
    renderCube_(0.1f);
    stack_.rotate(45.0, 1.0f, 0.0f, 0.0f);
@@ -861,8 +714,8 @@ void ColladaRendererGL::setLights_() {
    renderCube_(0.1f);
    stack_.popMatrix();
 
-   float light_pos[] = {lx, ly, lz, 1.0};
-   glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+   /*float light_pos[] = {lx, ly, lz, 1.0};
+   glLightfv(GL_LIGHT0, GL_POSITION, light_pos);*/
 }
 
 void ColladaRendererGL::render(ColladaLitShader* lit) {
@@ -873,8 +726,6 @@ void ColladaRendererGL::render(ColladaLitShader* lit) {
    const float (&ambient)[4] = lit->getAmbient().getArray();
    const float (&diffuse)[4] = lit->getDiffuse().getArray();
    const float (&emission)[4] = lit->getEmission().getArray();
-
-   #warning ['TODO']: Apply per-pixel Phong shader...
 
    glColor4f(diffuse[0], diffuse[1], diffuse[2], diffuse[3]);
    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
@@ -900,6 +751,15 @@ void ColladaRendererGL::render(ColladaLitShader* lit) {
    }
 }
 
+void ColladaRendererGL::bindShader_(const GLSLShaderPtr& shader) {
+   shader->begin();
+   shader->bindModelviewMatrix(stack_.getMatrix());
+   shader->bindModelviewProjectionMatrix(projection_matrix_ * stack_.getMatrix());
+   shader->bindNormalMatrix(stack_.getNormalMatrix());
+   shader->bindLights(lights_);
+   shader->bindAttributes();   
+}
+
 void ColladaRendererGL::render(Phong* phong) {
    const float (&specular)[4] = phong->getSpecular().getArray();
    float shininess[1] = {phong->getShininess()};
@@ -907,11 +767,10 @@ void ColladaRendererGL::render(Phong* phong) {
    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 
+   GLSLShaderPtr shader = shader_manager_.getPhong();
    phong->ColladaLitShader::render();
-   shader_manager_.getPhong()->begin();
-   shader_manager_.getPhong()->bindModelviewMatrix(stack_.getMatrix());
-   shader_manager_.getPhong()->bindModelviewProjectionMatrix(projection_matrix_ * stack_.getMatrix());
-   shader_manager_.getPhong()->bindAttributes();
+   bindShader_(shader);
+   shader->bindMaterial(phong);
 }
 
 void ColladaRendererGL::render(Lambert* lambert) {

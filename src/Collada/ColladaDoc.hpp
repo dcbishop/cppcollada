@@ -60,10 +60,6 @@ typedef unordered_map<string, ColladaObjectPtr> ColladaObjectMap;
 typedef ColladaObjectMap::iterator ColladaObjectMapIterator;
 typedef pair<string, ColladaObjectPtr> ColladaObjectMapPair;
 
-typedef vector<int> VectorOfInts;
-typedef shared_ptr<VectorOfInts> VectorOfIntsPtr;
-
-
 class ColladaDoc {
    public:
       ColladaDoc(ColladaDocManager* manager, string url);
@@ -75,7 +71,7 @@ class ColladaDoc {
       ColladaObjectPtr getColladaObjectById(string id);
 
       //TODO: Consider seperating these into a namespace
-      shared_ptr< vector<float> > getFloatsVector(const string& text);
+      VectorOfFloatsPtr getFloatsVector(const string& text);
       ColladaObjectPtr loadColladaObject(const DOMElement* element);
       string getAttribute(const DOMElement* element, string attribute);
       void loadId(const DOMElement* element, Id* id);

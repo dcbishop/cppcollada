@@ -12,7 +12,9 @@ using namespace std;
 
 #include "../Debug/console.h"
 
+GLSLShaderPtr GLSLShaderManager::phong_;
 GLSLShaderPtr GLSLShaderManager::blinn_phong_;
+GLSLShaderPtr GLSLShaderManager::flat_;
 
 GLSLShaderPtr GLSLShaderManager::getLambert() {
    // TODO
@@ -20,18 +22,33 @@ GLSLShaderPtr GLSLShaderManager::getLambert() {
 }
 
 GLSLShaderPtr GLSLShaderManager::getPhong() {
-   // TODO
-   return getBlinnPhong();
+   if(phong_.get() == NULL) {
+      DEBUG_M("Loading phong shader..."); //TODO: Use relative paths (seems to break gDEBugger
+      phong_ = GLSLShaderPtr(loadShaders("Data/Shaders/Phong.vert", "Data/Shaders/Phong.frag"));
+   }
+   //TODO Debug code...
+   /*if(phong_.get() == NULL) {
+      DEBUG_M("Loading phong shader..."); //TODO: Use relative paths (seems to break gDEBugger
+      phong_ = GLSLShaderPtr(loadShaders("Data/Shaders/NormalDebug.vert", "Data/Shaders/NormalDebug.frag"));
+   }*/
+   /*if(phong_.get() == NULL) {
+      DEBUG_M("Loading phong shader..."); //TODO: Use relative paths (seems to break gDEBugger
+      phong_ = GLSLShaderPtr(loadShaders("Data/Shaders/Brick.vert", "Data/Shaders/Brick.frag"));
+   }*/
+   return phong_;
 }
 
 GLSLShaderPtr GLSLShaderManager::getFlat() {
-   // TODO
-   return getBlinnPhong();
+   if(flat_.get() == NULL) {
+      DEBUG_M("Loading blinn phong shader..."); //TODO: Use relative paths (seems to break gDEBugger
+      flat_ = GLSLShaderPtr(loadShaders("Data/Shaders/Flat.vert", "Data/Shaders/Flat.frag"));
+   }
+   return flat_;
 }
 
 GLSLShaderPtr GLSLShaderManager::getBlinnPhong() {
    if(blinn_phong_.get() == NULL) {
-      DEBUG_M("Loading blinn phong shader...");
+      DEBUG_M("Loading flat shader...");
       blinn_phong_ = GLSLShaderPtr(loadShaders("Data/Shaders/Projection.vert", "Data/Shaders/BlinnPhong.frag"));
    }
    return blinn_phong_;
@@ -52,6 +69,14 @@ string GLSLShaderManager::loadFile_(const string& filename) {
 GLSLShaderPtr GLSLShaderManager::loadShaders(const string& vertex_file, const string& fragment_file) {
    string vertex_raw = loadFile_(vertex_file);
    string fragment_raw = loadFile_(fragment_file);
+   if(vertex_raw.empty()) {
+      ERROR("Failed to load vertex shader '%s', vertex_file");
+      return GLSLShaderPtr();
+   }
+   if(fragment_raw.empty()) {
+      ERROR("Failed to load fragment shader '%s', fragment_file");
+      return GLSLShaderPtr();
+   }
 
    GLuint vertex_id = glCreateShader(GL_VERTEX_SHADER);
    GLuint fragment_id = glCreateShader(GL_FRAGMENT_SHADER);
@@ -113,4 +138,3 @@ string GLSLShaderManager::getProgramInfoLog_(const int& program_id) {
    glGetProgramInfoLog(program_id, buff_size, &bytes, info_log);
    return info_log;
 }
-

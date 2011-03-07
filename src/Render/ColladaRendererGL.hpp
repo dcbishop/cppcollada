@@ -8,6 +8,7 @@
 #include "../Render/ColladaRendererGL_DevIL.hpp"
 #include "../Render/GLMatrixStack.hpp"
 #include "../Render/GLSLShaderManager.hpp"
+#include "../Render/GLSLShader.hpp"
 
 class ColladaRendererGL : public ColladaRenderer {
    public:
@@ -46,7 +47,7 @@ class ColladaRendererGL : public ColladaRenderer {
       void renderDefaultMaterial_();
       void fixAxis_(const Collada* collada);
       void renderAxis_();
-      void renderCube_(const float size);
+      void renderCube_(const float& size);
       void setPerspective_();
       void setPolygonMode_();
       void setWireframeMode_();
@@ -56,6 +57,7 @@ class ColladaRendererGL : public ColladaRenderer {
       void renderOctreeNode_(Octree* octree);
       void bindModelviewMatrix_();
       void bindProjectionMatrix_();
+      void bindShader_(const GLSLShaderPtr& shader);
 
       Phong defaultMaterial_;
       int width_;
@@ -65,6 +67,7 @@ class ColladaRendererGL : public ColladaRenderer {
       GLMatrixStack stack_;
       glm::mat4 projection_matrix_;
       GLSLShaderManager shader_manager_;
+      light lights_[8];
 };
 
 #endif /* COLLADACPP_COLLADARENDERERGL_HPP_ */
