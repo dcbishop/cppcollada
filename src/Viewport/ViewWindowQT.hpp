@@ -19,6 +19,7 @@ class Grid;
 
 #include <QtGui>
 #include <QtOpenGL>
+#include <QWebView>
 
 class ViewWindowQT;
 class ViewWidget;
@@ -29,9 +30,9 @@ class OpenGLScene : public QGraphicsScene {
       OpenGLScene(ViewWindowQT* vwqt);
       ~OpenGLScene() { DEBUG_M("Cleaning up OpenGLScene");}
       void drawBackground(QPainter *painter, const QRectF &rect);
-      void addOverlayedWidget(QWidget* widget);
-
+      void addOverlayedWidget(QWidget* widget, bool disableFrame = true, bool transparentBackground = true);
       ColladaRendererGL renderer_;
+      void setSize(const int width, const int height);
 
    public slots:
       void editCollada();
@@ -43,6 +44,7 @@ class OpenGLScene : public QGraphicsScene {
       QTime time_;
       QWidget *editScene;
       QTEditColladas* newEditColladas;
+      QWebView* htmlOverlay;
 };
 
 /**
@@ -57,6 +59,7 @@ class ViewWindowQT: public ViewWindow {
       virtual void mainLoop();
       virtual void quit();
       void resizeEvent(QResizeEvent *event);
+      OpenGLScene* getOpenGLScene();
 
    private:
       QApplication *app_;

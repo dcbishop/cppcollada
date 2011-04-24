@@ -156,7 +156,7 @@ void ColladaDoc::buildIdMap_() {
  * @param id The id of the element to find.
  * @return the DOMElement with the id or null.
  */
-DOMElement* ColladaDoc::getElementById(string id) {
+DOMElement* ColladaDoc::getElementById(const string id) {
    DEBUG_M("Entering function... id='%s'", id.c_str());
 
    // See buildIDMap's comment...
@@ -192,7 +192,7 @@ DOMNodeList* ColladaDoc::getElementsByTagName(const DOMElement* element, string 
 /**
  * Gets a ColladaObject based on its XML id.
  */
-ColladaObjectPtr ColladaDoc::getColladaObjectById(string id) {
+ColladaObjectPtr ColladaDoc::getColladaObjectById(const string id) {
    DEBUG_M("Entering function: id='%s'", id.c_str());
    ColladaObjectPtr colladaObject;
 
@@ -305,15 +305,13 @@ ColladaObjectPtr ColladaDoc::loadColladaObject(const DOMElement* element) {
 
    DEBUG_H("Loading: '%s'", tagName_c);
 
-   
-   if(colladaObject != NULL) {
+   if(colladaObject != ColladaObjectPtr()) {
       loadId(element, colladaObject.get());
       loadName(element, colladaObject.get());
    }
    XMLString::release(&tagName_c);
 
    return colladaObject;
-   
 }
 
 shared_ptr<ColladaLight> ColladaDoc::loadColladaLight(const DOMElement* element) {
@@ -335,7 +333,7 @@ shared_ptr<Geometry> ColladaDoc::loadGeometry(const DOMElement* element) {
    // spline
    // brep?
    shared_ptr<Geometry> geometry;
-   
+
    DOMNodeList* children = element->getChildNodes();
    int length = children->getLength();
    for(int i = 0; i < length; i++) {
@@ -359,7 +357,7 @@ shared_ptr<Geometry> ColladaDoc::loadGeometry(const DOMElement* element) {
          // TODO: Other types, convex_mesg, spline, brep, nodes...
       }
    }
-   
+
    return shared_ptr<Geometry>();
 }
 

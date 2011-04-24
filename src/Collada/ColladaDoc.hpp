@@ -67,10 +67,23 @@ class ColladaDoc {
       DOMDocument* loadColladaDoc(const string& url);
       DOMDocument* loadColladaDocFile(const string& filename);
       DOMNodeList* getElementsByTagName(const DOMElement* element, string tag);
-      DOMElement* getElementById(string id);
-      ColladaObjectPtr getColladaObjectById(string id);
+      DOMElement* getElementById(const string id);
+      ColladaObjectPtr getColladaObjectById(const string id);
+      ColladaObjectPtr getColladaObjectByUrl(const string& url);
+      shared_ptr<Collada> getCollada();
 
-      //TODO: Consider seperating these into a namespace
+   private:
+      void buildIdMap_();
+      void loadInstanceGeometry_BindMaterials_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
+      void loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
+      bool isString_(const XMLCh* tag1, string tag2);
+      ColladaObjectPtr loadEffectNewparamBySid_(const DOMElement* profileCommon, string sid);
+      void loadShaderAttributes_(ColladaShaderPtr shader, const DOMElement* element, const DOMElement* texturehack);
+      PhongPtr loadPhong_(const DOMElement* element, const DOMElement* texturehack);
+      LambertPtr loadLambert_(const DOMElement* element, const DOMElement* texturehack);
+
+      //TODO: Consider seperating these into a namespace or something
+      //TODO: Apply _ private naming convention...
       VectorOfFloatsPtr getFloatsVector(const string& text);
       ColladaObjectPtr loadColladaObject(const DOMElement* element);
       string getAttribute(const DOMElement* element, string attribute);
@@ -99,29 +112,16 @@ class ColladaDoc {
       ColladaObjectPtr loadSampler2D(const DOMElement* profileCommon, const DOMElement* element);
       void loadSourceTechnique(const DOMElement* element, shared_ptr<Source> source);
       DOMElement* getElementByTagName(const DOMElement* element, string tag);
-      shared_ptr<Collada> getCollada();
       ScenePtr getScene();
       bool isUrlLocal(const string& url);
       string getUrlId(const string& url);
       shared_ptr<VisualScene> getVisualScene(const string& url);
-      ColladaObjectPtr getColladaObjectByUrl(const string& url);
       shared_ptr<Input> loadInput(const DOMElement* element);
       VectorOfIntsPtr loadPrimitives(const DOMElement* element);
       shared_ptr<Effect> loadEffect(const DOMElement* element);
       ColladaObjectPtr loadNewparam(const DOMElement* profileCommon, const DOMElement* node);
       ColladaObjectPtr loadSurface(const DOMElement* element);
       shared_ptr<Image> loadImage(const DOMElement* element);
-
-   private:
-      void buildIdMap_();
-      void loadInstanceGeometry_BindMaterials_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
-      void loadInstanceGeometry_BindMaterial_(shared_ptr<InstanceGeometry> ig, const DOMElement* element);
-      bool isString_(const XMLCh* tag1, string tag2);
-      ColladaObjectPtr loadEffectNewparamBySid_(const DOMElement* profileCommon, string sid);
-      void loadShaderAttributes_(ColladaShaderPtr shader, const DOMElement* element, const DOMElement* texturehack);
-      PhongPtr loadPhong_(const DOMElement* element, const DOMElement* texturehack);
-      LambertPtr loadLambert_(const DOMElement* element, const DOMElement* texturehack);
-
 
       string url_;
       XercesDOMParser* parser_;

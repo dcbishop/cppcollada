@@ -1,0 +1,22 @@
+body {
+	background-color: transparent;
+	color: white;
+	text-shadow: 0px 0px 3px black;
+}
+
+#health-box {
+   background: rgba(255, 255, 255, 0.5);
+   border-width: 1px;
+   border-color: black;
+   border-radius: 10px;
+   padding: 5px;
+   padding-left: 10px;
+   -webkit-text-stroke: 5px black;
+   font-weight: bold;
+}
+
+footer {
+   float: bottom;
+	position: absolute;
+	bottom: 10px;
+}

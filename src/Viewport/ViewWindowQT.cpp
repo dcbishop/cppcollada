@@ -2,6 +2,7 @@
 #include <QtGui>
 #include <QtOpenGL>
 
+
 #include "../Debug/console.h"
 
 #include "../GameData/Grid.hpp"
@@ -23,14 +24,32 @@ OpenGLScene::OpenGLScene(ViewWindowQT* vwqt) {
    editCollada->setWindowTitle("Edit Collada");
    editCollada->setLayout(new QVBoxLayout);
    
+   htmlOverlay = new QWebView();
+   htmlOverlay->load(QUrl("Data/html/overlay.html"));
+   QPalette transp = htmlOverlay->palette();
+   transp.setBrush(QPalette::Base, Qt::transparent);
+   htmlOverlay->setPalette(transp);
+   htmlOverlay->page()->setPalette(transp);
+   htmlOverlay->show();
+   
+   
    QPushButton* editColladaButton = new QPushButton(tr("Edit Collada"));
    editCollada->layout()->addWidget(editColladaButton);
    
    connect(editColladaButton, SIGNAL(clicked()), this, SLOT(editCollada()));
-   addOverlayedWidget(editCollada);
+   addOverlayedWidget(editCollada, false, false);
+   addOverlayedWidget(htmlOverlay, true, true);
+
+   setSize(vwqt_->getWidth(), vwqt_->getHeight());
 
    time_.start();
+}
 
+void OpenGLScene::setSize(const int width, const int height) {
+   // TODO: This doesn't work (maybe set proxy size?)
+   htmlOverlay->setContentsMargins(0, 0, width, height);
+   htmlOverlay->setMinimumSize(QSize(width, height));
+   htmlOverlay->setMaximumSize(QSize(width, height));
 }
 
 void OpenGLScene::editCollada() {
@@ -40,18 +59,32 @@ void OpenGLScene::editCollada() {
    addOverlayedWidget((QWidget*)newEditColladas);*/
 }
 
-void OpenGLScene::addOverlayedWidget(QWidget* widget) {
+void OpenGLScene::addOverlayedWidget(QWidget* widget, bool disableFrame, bool transparentBackground) {
    DEBUG_M("Entering function... %p", widget);
    if(!widget) {
       return;
    }
-   widget->setWindowOpacity(0.8);
+   //widget->setWindowOpacity(0.8);
 
    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(0, Qt::Dialog);
+
+   if(disableFrame) {
+      proxy->setWindowFlags(Qt::WindowFlags(Qt::FramelessWindowHint));
+   }
+
+   if(transparentBackground) {
+      QPalette transp(palette()); 
+      transp.setColor (QPalette::Window, Qt::transparent);  
+      proxy->setPalette(transp);
+      proxy->setAttribute(Qt::WA_OpaquePaintEvent, false);
+      proxy->setAutoFillBackground(false);
+   }
+
    proxy->setWidget(widget);
    addItem(proxy);
 
-   QPointF pos(10, 10);
+   //TODO: For some reason setting this to 0 makes the html overlay move to the right side of the screen.
+   QPointF pos(1, 1);
    foreach (QGraphicsItem *item, items()) {
       item->setFlag(QGraphicsItem::ItemIsMovable);
       item->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
@@ -133,7 +166,7 @@ ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width,
    DEBUG_M("ViewWindowQT spawning...");
 
    int argc = 1;
-   char* argv[] = {"Blah"};
+   char* argv[] = {"No Window Title"};
    //QApplication::setStyle(QStyleFactory::create("motif"));
    app_ = new QApplication(argc, argv);
    scene_ = new OpenGLScene(this);
@@ -157,6 +190,10 @@ void ViewWindowQT::setTitle(const string title) {
    if(vw_) {
       vw_->setWindowTitle(title.c_str());
    }
+}
+
+OpenGLScene* ViewWindowQT::getOpenGLScene() {
+   return scene_;
 }
 
 /**
@@ -189,6 +226,7 @@ void ViewWidget::resizeEvent(QResizeEvent *event) {
    QGraphicsView::resizeEvent(event);
 
    vwqt_->getRenderer()->setSize(event->size().width(), event->size().height());
+   vwqt_->getOpenGLScene()->setSize(vwqt_->getWidth(), vwqt_->getHeight());
 }
 
 void ViewWidget::mouseMoveEvent(QMouseEvent *event) {

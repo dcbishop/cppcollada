@@ -71,7 +71,12 @@ void ColladaRendererGL::preFrame() {
 void ColladaRendererGL::postFrame() {
    setRenderMode_();
    setPolygonMode_();
+
+   glFrontFace(GL_CW);
    glDisable(GL_CULL_FACE); //Cullface interfears with Qt for some reason
+   //glCullFace(GL_BACK);
+   glDisable(GL_DEPTH_TEST);
+
    glFlush();
    
    // Log any OpenGL errors.
@@ -80,6 +85,10 @@ void ColladaRendererGL::postFrame() {
 		const GLubyte *glerr = gluErrorString(glerrno);
 		ERROR("OpenGL Error #%d: %s!", glerrno, glerr);
 	}
+
+   glPolygonMode(GL_FRONT, GL_FILL);
+
+   
 }
 
 /**

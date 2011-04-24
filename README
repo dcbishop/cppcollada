@@ -28,4 +28,4 @@ libxerces-c-dev - XML parsing.
 libqt4-dev - For the QT interface.
 libqt4-opengl-dev
 libnoise-dev - Use for an experiment using noise for random level generation.
-
+libsdl1.2-dev

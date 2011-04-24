@@ -19,7 +19,7 @@ env.AppendUnique(LIBS=['xerces-c', 'GL', 'GLU', 'GLEW', 'IL', 'noise'])#, 'boost
 env.AppendUnique(CCFLAGS=['-llibboost_system', '-llibboost_thread'])
 env['QTDIR'] = '/usr'
 env['QT_LIB'] = 'QtGui'
-env.ParseConfig('pkg-config --libs --cflags QtGui QtOpenGL')
+env.ParseConfig('pkg-config --libs --cflags QtGui QtOpenGL QtWebKit')
 #if int(win32):
 #	env.Tool('crossmingw', toolpath = ['scons-tools'])
 #	env['MINGWROOT'] = '/usr/$MINGWPREFIX'
