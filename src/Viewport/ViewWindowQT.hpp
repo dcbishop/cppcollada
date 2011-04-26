@@ -32,13 +32,16 @@ class OpenGLScene : public QGraphicsScene {
       void drawBackground(QPainter *painter, const QRectF &rect);
       void addOverlayedWidget(QWidget* widget, bool disableFrame = true, bool transparentBackground = true);
       ColladaRendererGL renderer_;
-      void setSize(const int width, const int height);
+      void setHTMLOverlaySize(const int width, const int height);
 
    public slots:
       void editCollada();
 
 
    private:
+      void addHTMLOverlay_(QWidget* widget);
+      void makeWidgetTransparent_(QWidget* widget);
+
       ViewWindowQT *vwqt_;
       shared_ptr<Grid> grid_;
       QTime time_;
