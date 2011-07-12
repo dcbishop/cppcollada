@@ -33,14 +33,13 @@ OpenGLScene::OpenGLScene(ViewWindowQT* vwqt) {
    transp.setBrush(QPalette::Base, Qt::transparent);
    htmlOverlay->page()->setPalette(transp);
    
-   htmlOverlay->show();
-   
    QPushButton* editColladaButton = new QPushButton(tr("Edit Collada"));
    editCollada->layout()->addWidget(editColladaButton);
    
    connect(editColladaButton, SIGNAL(clicked()), this, SLOT(editCollada()));
    addOverlayedWidget(editCollada, false, false);
-   addHTMLOverlay_(htmlOverlay);
+   // TODO: Disabled HTML5 overlay this untill input events are passed through
+   //addHTMLOverlay_(htmlOverlay);
 
    setHTMLOverlaySize(vwqt_->getWidth(), vwqt_->getHeight());
 
