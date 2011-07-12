@@ -6,7 +6,7 @@ body {
 .whitebox {
 	background: rgba(255, 255, 255, 0.5);
 
-	border-width: 1px;
+	border-width: 2px;
 	border-color: black;
 	border-radius: 10px;
 
@@ -22,6 +22,63 @@ footer {
 	float: bottom;
 	position: absolute;
 	bottom: 10px;
+}
+
+menu {
+   float: center;
+   width: 20%;
+   text-align: center;
+   position: absolute;
+   left: 40%;
+   top: 35%;
+   list-style-type: none;
+
+   padding-top: 0px;
+   padding-left: 20px;
+   padding-right: 20px;
+   padding-bottom: 10px;
+   
+   background-color:#000000;
+   border-width:2px;
+   border-color:#999999;
+   border-radius:8px;
+   box-shadow:0px 0px 4px #000000;
+   background: -webkit-gradient(linear, center top, center bottom, from(#0affb7), to(#0f2d85));
+}
+
+li {
+	padding: 5px;
+	float: center;
+	border: solid;
+	background-color:#000000;
+   border-width:2px;
+   border-color:#999999;
+   border-radius:8px;
+   box-shadow:0px 0px 4px #000000;
+   background: -webkit-gradient(linear, center top, center bottom, from(#0affb7), to(#0f2d85));
+}
+
+li:hover {
+   background-color:#000000;
+   border-width:2px;
+   border-color:#999999;
+   border-radius:8px;
+   box-shadow:0px 0px 4px #000000;
+   background: -webkit-gradient(linear, center top, center bottom, from(#0affb7), to(#0f2d85));
+   opacity: 0.25;
+}
+
+menu a {
+	background: rgba(255, 255, 255, 0.75);
+	color: white;
+}
+
+menu a:hover {
+	background: rgba(255, 255, 255, 1.0);
+}
+
+.menuhead {
+   font-size: 1.5em;
 }
 
 aside {
