@@ -150,6 +150,9 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
       return;
    }*/
 
+   // TODO: This should be seperate from the render loop.
+   vwqt_->getController()->Update((current_time - last_render_time)/1000.0f);
+
    // Calculate FPS
    frame++;
    if(current_time - last_fps_time > 1000) {
@@ -243,6 +246,8 @@ void ViewWindowQT::quit() {
 ViewWidget::ViewWidget(ViewWindowQT* vwqt) {
    vwqt_ = vwqt;
    mouseDown_ = false;
+   setCursor(QCursor(Qt::BlankCursor));
+   centerCursor_();
 }
 
 void ViewWidget::resizeEvent(QResizeEvent *event) {
@@ -257,18 +262,20 @@ void ViewWidget::resizeEvent(QResizeEvent *event) {
 
 void ViewWidget::mouseMoveEvent(QMouseEvent *event) {
    DEBUG_H("Fired...");
-   // Check if the event is handled by the overdrawn QT widgets
-   if(!mouseDown_) {
-      QGraphicsView::mouseMoveEvent(event);
-      if(event->isAccepted()) {
-         return;
-      }
+   if(!hasFocus()) {
+      return;
    }
 
-   int x = event->x();
-   int y = event->y();
-   float xrel = x-oldx_;
-   float yrel = y-oldy_;
+   // Check if the event is handled by the overdrawn QT widgets
+   //if(!mouseDown_) {
+      /*QGraphicsView::mouseMoveEvent(event);
+      if(event->isAccepted()) {
+         return;
+      }*/
+   //}
+
+   float xrel = QCursor::pos().x() - (pos().x()+(getViewWindow()->getWidth()/2));
+   float yrel = QCursor::pos().y() - (pos().y()+(getViewWindow()->getHeight()/2));
 
    event->accept();
 
@@ -277,12 +284,29 @@ void ViewWidget::mouseMoveEvent(QMouseEvent *event) {
       WARNING("NO CAMERA!");
       return;
    }
-   camera->setRotX(camera->getRotX() + xrel / vwqt_->getWidth() * 100);
-   camera->setRotY(camera->getRotY() - yrel / vwqt_->getHeight() * 100);
-   update();
 
-   oldx_ = x;
-   oldy_ = y;
+   // If there is no controller, skip input.
+   if(getController() == ControllerPtr()) {
+      return;
+   }
+
+   getController()->addYaw(xrel / vwqt_->getWidth() * 100);
+   getController()->addPitch(yrel / vwqt_->getHeight() * 100);
+
+   update();
+   centerCursor_();
+}
+
+void ViewWidget::centerCursor_() {
+   QCursor::setPos(pos().x()+(getViewWindow()->getWidth()/2), pos().y()+(getViewWindow()->getHeight()/2));
+}
+
+void ViewWidget::focusOutEvent(QFocusEvent * event) {
+   setCursor(QCursor(Qt::ArrowCursor));
+}
+
+void ViewWidget::focusInEvent(QFocusEvent * event) {
+   setCursor(QCursor(Qt::BlankCursor));
 }
 
 void ViewWidget::mousePressEvent(QMouseEvent *event) {
@@ -293,7 +317,19 @@ void ViewWidget::mousePressEvent(QMouseEvent *event) {
       return;
    }
 
-   mouseDown_ = true;
+   // If there is no controller, skip input.
+   if(getController() == ControllerPtr()) {
+      return;
+   }
+
+   if(event->button()==Qt::LeftButton) {
+      getController()->setAction(1, true);
+   } else if(event->button()==Qt::RightButton) {
+      getController()->setAction(2, true);
+   } else if(event->button()==Qt::MidButton) {
+      getController()->setAction(3, true);
+   }
+
    oldx_ = event->x();
    oldy_ = event->y();
    event->accept();
@@ -303,9 +339,22 @@ void ViewWidget::mouseReleaseEvent(QMouseEvent *event) {
    DEBUG_H("Fired...");
    mouseDown_ = false;
    // Check if the event is handled by the overdrawn QT widgets
-   QGraphicsView::mouseReleaseEvent(event);
+   /*QGraphicsView::mouseReleaseEvent(event);
    if(event->isAccepted()) {
       return;
+   }*/
+
+   // If there is no controller, skip input.
+   if(getController() == ControllerPtr()) {
+      return;
+   }
+   
+   if(event->button()==Qt::LeftButton) {
+      getController()->setAction(1, false);
+   } else if(event->button()==Qt::RightButton) {
+      getController()->setAction(2, false);
+   } else if(event->button()==Qt::MidButton) {
+      getController()->setAction(3, false);
    }
    
 }
@@ -320,11 +369,19 @@ void ViewWidget::wheelEvent(QWheelEvent * event) {
    int numDegrees = event->delta() / 8;
    int numSteps = numDegrees / 15;
 
+   // If there is no controller, skip input.
+   if(getController() == ControllerPtr()) {
+      return;
+   }
+
    if(event->orientation() == Qt::Horizontal) {
       // left/right scrolling...
    } else {
-      CameraPtr camera = vwqt_->getCamera();
-      camera->setZoom(camera->getZoomTarget() + ZOOM_STEP * -numSteps);
+      if(numSteps > 0) {
+         getController()->Increment();
+      } else {
+         getController()->Decrement();
+      }
    }
    event->accept();
    update();
@@ -336,11 +393,58 @@ void ViewWidget::keyPressEvent(QKeyEvent * event) {
    if(event->isAccepted()) {
       return;
    }
+
+   // TODO: Seperate this into a propper 'global' input control class
    if(event->matches(QKeySequence::Quit) ||
       event->key() == Qt::Key_Q ||
       event->key() == Qt::Key_Escape) {
       DEBUG_M("Quit key pressed...");
       vwqt_->quit();
+      return;
+   }
+
+   // If there is no controller, skip input.
+   if(getController() == ControllerPtr()) {
+      return;
+   }
+   
+   if(event->key() == Qt::Key_Up || event->key() == Qt::Key_W) {
+      getController()->setIsMovingForward(true);
+      return;
+   }
+
+   if(event->key() == Qt::Key_Down || event->key() == Qt::Key_S) {
+      getController()->setIsMovingBackward(true);
+      return;
+   }
+
+   if(event->key() == Qt::Key_Left || event->key() == Qt::Key_A) {
+      getController()->setIsMovingLeft(true);
+      return;
+   }
+
+   if(event->key() == Qt::Key_Right || event->key() == Qt::Key_D) {
+      getController()->setIsMovingRight(true);
+      return;
+   }
+
+   if(event->key() == Qt::Key_Space) {
+      getController()->setIsMovingUp(true);
+      return;
+   }
+   
+   if(event->key() == Qt::Key_Control) {
+      getController()->setIsMovingDown(true);
+      return;
+   }
+
+   if(event->key() == Qt::Key_Q) {
+      getController()->setIsRollingLeft(true);
+      return;
+   }
+
+   if(event->key() == Qt::Key_E) {
+      getController()->setIsRollingRight(true);
       return;
    }
 }
@@ -351,4 +455,57 @@ void ViewWidget::keyReleaseEvent(QKeyEvent * event) {
    if(event->isAccepted()) {
       return;
    }
+
+   // If there is no controller, skip input.
+   if(getController() == ControllerPtr()) {
+      return;
+   }
+
+   if(event->key() == Qt::Key_Up || event->key() == Qt::Key_W) {
+      getController()->setIsMovingForward(false);
+      return;
+   }
+
+   if(event->key() == Qt::Key_Down || event->key() == Qt::Key_S) {
+      getController()->setIsMovingBackward(false);
+      return;
+   }
+   
+   if(event->key() == Qt::Key_Left || event->key() == Qt::Key_A) {
+      getController()->setIsMovingLeft(false);
+      return;
+   }
+
+   if(event->key() == Qt::Key_Right || event->key() == Qt::Key_D) {
+      getController()->setIsMovingRight(false);
+      return;
+   }
+
+   if(event->key() == Qt::Key_Space) {
+      getController()->setIsMovingUp(false);
+      return;
+   }
+   
+   if(event->key() == Qt::Key_Control) {
+      getController()->setIsMovingDown(false);
+      return;
+   }
+
+   if(event->key() == Qt::Key_Q) {
+      getController()->setIsRollingLeft(false);
+      return;
+   }
+
+   if(event->key() == Qt::Key_E) {
+      getController()->setIsRollingRight(false);
+      return;
+   }
+}
+
+ViewWindow* ViewWidget::getViewWindow() const {
+   return vwqt_;
+}
+
+ControllerPtr ViewWidget::getController() const {
+   return getViewWindow()->getController();
 }

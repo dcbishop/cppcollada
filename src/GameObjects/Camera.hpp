@@ -10,7 +10,7 @@ const float Y_MIN = 0.01f;
 const float Y_MAX = 175.0f-Y_MIN;
 
 const float ZOOM_STEP = 0.5f;
-const float ZOOM_MIN = 0.5f;
+const float ZOOM_MIN = 0.001f;
 const float ZOOM_MAX = 20.0f;
 const float ZOOM_SPEED = 3.0f;
 const float ZOOM_THRESHOLD = 0.001f;

@@ -14,6 +14,7 @@
 #include "../Viewport/ViewWindowQT.hpp"
 
 #include "../GameData/SmartPointers.hpp"
+#include "../GameData/Controller.hpp"
 
 #include "../GameObjects/Camera.hpp"
 
@@ -26,7 +27,8 @@
 
 #include "../GameObjects/Area.hpp"
 #include "../GameObjects/ColladaMesh.hpp"
-#include "../GameObjects/Octree.hpp"
+//#include "../GameObjects/Octree.hpp"
+//#include "../GameObjects/BlockChunk.hpp"
 
 #include "../Render/GLMatrixStack.hpp"
 
@@ -59,21 +61,31 @@ int main(int argc, char* argv[]) {
    //octreeTest->setScaleXYZ(10, 10, 10);
    //octreeTest->debug();
 
+   //BlockChunkPtr chunkTest = BlockChunkPtr(new BlockChunk);
+
+
    CameraPtr camera = CameraPtr(new Camera);
-   camera->setTarget(colladaMesh);
+   //camera->setTarget(chunkTest);
    //camera->setTarget(octreeTest);
+   camera->setTarget(colladaMesh);
    camera->setZoom(10.0f);
+   ControllerPtr controller = ControllerPtr(new Controller);
+   controller->setCamera(camera);
+   controller->setControlled(colladaMesh);
 
    AreaPtr area = AreaPtr(new Area());
    area->addObject(camera);
    area->addObject(colladaMesh);
    //area->addObject(octreeTest);
+   //chunkTest->generateRandomBlockChunk(chunkTest.get());
+   //area->addObject(chunkTest);
 
    //ViewWindowSDL vw(800, 600);
    
    ViewWindowQT vw(800, 600);
    vw.setTitle(filename);
    vw.setCamera(camera);
+   vw.setController(controller);
    vw.mainLoop();
 
    /*shared_ptr<RotationGL> rotation(new RotationGL);
@@ -92,7 +104,6 @@ int main(int argc, char* argv[]) {
    //teststack.rotate(45.0, 1.0, 0, 0);
    teststack.scale(2.0, 2.0, 2.0);
    printMatrix(teststack.getMatrix());*/
-   
 
    LOG("Goodbye...");
 }

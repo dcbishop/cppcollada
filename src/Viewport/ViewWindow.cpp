@@ -14,11 +14,11 @@ void ViewWindow::setSize(const int width, const int height) {
    height_ = height;
 }
 
-int ViewWindow::getWidth() {
+int ViewWindow::getWidth() const {
    return width_;
 }
 
-int ViewWindow::getHeight() {
+int ViewWindow::getHeight() const {
    return height_;
 }
 
@@ -27,21 +27,14 @@ void ViewWindow::setCamera(CameraPtr camera) {
    camera_->setRenderer(getRenderer());
 }
 
-CameraPtr ViewWindow::getCamera() {
+CameraPtr ViewWindow::getCamera() const {
    return camera_;
 }
 
-#if 0 // ['TODO']: Remove me!
-void ViewWindow::setCollada(shared_ptr<Collada> collada) {
-   collada_ = collada;
-   collada_->setRenderer(getRenderer());
-   /*if(getCamera()) {
-      shared_ptr<Position> position = static_pointer_cast<Position, Collada>(collada);
-      getCamera()->setTarget(position);
-   }*/
+ControllerPtr ViewWindow::getController() const {
+   return controller_;
 }
 
-shared_ptr<Collada> ViewWindow::getCollada() {
-   return collada_;
+void ViewWindow::setController(ControllerPtr controller) {
+   controller_ = controller;
 }
-#endif

@@ -84,9 +84,14 @@ class ViewWidget: public QGraphicsView {
       void wheelEvent(QWheelEvent * event);
       void keyPressEvent(QKeyEvent * event);
       void keyReleaseEvent(QKeyEvent * event);
-
+      void focusOutEvent(QFocusEvent * event);
+      void focusInEvent(QFocusEvent * event);
+      ViewWindow* getViewWindow() const;
+      ControllerPtr getController() const;
 
    private:
+      void centerCursor_();
+
       ViewWindowQT *vwqt_;
       int oldx_;
       int oldy_;
