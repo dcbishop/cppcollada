@@ -5,9 +5,9 @@ using namespace std;
 #include "../GameData/SmartPointers.hpp"
 #include "../Collada/Image.hpp"
 
-class ColladaRendererGL_DevIL {
+class RendererGL_DevIL {
    public:
-      ~ColladaRendererGL_DevIL();
+      ~RendererGL_DevIL();
       void init();
       int loadImage(ImagePtr image);
 

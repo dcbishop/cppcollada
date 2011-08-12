@@ -1,16 +1,16 @@
-#ifndef COLLADACPP_COLLADARENDERERGL_HPP_
-#define COLLADACPP_COLLADARENDERERGL_HPP_
+#ifndef COLLADACPP_RENDERERGL_HPP_
+#define COLLADACPP_RENDERERGL_HPP_
 
 #include <GL/glew.h>
 
-#include "../Render/ColladaRenderer.hpp"
+#include "../Render/Renderer.hpp"
 #include "../Collada/Phong.hpp"
-#include "../Render/ColladaRendererGL_DevIL.hpp"
+#include "../Render/RendererGL_DevIL.hpp"
 #include "../Render/GLMatrixStack.hpp"
 #include "../Render/GLSLShaderManager.hpp"
 #include "../Render/GLSLShader.hpp"
 
-class ColladaRendererGL : public ColladaRenderer {
+class RendererGL : public Renderer {
    public:
       virtual void render(Renderable* renderable);
       virtual void render(GameObject* gameObject);
@@ -64,11 +64,11 @@ class ColladaRendererGL : public ColladaRenderer {
       int width_;
       int height_;
       bool glewInit_;
-      ColladaRendererGL_DevIL imageLoader_;
+      RendererGL_DevIL imageLoader_;
       GLMatrixStack stack_;
       glm::mat4 projection_matrix_;
       GLSLShaderManager shader_manager_;
       light lights_[8];
 };
 
-#endif /* COLLADACPP_COLLADARENDERERGL_HPP_ */
+#endif /* COLLADACPP_RENDERERGL_HPP_ */

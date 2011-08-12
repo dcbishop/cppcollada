@@ -8,7 +8,7 @@ class Camera;
 using namespace std;
 
 #include "../GameData/SmartPointers.hpp"
-#include "../Render/ColladaRenderer.hpp"
+#include "../Render/Renderer.hpp"
 #include "../Collada/ColladaManager.hpp"
 #include "../GameObjects/Camera.hpp"
 #include "../GameData/Controller.hpp"
@@ -25,7 +25,7 @@ class ViewWindow {
       virtual void setSize(const int width, const int height);
       virtual int getWidth() const;
       virtual int getHeight() const;
-      virtual ColladaRenderer* getRenderer() = 0;
+      virtual Renderer* getRenderer() = 0;
       virtual void setCamera(CameraPtr camera);
       virtual CameraPtr getCamera() const;
       ControllerPtr getController() const;

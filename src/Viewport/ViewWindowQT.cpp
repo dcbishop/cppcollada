@@ -8,7 +8,7 @@
 #include "../GameData/Grid.hpp"
 #include "../GameObjects/Camera.hpp"
 #include "../Collada/Collada.hpp"
-#include "../Render/ColladaRendererGL.hpp"
+#include "../Render/RendererGL.hpp"
 
 #include "../QTGui/QTEditScene.hpp"
 #include "../QTGui/QTEditGeneric.hpp"
@@ -235,7 +235,7 @@ void ViewWindowQT::mainLoop() {
    DEBUG_M("Finished...");
 }
 
-ColladaRenderer* ViewWindowQT::getRenderer() {
+Renderer* ViewWindowQT::getRenderer() {
    return &scene_->renderer_;
 }
 

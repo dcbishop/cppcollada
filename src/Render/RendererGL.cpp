@@ -1,4 +1,4 @@
-#include "../Render/ColladaRendererGL.hpp"
+#include "../Render/RendererGL.hpp"
 
 #include "../Collada/Collada.hpp"
 #include "../Collada/Scene.hpp"
@@ -32,7 +32,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-void ColladaRendererGL::init() {
+void RendererGL::init() {
    LOG("Initilizing OpenGL renderer...");
    glewInit_ = false;
    defaultMaterial_.setRenderer(this);
@@ -46,7 +46,7 @@ void ColladaRendererGL::init() {
 /**
  * OpenGL stuff to run prior to each drawing of the frame.
  */
-void ColladaRendererGL::preFrame() {
+void RendererGL::preFrame() {
 	if(glewInit_ == false) {
 		GLenum err = glewInit();
 		if (GLEW_OK != err)
@@ -69,7 +69,7 @@ void ColladaRendererGL::preFrame() {
 /**
  * OpenGL stuff to run after each drawing of the frame.
  */
-void ColladaRendererGL::postFrame() {
+void RendererGL::postFrame() {
    setRenderMode_();
    setPolygonMode_();
 
@@ -95,31 +95,31 @@ void ColladaRendererGL::postFrame() {
 /**
  * Set the size of the OpenGL renderer.
  */
-void ColladaRendererGL::setSize(const int width, const int height) {
+void RendererGL::setSize(const int width, const int height) {
    width_ = width;
    height_ = height;
    DEBUG_M("setSize(%d, %d)=%f", width, height, width_ / height_);
    //TODO: Set perspective here? or just let the next frame update do it?
 }
 
-void ColladaRendererGL::setPerspective_() {
+void RendererGL::setPerspective_() {
    projection_matrix_ = glm::perspective(90.0f, (float)1.0 * width_ / height_, 0.1f, 10000.0f);
    bindProjectionMatrix_();
 }
 
-void ColladaRendererGL::bindModelviewMatrix_() {
+void RendererGL::bindModelviewMatrix_() {
    glMatrixMode(GL_MODELVIEW);
    glLoadMatrixf(stack_.getOpenGLMatrix());
 }
 
-void ColladaRendererGL::bindProjectionMatrix_() {
+void RendererGL::bindProjectionMatrix_() {
    glMatrixMode(GL_PROJECTION);
    glLoadMatrixf(&projection_matrix_[0][0]);
    glMatrixMode(GL_MODELVIEW);
 }
 
-void ColladaRendererGL::render(ColladaObject* colladaObject) {
-   DEBUG_H("ColladaRendererGL::render(ColladaObject* colladaObject)");
+void RendererGL::render(ColladaObject* colladaObject) {
+   DEBUG_H("RendererGL::render(ColladaObject* colladaObject)");
    static bool nospam = false;
    if(!nospam) {
       WARNING("Tried to render raw ColladaObject '%s'", colladaObject->getId().c_str());
@@ -127,8 +127,8 @@ void ColladaRendererGL::render(ColladaObject* colladaObject) {
    }
 }
 
-void ColladaRendererGL::fixAxis_(const Collada* collada) {
-   DEBUG_H("void ColladaRendererGL::fixAxis_(const Collada* collada) {");
+void RendererGL::fixAxis_(const Collada* collada) {
+   DEBUG_H("void RendererGL::fixAxis_(const Collada* collada) {");
    static const int Z_UP = 0;
    static const int X_UP = 1;
    static const int Y_UP = 2;
@@ -147,7 +147,7 @@ void ColladaRendererGL::fixAxis_(const Collada* collada) {
    }
 }
 
-void ColladaRendererGL::render(Area* area) {
+void RendererGL::render(Area* area) {
    GameObjectIterator goi = area->getFirstGameObject();
    GameObjectIterator goie = area->getEndGameObject();
 
@@ -157,21 +157,21 @@ void ColladaRendererGL::render(Area* area) {
    }
 }
 
-void ColladaRendererGL::render(GameObject* gameObject) {
+void RendererGL::render(GameObject* gameObject) {
    gameObject->Position::render();
    gameObject->RotationGL::render();
    gameObject->Scale::render();
 }
 
-void ColladaRendererGL::render(ColladaMesh* colladaMesh) {
+void RendererGL::render(ColladaMesh* colladaMesh) {
    stack_.pushMatrix();
    colladaMesh->GameObject::render();
    colladaMesh->getCollada()->render();
    stack_.popMatrix();
 }
 
-void ColladaRendererGL::render(Collada* collada) {
-   DEBUG_H("ColladaRendererGL::render(Collada* collada)");
+void RendererGL::render(Collada* collada) {
+   DEBUG_H("RendererGL::render(Collada* collada)");
 
    stack_.pushMatrix();
    fixAxis_(collada);
@@ -186,8 +186,8 @@ void ColladaRendererGL::render(Collada* collada) {
    stack_.popMatrix();
 }
 
-void ColladaRendererGL::render(Scene* scene) {
-   DEBUG_H("ColladaRendererGL::render(Scene* scene)");
+void RendererGL::render(Scene* scene) {
+   DEBUG_H("RendererGL::render(Scene* scene)");
 
    VisualSceneIterator vsi = scene->getFirstVisualScene();
    VisualSceneIterator vsie = scene->getEndVisualScene();
@@ -197,8 +197,8 @@ void ColladaRendererGL::render(Scene* scene) {
    }
 }
 
-void ColladaRendererGL::render(VisualScene* vs) {
-   DEBUG_H("ColladaRendererGL::render(VisualScene* vs)");
+void RendererGL::render(VisualScene* vs) {
+   DEBUG_H("RendererGL::render(VisualScene* vs)");
    ColladaNodeIterator ni = vs->getFirstColladaNode();
    while(ni != vs->getEndColladaNode()) {
       stack_.pushMatrix();
@@ -208,8 +208,8 @@ void ColladaRendererGL::render(VisualScene* vs) {
    }
 }
 
-void ColladaRendererGL::render(ColladaNode* node) {
-   DEBUG_H("ColladaRendererGL::render(ColladaNode* node)");
+void RendererGL::render(ColladaNode* node) {
+   DEBUG_H("RendererGL::render(ColladaNode* node)");
 
    stack_.pushMatrix();
    
@@ -235,8 +235,8 @@ void ColladaRendererGL::render(ColladaNode* node) {
 /**
  * Renders a devutting axis.
  */
-void ColladaRendererGL::renderAxis_() {
-   DEBUG_H("void ColladaRendererGL::renderAxis_()");
+void RendererGL::renderAxis_() {
+   DEBUG_H("void RendererGL::renderAxis_()");
    // Draw debug axis...
    /*bindModelviewMatrix_();
 
@@ -293,16 +293,16 @@ void ColladaRendererGL::renderAxis_() {
 /**
  * Applies transformation.
  */
-void ColladaRendererGL::render(Position* position) {
-   DEBUG_H("ColladaRendererGL::render(Position* position)");
+void RendererGL::render(Position* position) {
+   DEBUG_H("RendererGL::render(Position* position)");
    stack_.translate(position->getX(), position->getY(), position->getZ());
 }
 
 /**
  * Applies rotation.
  */
-void ColladaRendererGL::render(RotationGL* rotation) {
-   DEBUG_H("ColladaRendererGL::render(RotationGL* rotation)");
+void RendererGL::render(RotationGL* rotation) {
+   DEBUG_H("RendererGL::render(RotationGL* rotation)");
    float angle, x, y, z;
    for(int i = 0; i < 3; i++) {
       rotation->getRotationGL(i, x, y, z, angle);
@@ -313,24 +313,24 @@ void ColladaRendererGL::render(RotationGL* rotation) {
 /**
  * Applies scale.
  */
-void ColladaRendererGL::render(Scale* scale) {
-   DEBUG_H("ColladaRendererGL::render(Scale* scale)");
+void RendererGL::render(Scale* scale) {
+   DEBUG_H("RendererGL::render(Scale* scale)");
    stack_.scale(scale->getScaleX(), scale->getScaleY(), scale->getScaleZ());
 }
 
 /**
  * The render function for the base render class (shouldn't be called...).
  */
-void ColladaRendererGL::render(Renderable* renderable) {
-   DEBUG_H("ColladaRendererGL::render(Renderable* renderable)");
+void RendererGL::render(Renderable* renderable) {
+   DEBUG_H("RendererGL::render(Renderable* renderable)");
    //renderable->render();
 }
 
 /**
  * Renders a visible camera (For debugging).
  */
-void ColladaRendererGL::render(Camera* camera) {
-   DEBUG_H("void ColladaRendererGL::render(Camera* camera)");
+void RendererGL::render(Camera* camera) {
+   DEBUG_H("void RendererGL::render(Camera* camera)");
    stack_.pushMatrix();
       camera->GameObject::render();
       renderAxis_();
@@ -340,8 +340,8 @@ void ColladaRendererGL::render(Camera* camera) {
 /**
  * Positions the camera for OpenGL.
  */
-void ColladaRendererGL::setCamera(Camera* camera) {
-   DEBUG_H("void ColladaRendererGL::render(Camera* camera)");
+void RendererGL::setCamera(Camera* camera) {
+   DEBUG_H("void RendererGL::render(Camera* camera)");
    float cx = 0.0f;
    float cy = 0.0f;
    float cz = 0.0f;
@@ -359,8 +359,8 @@ void ColladaRendererGL::setCamera(Camera* camera) {
 }
 
 
-void ColladaRendererGL::render(Grid* grid) {
-   DEBUG_H("void ColladaRendererGL::render(Grid* grid)");
+void RendererGL::render(Grid* grid) {
+   DEBUG_H("void RendererGL::render(Grid* grid)");
 
    setUnlitMode_();
    
@@ -405,8 +405,8 @@ void ColladaRendererGL::render(Grid* grid) {
    glEnd();
 }
 
-void ColladaRendererGL::render(Geometry* geometry) {
-   DEBUG_H("void ColladaRendererGL::render(Geometry* '%s')", geometry->getId().c_str());
+void RendererGL::render(Geometry* geometry) {
+   DEBUG_H("void RendererGL::render(Geometry* '%s')", geometry->getId().c_str());
    GeoPrimIterator iter = geometry->getFirstPrimitive();
    while(iter != geometry->getEndPrimitive()) {
       (*iter)->render();
@@ -414,16 +414,16 @@ void ColladaRendererGL::render(Geometry* geometry) {
    }
 }
 
-void ColladaRendererGL::render(Triangles* triangles) {
-   DEBUG_H("ColladaRendererGL::render(Triangles* triangles)");
+void RendererGL::render(Triangles* triangles) {
+   DEBUG_H("RendererGL::render(Triangles* triangles)");
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
    glBegin(GL_TRIANGLES);
       triangles->GeometricPrimitive::render();
    glEnd();
 }
 
-void ColladaRendererGL::render(GeometricPrimitive* geometry) {
-   DEBUG_H("ColladaRendererGL::render(GeometricPrimitive* geometry)");
+void RendererGL::render(GeometricPrimitive* geometry) {
+   DEBUG_H("RendererGL::render(GeometricPrimitive* geometry)");
 
    static int nospam;
    if(!nospam) {
@@ -439,8 +439,8 @@ void ColladaRendererGL::render(GeometricPrimitive* geometry) {
    }
 }
 
-void ColladaRendererGL::render(InstanceGeometry* ig) {
-   DEBUG_H("void ColladaRendererGL::render(InstanceGeometry* ig) {");
+void RendererGL::render(InstanceGeometry* ig) {
+   DEBUG_H("void RendererGL::render(InstanceGeometry* ig) {");
    shared_ptr<Geometry> geometry = ig->getGeometry();
 
    GeoPrimIterator iter = geometry->getFirstPrimitive();
@@ -464,12 +464,12 @@ void ColladaRendererGL::render(InstanceGeometry* ig) {
    }
 }
 
-void ColladaRendererGL::renderDefaultMaterial_() {
+void RendererGL::renderDefaultMaterial_() {
    defaultMaterial_.render();
 }
 
-void ColladaRendererGL::render(Material* material) {
-   DEBUG_H("void ColladaRendererGL::render(Material* material)");
+void RendererGL::render(Material* material) {
+   DEBUG_H("void RendererGL::render(Material* material)");
    shared_ptr<Effect> effect = material->getEffect();
    if(effect.get()) {
       effect->render();
@@ -482,13 +482,13 @@ void ColladaRendererGL::render(Material* material) {
    }
 }
 
-void ColladaRendererGL::render(TestRenderable* tr) {
+void RendererGL::render(TestRenderable* tr) {
    DEBUG_H("void ");
    tr->ColladaNode::render();
    renderCube_(tr->getScaleX());
 }
 
-void ColladaRendererGL::renderCube_(const float& size) {
+void RendererGL::renderCube_(const float& size) {
 	// Render a cube from a VAO
    static GLuint vao = 0;
    static GLuint cube_buf_id = 0;
@@ -660,7 +660,7 @@ void ColladaRendererGL::renderCube_(const float& size) {
 }
 
 
-void ColladaRendererGL::setRenderMode_() {
+void RendererGL::setRenderMode_() {
    glDisable(GL_COLOR_MATERIAL);
    /*glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);*/
@@ -668,12 +668,12 @@ void ColladaRendererGL::setRenderMode_() {
    glEnable(GL_NORMALIZE);
 }
 
-void ColladaRendererGL::setUnlitMode_() {
+void RendererGL::setUnlitMode_() {
    bindShader_(shader_manager_.getFlat());
    /*glDisable(GL_LIGHTING);*/
 }
 
-void ColladaRendererGL::setPolygonMode_() {
+void RendererGL::setPolygonMode_() {
    glPolygonMode(GL_FRONT, GL_FILL);
    glFrontFace(GL_CCW);
    glCullFace(GL_BACK);
@@ -681,7 +681,7 @@ void ColladaRendererGL::setPolygonMode_() {
    glEnable(GL_DEPTH_TEST);
 }
 
-void ColladaRendererGL::setWireframeMode_() {
+void RendererGL::setWireframeMode_() {
    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
    setUnlitMode_();
    glDisable(GL_CULL_FACE);
@@ -691,7 +691,7 @@ void ColladaRendererGL::setWireframeMode_() {
  * Setup the lights. This is currently a fixed light for debugging purposes.
  */
 #warning ['TODO']: Use actual lights...
-void ColladaRendererGL::setLights_() {
+void RendererGL::setLights_() {
    // DEBUG: Move the light up, render some axis
    static float debugPos = 1.0f;
    static float debugPos2 = 1.0f;
@@ -728,8 +728,8 @@ void ColladaRendererGL::setLights_() {
    glLightfv(GL_LIGHT0, GL_POSITION, light_pos);*/
 }
 
-void ColladaRendererGL::render(ColladaLitShader* lit) {
-   DEBUG_H("void ColladaRendererGL::render(ColladaLitShader* lit)");
+void RendererGL::render(ColladaLitShader* lit) {
+   DEBUG_H("void RendererGL::render(ColladaLitShader* lit)");
 
    setRenderMode_();
 
@@ -761,7 +761,7 @@ void ColladaRendererGL::render(ColladaLitShader* lit) {
    }
 }
 
-void ColladaRendererGL::bindShader_(const GLSLShaderPtr& shader) {
+void RendererGL::bindShader_(const GLSLShaderPtr& shader) {
    shader->begin();
    shader->bindModelviewMatrix(stack_.getMatrix());
    shader->bindModelviewProjectionMatrix(projection_matrix_ * stack_.getMatrix());
@@ -770,7 +770,7 @@ void ColladaRendererGL::bindShader_(const GLSLShaderPtr& shader) {
    shader->bindAttributes();   
 }
 
-void ColladaRendererGL::render(Phong* phong) {
+void RendererGL::render(Phong* phong) {
    const float (&specular)[4] = phong->getSpecular().getArray();
    float shininess[1] = {phong->getShininess()};
 
@@ -783,11 +783,11 @@ void ColladaRendererGL::render(Phong* phong) {
    shader->bindMaterial(phong);
 }
 
-void ColladaRendererGL::render(Lambert* lambert) {
+void RendererGL::render(Lambert* lambert) {
    shader_manager_.getLambert()->begin();
 }
 
-void ColladaRendererGL::renderOctreeNode_(Octree* octree) {
+void RendererGL::renderOctreeNode_(Octree* octree) {
    /*glEnable(GL_COLOR_MATERIAL);
    if(octree->getIsSolid()) {
       //setPolygonMode_();
@@ -802,7 +802,7 @@ void ColladaRendererGL::renderOctreeNode_(Octree* octree) {
 
 }
 
-void ColladaRendererGL::render(Octree* octree) {
+void RendererGL::render(Octree* octree) {
    /*stack_.pushMatrix();
 
 	setPolygonMode_();
@@ -846,7 +846,7 @@ void ColladaRendererGL::render(Octree* octree) {
    stack_.popMatrix();*/
 }
 
-void ColladaRendererGL::render(BlockChunk* blockchunk) {
+void RendererGL::render(BlockChunk* blockchunk) {
    // TODO: Make this efficient.
    static const float cubeSize = 0.1;
    renderAxis_();

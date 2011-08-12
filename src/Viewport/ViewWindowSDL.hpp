@@ -10,7 +10,7 @@ using namespace std;
 #include "SDL.h"
 
 #include "../GameData/SmartPointers.hpp"
-#include "../Render/ColladaRendererGL.hpp"
+#include "../Render/RendererGL.hpp"
 #include "../Render/Renderable.hpp"
 class Grid;
 
@@ -20,7 +20,7 @@ class Grid;
 class ViewWindowSDL: public ViewWindow {
    public:
       ViewWindowSDL(const int width, const int height);
-      virtual ColladaRenderer* getRenderer();
+      virtual Renderer* getRenderer();
       virtual void setTitle(const string title);
       virtual void mainLoop();
 
@@ -31,7 +31,7 @@ class ViewWindowSDL: public ViewWindow {
       void handleKeyUp_(const SDL_Event& event);
 
       bool finished_;
-      ColladaRendererGL renderer_;
+      RendererGL renderer_;
       int mx_, my_;
       bool cam_move_;
       shared_ptr<Grid> grid_;

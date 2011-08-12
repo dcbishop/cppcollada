@@ -1,5 +1,5 @@
-#ifndef COLLADACPP_COLLADARENDERER_HPP_
-#define COLLADACPP_COLLADARENDERER_HPP_
+#ifndef COLLADACPP_RENDERER_HPP_
+#define COLLADACPP_RENDERER_HPP_
 
 class Renderable;
 class Collada;
@@ -29,7 +29,7 @@ class Octree;
 class BlockChunk;
 class GLSLShader;
 
-class ColladaRenderer {
+class Renderer {
    public:
       virtual void render(Renderable* renderable) = 0;
       virtual void render(GameObject* gameObject) = 0;
@@ -63,4 +63,4 @@ class ColladaRenderer {
       virtual void init() = 0;
 };
 
-#endif /* COLLADACPP_COLLADARENDERER_HPP_ */
+#endif /* COLLADACPP_RENDERER_HPP_ */

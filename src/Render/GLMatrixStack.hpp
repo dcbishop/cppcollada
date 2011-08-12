@@ -1,5 +1,5 @@
-#ifndef COLLADACPP_COLLADARENDERERGL_MATRIXSTACK_HPP_
-#define COLLADACPP_COLLADARENDERERGL_MATRIXSTACK_HPP_
+#ifndef COLLADACPP_RENDERERGL_MATRIXSTACK_HPP_
+#define COLLADACPP_RENDERERGL_MATRIXSTACK_HPP_
 
 #include <cmath>
 #include <stack>
@@ -104,4 +104,4 @@ inline glm::mat3 GLMatrixStack::getNormalMatrix(const bool normalized = true) {
    return glm::transpose(glm::inverse(glm::mat3x3(matricies_.top())));
 }
 
-#endif /* COLLADACPP_COLLADARENDERERGL_MATRIXSTACK_HPP_ */
+#endif /* COLLADACPP_RENDERERGL_MATRIXSTACK_HPP_ */

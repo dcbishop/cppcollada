@@ -13,8 +13,8 @@ using namespace std;
 #include "../Render/Renderable.hpp"
 #include "../GameObjects/Camera.hpp"
 #include "../Collada/Collada.hpp"
-#include "../Render/ColladaRendererGL.hpp"
-#include "../Render/ColladaRenderer.hpp"
+#include "../Render/RendererGL.hpp"
+#include "../Render/Renderer.hpp"
 #include "../GameData/Grid.hpp"
 #include "../GameObjects/Area.hpp"
 
@@ -205,6 +205,6 @@ int ViewWindowSDL::getComputerTime_() {
    return SDL_GetTicks();
 }
 
-ColladaRenderer* ViewWindowSDL::getRenderer() {
+Renderer* ViewWindowSDL::getRenderer() {
    return &renderer_;
 }

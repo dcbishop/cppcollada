@@ -1,15 +1,15 @@
-#include "../Render/ColladaRendererGL_DevIL.hpp"
+#include "../Render/RendererGL_DevIL.hpp"
 
 #include <GL/gl.h>
 
 #include <IL/il.h>
 #include "../Debug/console.h"
 
-ColladaRendererGL_DevIL::~ColladaRendererGL_DevIL() {
+RendererGL_DevIL::~RendererGL_DevIL() {
    #warning ['TODO']: Unload all the images...
 }
 
-void ColladaRendererGL_DevIL::init() {
+void RendererGL_DevIL::init() {
    LOG("Initilizing DevIL image loader...");
    if(ilGetInteger(IL_VERSION_NUM) < IL_VERSION) {
          ERROR("DevIL library version '%d' is different to '%d'... This might crash...\n", ilGetInteger(IL_VERSION_NUM), IL_VERSION);
@@ -19,7 +19,7 @@ void ColladaRendererGL_DevIL::init() {
 }
 
 
-int ColladaRendererGL_DevIL::loadImage(ImagePtr image) {
+int RendererGL_DevIL::loadImage(ImagePtr image) {
    string filename = image->getFilename();
    DEBUG_M("Loading image '%s'...", filename.c_str());
 
