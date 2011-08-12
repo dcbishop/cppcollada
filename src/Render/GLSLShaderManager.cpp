@@ -15,6 +15,7 @@ using namespace std;
 GLSLShaderPtr GLSLShaderManager::phong_;
 GLSLShaderPtr GLSLShaderManager::blinn_phong_;
 GLSLShaderPtr GLSLShaderManager::flat_;
+GLSLShaderPtr GLSLShaderManager::normal_debug_;
 
 GLSLShaderPtr GLSLShaderManager::getLambert() {
    // TODO
@@ -26,8 +27,8 @@ GLSLShaderPtr GLSLShaderManager::getPhong() {
       DEBUG_M("Loading phong shader..."); //TODO: Use relative paths (seems to break gDEBugger
       phong_ = GLSLShaderPtr(loadShaders("Data/Shaders/Phong.vert", "Data/Shaders/Phong.frag"));
    }
-   //TODO Debug code...
-   /*if(phong_.get() == NULL) {
+   /*TODO Debug code...
+   if(phong_.get() == NULL) {
       DEBUG_M("Loading phong shader..."); //TODO: Use relative paths (seems to break gDEBugger
       phong_ = GLSLShaderPtr(loadShaders("Data/Shaders/NormalDebug.vert", "Data/Shaders/NormalDebug.frag"));
    }*/
@@ -52,6 +53,14 @@ GLSLShaderPtr GLSLShaderManager::getBlinnPhong() {
       blinn_phong_ = GLSLShaderPtr(loadShaders("Data/Shaders/Projection.vert", "Data/Shaders/BlinnPhong.frag"));
    }
    return blinn_phong_;
+}
+
+GLSLShaderPtr GLSLShaderManager::getNormalDebug() {
+   if(flat_.get() == NULL) {
+      DEBUG_M("Loading normal debug shader..."); //TODO: Use relative paths (seems to break gDEBugger
+      flat_ = GLSLShaderPtr(loadShaders("Data/Shaders/NormalDebug.vert", "Data/Shaders/NormalDebug.frag"));
+   }
+   return flat_;
 }
 
 string GLSLShaderManager::loadFile_(const string& filename) {

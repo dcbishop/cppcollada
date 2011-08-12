@@ -36,6 +36,7 @@ class ColladaRendererGL : public ColladaRenderer {
       virtual void render(Lambert* lambert);
       virtual void render(TestRenderable* tr);
       virtual void render(Octree* octree);
+      virtual void render(BlockChunk* blockchunk);
       virtual void preFrame();
       virtual void postFrame();
       virtual void init();

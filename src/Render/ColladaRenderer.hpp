@@ -26,6 +26,7 @@ class GameObject;
 class Area;
 class ColladaMesh;
 class Octree;
+class BlockChunk;
 class GLSLShader;
 
 class ColladaRenderer {
@@ -54,6 +55,7 @@ class ColladaRenderer {
       virtual void render(Lambert* lambert) = 0;
       virtual void render(TestRenderable* tr) = 0;
       virtual void render(Octree* octree) = 0;
+      virtual void render(BlockChunk* blockchunk) = 0;
       virtual void setCamera(Camera* camera) = 0;
       virtual void setSize(const int width, const int height) = 0;
       virtual void preFrame() = 0;

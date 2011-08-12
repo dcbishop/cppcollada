@@ -22,6 +22,7 @@
 #include "../GameObjects/Area.hpp"f
 #include "../GameObjects/Camera.hpp"
 #include "../GameObjects/Octree.hpp"
+#include "../GameObjects/BlockChunk.hpp"
 
 #include "../Debug/console.h"
 #include "../Debug/TestRenderable.hpp"
@@ -543,7 +544,7 @@ void ColladaRendererGL::renderCube_(const float& size) {
 
    stack_.pushMatrix();
    stack_.scale(size, size, size);
-   bindShader_(shader_manager_.getFlat());
+   //bindShader_(shader_manager_.getFlat());
    glBindVertexArray(vao);
    glDrawArrays(GL_QUADS, 0, 24);
    glBindVertexArray(0);
@@ -843,4 +844,36 @@ void ColladaRendererGL::render(Octree* octree) {
    renderOctreeNode_(octree);
 
    stack_.popMatrix();*/
+}
+
+void ColladaRendererGL::render(BlockChunk* blockchunk) {
+   // TODO: Make this efficient.
+   static const float cubeSize = 0.1;
+   renderAxis_();
+
+   unsigned int width = blockchunk->getChunkWidth();
+   unsigned int height = blockchunk->getChunkHeight();
+   unsigned int depth = blockchunk->getChunkDepth();
+   
+   glEnable(GL_DEPTH_TEST);
+   setRenderMode_();
+   setPolygonMode_();
+   setLights_();
+   renderDefaultMaterial_();
+
+   stack_.pushMatrix();
+   stack_.translate(-cubeSize * width / 2.0, -cubeSize * height / 2.0, -cubeSize * depth / 2.0);
+   for(unsigned int z = 0; z < blockchunk->getChunkDepth(); z++) {
+      for(unsigned int y = 0; y < blockchunk->getChunkHeight(); y++) {
+         for(unsigned int x = 0; x < blockchunk->getChunkWidth(); x++) {
+            stack_.pushMatrix();
+            if(blockchunk->getBlock(x, y, z)) {
+               stack_.translate(x*cubeSize, y*cubeSize, z*cubeSize);
+               renderCube_(cubeSize);
+            }
+            stack_.popMatrix();
+         }
+      }
+   }
+   stack_.popMatrix();
 }

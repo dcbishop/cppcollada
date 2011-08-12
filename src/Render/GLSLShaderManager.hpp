@@ -12,6 +12,7 @@ class GLSLShaderManager {
       GLSLShaderPtr getBlinnPhong();
       GLSLShaderPtr getPhong();
       GLSLShaderPtr getFlat();
+      GLSLShaderPtr getNormalDebug();
       GLSLShaderPtr loadShaders(const string& vertex, const string& fragment);
       void displayInfoLog(const int& id);
       static GLuint getVertexAttribId();
@@ -28,6 +29,7 @@ class GLSLShaderManager {
       static GLSLShaderPtr phong_;
       static GLSLShaderPtr blinn_phong_;
       static GLSLShaderPtr flat_;
+      static GLSLShaderPtr normal_debug_;
 };
 
 inline GLuint GLSLShaderManager::getVertexAttribId() {
