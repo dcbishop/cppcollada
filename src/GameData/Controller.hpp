@@ -40,8 +40,8 @@ const int MAX_FLAGS = 12;
 #include <math.h>
 
 #include "../GameData/Updateable.hpp"
+#include "../GameData/SmartPointers.hpp"
 #include "../GameObjects/Camera.hpp"
-
 #include "../Debug/console.h"
 
 class Controller;
@@ -49,28 +49,13 @@ typedef shared_ptr<Controller> ControllerPtr;
 
 class Controller : public Updateable {
    public:
-      Controller() {
-         defaultForwardSpeed_ = 3.0f;
-         defaultBackwardSpeed_ = defaultForwardSpeed_;
-         defaultMoveLeftSpeed_ = defaultForwardSpeed_;
-         defaultMoveRightSpeed_ = defaultForwardSpeed_;
-         defaultMoveUpSpeed_ = defaultForwardSpeed_;
-         defaultMoveDownSpeed_ = defaultForwardSpeed_;
-         
-         for(int i = 0; i < MAX_FLAGS; i++) {
-            setFlag(i, false);
-         }
-         // TODO: Set Actions
-      }
+      Controller();
 
       /**
        * Sets a flag indicating that the controller is in a mode.
        * The appropriate action should be applied to the controlled object in the update function.
        */
-      void setFlag(const int flag, const bool value) {
-         if(flag < 0 || flag > MAX_FLAGS);
-         flags_[flag] = value;
-      }
+      void setFlag(const int flag, const bool value);
 
       /**
        * Tells the controlled object if it should be moving forward.
@@ -80,9 +65,7 @@ class Controller : public Updateable {
        * A bipedal humanoid taking steps forward.
        * Forward thrusters on a spacecraft.
        */
-      void setIsMovingForward(const bool value) {
-         setFlag(IS_MOVING_FORWARD, value);
-      }
+      void setIsMovingForward(const bool value);
 
       /**
        * Tells the controlled object if it should be moving backward.
@@ -92,9 +75,7 @@ class Controller : public Updateable {
        * A bipedal humanoid taking steps backwards.
        * Reverse thrusters on a spacecraft.
        */
-      void setIsMovingBackward(const bool value) {
-         setFlag(IS_MOVING_BACKWARD, value);
-      }
+      void setIsMovingBackward(const bool value);
 
       /**
        * Tells the controlled object if it should be moving left.
@@ -104,9 +85,7 @@ class Controller : public Updateable {
        * A bipedal humanoid strafing left.
        * Left thrusters on a spacecraft.
        */
-      void setIsMovingLeft(const bool value) {
-         setFlag(IS_MOVING_LEFT, value);
-      }
+      void setIsMovingLeft(const bool value);
 
       /**
        * Tells the controlled object if it should be moving right.
@@ -116,9 +95,7 @@ class Controller : public Updateable {
        * A bipedal humanoid strafing right.
        * Right thrusters on a spacecraft.
        */
-      void setIsMovingRight(const bool value) {
-         setFlag(IS_MOVING_RIGHT, value);
-      }
+      void setIsMovingRight(const bool value);
 
       /**
        * Tells the controlled object if it should be moving up.
@@ -128,9 +105,7 @@ class Controller : public Updateable {
        * A bipedal humanoid jumping. Or swiming towards the surface if in water.
        * Up thrusters on a spacecraft.
        */
-      void setIsMovingUp(const bool value) {
-         setFlag(IS_MOVING_UP, value);
-      }
+      void setIsMovingUp(const bool value);
 
       /**
        * Tells the controlled object if it should be moving down.
@@ -140,9 +115,7 @@ class Controller : public Updateable {
        * A bipedal humanoid crouching. Or swiming away from the surface if in water.
        * Down thrusters on a spacecraft.
        */
-      void setIsMovingDown(const bool value) {
-         setFlag(IS_MOVING_DOWN, value);
-      }
+      void setIsMovingDown(const bool value);
 
       /**
        * Tells the controlled object if it should be pitching up.
@@ -152,9 +125,7 @@ class Controller : public Updateable {
        * Looking the head up towards the sky/celing in first person.
        * Turning a spacecraft up relative to it's rotation.
        */
-      void setIsPitchingUp(const bool value) {
-         setFlag(IS_PITCHING_UP, value);
-      }
+      void setIsPitchingUp(const bool value);
 
       /**
        * Tells the controlled object if it should be pitching down.
@@ -164,9 +135,7 @@ class Controller : public Updateable {
        * Turning the head down towards the ground in first person.
        * Turning a spacecraft down relative to it's rotation.
        */
-      void setIsPitchingDown(const bool value) {
-         setFlag(IS_PITCHING_DOWN, value);
-      }
+      void setIsPitchingDown(const bool value);
 
       /**
        * Tells the controlled object if it should be yawing left.
@@ -176,9 +145,7 @@ class Controller : public Updateable {
        * Turning the player's body left around the worlds Y-axis in first person.
        * Turning a spacecraft left relative to it's rotation.
        */
-      void setIsYawingLeft(const bool value) {
-         setFlag(IS_YAWING_LEFT, value);
-      }
+      void setIsYawingLeft(const bool value);
 
       /**
        * Tells the controlled object if it should be yawing right.
@@ -188,9 +155,7 @@ class Controller : public Updateable {
        * Turning the player's body left around the worlds Y-axis in first person.
        * Turning a spacecraft left relative to it's rotation.
        */
-      void setIsYawingRight(const bool value) {
-         setFlag(IS_YAWING_RIGHT, value);
-      }
+      void setIsYawingRight(const bool value);
 
       /**
        * Tells the controlled object if it should be rolling left.
@@ -199,9 +164,7 @@ class Controller : public Updateable {
        * A bipedal humanoid leaning left.
        * Rotating a spacecraft left.
        */
-      void setIsRollingLeft(const bool value) {
-         setFlag(IS_ROLLING_LEFT, value);
-      }
+      void setIsRollingLeft(const bool value);
 
       /**
        * Tells the controlled object if it should be rolling right.
@@ -210,9 +173,7 @@ class Controller : public Updateable {
        * A bipedal humanoid leaning right.
        * Rotating a spacecraft right.
        */
-      void setIsRollingRight(const bool value) {
-         setFlag(IS_ROLLING_RIGHT, value);
-      }
+      void setIsRollingRight(const bool value);
 
       /**
        * Tells the controlled object if it should be performing an action.
@@ -243,39 +204,23 @@ class Controller : public Updateable {
        *              Open Inventory, Open Journal. Change fire mode,
        *              Quick swap weapons, thermal vision.
        */
-      void setAction(const int index, const bool value) {
-         if(index < 1 || index > 10) {
-            return;
-         }
-         isAction_[index-1] = value;
-      }
+      void setAction(const int index, const bool value);
 
       // Instantly applied inputs.
       /**
        * Adds or subtracts from the yaw value.
        */
-      void addYaw(const float value) {
-         if(isAction_[0] || getCamera()->getZoom() <= 0.1) {
-            camera_->setRotX(camera_->getRotX() + value);
-            controlled_->setRotationGL(0, 0, 1.0, 0, -camera_->getRotX());
-         }
-      }
+      void addYaw(const float value);
 
       /**
        * Adds or subtracts from the pitch value.
        */
-      void addPitch(const float value) {
-         if(isAction_[0] || getCamera()->getZoom() <= 0.1) {
-            camera_->setRotY(camera_->getRotY() - value);
-         }
-      }
+      void addPitch(const float value);
 
       /**
        * Adds or subtracts from the roll value.
        */
-      void addRoll(const float value) {
-         return;
-      }
+      void addRoll(const float value);
 
       /**
        * A generic incrementing function.
@@ -286,9 +231,7 @@ class Controller : public Updateable {
        * Selecting the next weapon/item.
        * Zooming a scope in.
        */
-      void Increment() {
-         getCamera()->setZoom(getCamera()->getZoomTarget() - ZOOM_STEP);
-      }
+      void Increment();
 
       /**
        * A generic incrementing function.
@@ -299,52 +242,21 @@ class Controller : public Updateable {
        * Selecting the previous weapon/item.
        * Zooming a scope out.
        */
-      void Decrement() {
-         getCamera()->setZoom(getCamera()->getZoomTarget() + ZOOM_STEP);
-      }
+      void Decrement();
 
       /**
        * Sets the object to move.
        */
-      void setControlled(GameObjectPtr controlled) {
-         controlled_ = controlled;
-      }
+      void setControlled(GameObjectPtr controlled);
 
       /**
        * Sets the object to rotate.
        */      
-      void setCamera(CameraPtr camera) {
-         camera_ = camera;
-      }
+      void setCamera(CameraPtr camera);
 
-      CameraPtr getCamera() const {
-         return camera_;
-      }
+      CameraPtr getCamera() const;
 
-      void Update(const float dt) {
-         if(flags_[IS_MOVING_FORWARD]) {
-            controlled_->setX(controlled_->getX() + cos(camera_->getRotX()*(PI/180)) * (-defaultForwardSpeed_ * dt));
-            controlled_->setZ(controlled_->getZ() + sin(camera_->getRotX()*(PI/180)) * (-defaultForwardSpeed_ * dt));
-         }
-         if(flags_[IS_MOVING_BACKWARD]) {
-            controlled_->setX(controlled_->getX() + cos(camera_->getRotX()*(PI/180)) * (defaultBackwardSpeed_ * dt));
-            controlled_->setZ(controlled_->getZ() + sin(camera_->getRotX()*(PI/180)) * (defaultBackwardSpeed_ * dt));
-         }
-         if(flags_[IS_MOVING_LEFT]) {
-            controlled_->setX(controlled_->getX() - sin(camera_->getRotX()*(PI/180)) * (defaultMoveLeftSpeed_ * dt));
-            controlled_->setZ(controlled_->getZ() + cos(camera_->getRotX()*(PI/180)) * (defaultMoveLeftSpeed_ * dt));
-         }
-         if(flags_[IS_MOVING_RIGHT]) {
-            controlled_->setX(controlled_->getX() - sin(camera_->getRotX()*(PI/180)) * (-defaultMoveRightSpeed_ * dt));
-            controlled_->setZ(controlled_->getZ() + cos(camera_->getRotX()*(PI/180)) * (-defaultMoveRightSpeed_ * dt));
-         }
-         if(flags_[IS_MOVING_UP]) {
-            controlled_->setY(controlled_->getY() + (defaultMoveUpSpeed_ * dt));
-         }
-         if(flags_[IS_MOVING_DOWN]) {
-            controlled_->setY(controlled_->getY() - (defaultMoveDownSpeed_ * dt));
-         }
-      }
+      void Update(const float dt);
 
    private:
       bool flags_[MAX_FLAGS];

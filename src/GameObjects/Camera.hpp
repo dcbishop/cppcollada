@@ -16,6 +16,7 @@ const float ZOOM_SPEED = 3.0f;
 const float ZOOM_THRESHOLD = 0.001f;
 
 #include "../GameData/SmartPointers.hpp"
+#include "../GameData/Globals.hpp"
 #include "../GameObjects/GameObject.hpp"
 
 /**
@@ -45,7 +46,6 @@ class Camera : public GameObject {
       float getZ() const;
 
       COLLADA_RENDER_FUNCTION
-      virtual inline void setCamera() { getRenderer()->setCamera(this); }
 
    private:
       weak_ptr<Position> target_;

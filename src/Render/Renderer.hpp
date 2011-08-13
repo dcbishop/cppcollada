@@ -21,7 +21,6 @@ class Phong;
 class Lambert;
 class TestRenderable;
 class ColladaLitShader;
-
 class GameObject;
 class Area;
 class ColladaMesh;
@@ -31,6 +30,14 @@ class GLSLShader;
 
 class Renderer {
    public:
+      Renderer();
+      virtual void init();
+
+      virtual void setCameraMatrix(Camera* camera) = 0;
+      virtual void setSize(const int width, const int height) = 0;
+      virtual void preFrame() = 0;
+      virtual void postFrame() = 0;
+
       virtual void render(Renderable* renderable) = 0;
       virtual void render(GameObject* gameObject) = 0;
       virtual void render(ColladaMesh* colladaMesh) = 0;
@@ -56,11 +63,12 @@ class Renderer {
       virtual void render(TestRenderable* tr) = 0;
       virtual void render(Octree* octree) = 0;
       virtual void render(BlockChunk* blockchunk) = 0;
-      virtual void setCamera(Camera* camera) = 0;
-      virtual void setSize(const int width, const int height) = 0;
-      virtual void preFrame() = 0;
-      virtual void postFrame() = 0;
-      virtual void init() = 0;
+
+   private:
+      static void setInitState_(const bool initstate);
+      static bool getInitState_();
+
+      static bool initstate_;
 };
 
 #endif /* COLLADACPP_RENDERER_HPP_ */

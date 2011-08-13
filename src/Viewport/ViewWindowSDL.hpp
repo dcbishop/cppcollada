@@ -20,7 +20,6 @@ class Grid;
 class ViewWindowSDL: public ViewWindow {
    public:
       ViewWindowSDL(const int width, const int height);
-      virtual Renderer* getRenderer();
       virtual void setTitle(const string title);
       virtual void mainLoop();
 

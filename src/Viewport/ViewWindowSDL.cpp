@@ -81,7 +81,7 @@ void ViewWindowSDL::draw_() {
    shared_ptr<Area> area;
 
    if(camera != CameraPtr()) {
-      camera->setCamera();
+      g.getRenderer()->setCameraMatrix(camera.get());
       area = camera->getArea();
    }
 
@@ -203,8 +203,4 @@ void ViewWindowSDL::mainLoop() {
  */
 int ViewWindowSDL::getComputerTime_() {
    return SDL_GetTicks();
-}
-
-Renderer* ViewWindowSDL::getRenderer() {
-   return &renderer_;
 }

@@ -34,8 +34,8 @@
 
 void RendererGL::init() {
    LOG("Initilizing OpenGL renderer...");
+   Renderer::init();
    glewInit_ = false;
-   defaultMaterial_.setRenderer(this);
    debugPrimDraw = -1;
    imageLoader_.init();
    //glEnable(GL_MULTISAMPLE);
@@ -340,7 +340,7 @@ void RendererGL::render(Camera* camera) {
 /**
  * Positions the camera for OpenGL.
  */
-void RendererGL::setCamera(Camera* camera) {
+void RendererGL::setCameraMatrix(Camera* camera) {
    DEBUG_H("void RendererGL::render(Camera* camera)");
    float cx = 0.0f;
    float cy = 0.0f;

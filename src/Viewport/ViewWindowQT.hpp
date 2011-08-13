@@ -31,7 +31,6 @@ class OpenGLScene : public QGraphicsScene {
       ~OpenGLScene() { DEBUG_M("Cleaning up OpenGLScene");}
       void drawBackground(QPainter *painter, const QRectF &rect);
       void addOverlayedWidget(QWidget* widget, bool disableFrame = true, bool transparentBackground = true);
-      RendererGL renderer_;
       void setHTMLOverlaySize(const int width, const int height);
 
    public slots:
@@ -57,7 +56,6 @@ class ViewWindowQT: public ViewWindow {
    public:
       ViewWindowQT(const int width, const int height);
       ~ViewWindowQT();
-      virtual Renderer* getRenderer();
       virtual void setTitle(const string title);
       virtual void mainLoop();
       virtual void quit();

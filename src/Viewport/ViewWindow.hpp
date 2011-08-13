@@ -25,7 +25,6 @@ class ViewWindow {
       virtual void setSize(const int width, const int height);
       virtual int getWidth() const;
       virtual int getHeight() const;
-      virtual Renderer* getRenderer() = 0;
       virtual void setCamera(CameraPtr camera);
       virtual CameraPtr getCamera() const;
       ControllerPtr getController() const;

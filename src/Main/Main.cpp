@@ -37,15 +37,19 @@ using namespace xercesc;
 
 int main(int argc, char* argv[]) {
    LOG("Starting main...");
-	string filename;
+   
+   RendererGL render;
+   render.init();
 
-	// Assume the last arg is the uri to open if it doesn't start with a '-'.
+   string filename;
+
+   // Assume the last arg is the uri to open if it doesn't start with a '-'.
    if(argv[argc-1][0] != '-' && argc > 1) {
       filename = argv[argc-1];
    } else {
-		ERROR("No filename specified.");
-		return 1;
-	}
+      ERROR("No filename specified.");
+      return 1;
+   }
 
    DEBUG_A("Spawning ColladaManager...");
    ColladaManagerPtr cm(new ColladaManager());

@@ -5,6 +5,8 @@
 
 #include "../Debug/console.h"
 
+#include "../GameData/Globals.hpp"
+
 #include "../GameData/Grid.hpp"
 #include "../GameObjects/Camera.hpp"
 #include "../Collada/Collada.hpp"
@@ -17,8 +19,8 @@
 OpenGLScene::OpenGLScene(ViewWindowQT* vwqt) {
    grid_ = shared_ptr<Grid>(new Grid);
    vwqt_ = vwqt;
-   renderer_.init();
-   renderer_.setSize(vwqt_->getWidth(), vwqt_->getHeight());
+   g.getRenderer()->init();
+   g.getRenderer()->setSize(vwqt_->getWidth(), vwqt_->getHeight());
 
    QWidget *editCollada = new QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint);
    editCollada->setWindowTitle("Edit Collada");
@@ -165,13 +167,13 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
 
    painter->beginNativePainting();
 
-   renderer_.preFrame();
+   g.getRenderer()->preFrame();
 
    CameraPtr camera = vwqt_->getCamera();
    shared_ptr<Area> area;
 
    if(camera != CameraPtr()) {
-      camera->setCamera();
+      g.getRenderer()->setCameraMatrix(camera.get());
       area = camera->getArea();
    }
 
@@ -181,7 +183,7 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
 
    grid_->render();
 
-   renderer_.postFrame();
+   g.getRenderer()->postFrame();
 
    painter->endNativePainting();
 
@@ -235,10 +237,6 @@ void ViewWindowQT::mainLoop() {
    DEBUG_M("Finished...");
 }
 
-Renderer* ViewWindowQT::getRenderer() {
-   return &scene_->renderer_;
-}
-
 void ViewWindowQT::quit() {
    app_->quit();
 }
@@ -256,7 +254,7 @@ void ViewWidget::resizeEvent(QResizeEvent *event) {
    QGraphicsView::resizeEvent(event);
 
    vwqt_->setSize(event->size().width(), event->size().height());
-   vwqt_->getRenderer()->setSize(vwqt_->getWidth(), vwqt_->getHeight());
+   g.getRenderer()->setSize(vwqt_->getWidth(), vwqt_->getHeight());
    vwqt_->getOpenGLScene()->setHTMLOverlaySize(vwqt_->getWidth(), vwqt_->getHeight());
 }
 

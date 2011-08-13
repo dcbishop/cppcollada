@@ -4,6 +4,8 @@
 
 #include "../Debug/console.h"
 
+#include "../GameData/Globals.hpp"
+
 ViewWindow::ViewWindow(const int width, const int height) {
    camera_ = CameraPtr();
    setSize(width, height);
@@ -24,7 +26,7 @@ int ViewWindow::getHeight() const {
 
 void ViewWindow::setCamera(CameraPtr camera) {
    camera_ = camera;
-   camera_->setRenderer(getRenderer());
+   g.getRenderer()->setCameraMatrix(camera.get());
 }
 
 CameraPtr ViewWindow::getCamera() const {

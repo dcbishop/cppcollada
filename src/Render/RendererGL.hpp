@@ -12,6 +12,12 @@
 
 class RendererGL : public Renderer {
    public:
+      virtual void init();
+      virtual void preFrame();
+      virtual void postFrame();
+      virtual void setCameraMatrix(Camera* camera);
+      virtual void setSize(const int width, const int height);
+
       virtual void render(Renderable* renderable);
       virtual void render(GameObject* gameObject);
       virtual void render(ColladaMesh* colladaMesh);
@@ -37,11 +43,7 @@ class RendererGL : public Renderer {
       virtual void render(TestRenderable* tr);
       virtual void render(Octree* octree);
       virtual void render(BlockChunk* blockchunk);
-      virtual void preFrame();
-      virtual void postFrame();
-      virtual void init();
-      virtual void setCamera(Camera* camera);
-      virtual void setSize(const int width, const int height);
+
       int debugPrimDraw;
 
    private:
