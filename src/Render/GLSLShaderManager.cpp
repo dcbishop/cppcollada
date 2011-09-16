@@ -64,7 +64,7 @@ GLSLShaderPtr GLSLShaderManager::getNormalDebug() {
 }
 
 string GLSLShaderManager::loadFile_(const string& filename) {
-   ifstream file(filename);
+   ifstream file(filename.c_str());
    if(!file) {
       ERROR("Failed to load shader file '%s'.", filename.c_str());
       return "";
