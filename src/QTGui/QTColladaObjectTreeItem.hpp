@@ -6,6 +6,8 @@
 #include "../Collada/ColladaManager.hpp"
 
 class QTColladaObjectTreeItem {
+   //Q_OBJECT
+
    public:
       QTColladaObjectTreeItem(ColladaObjectPtr co, QTColladaObjectTreeItem *parent = 0);
       ~QTColladaObjectTreeItem();
