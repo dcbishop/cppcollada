@@ -195,8 +195,8 @@ void OpenGLScene::drawBackground(QPainter *painter, const QRectF &) {
 ViewWindowQT::ViewWindowQT(const int width, const int height): ViewWindow(width, height) {
    DEBUG_M("ViewWindowQT spawning...");
 
-   int argc = 1;
-   char* argv[] = {"No Window Title"};
+   static int argc = 1;
+   static char* argv[] = {"No Window Title"};
    //QApplication::setStyle(QStyleFactory::create("motif"));
    app_ = new QApplication(argc, argv);
    scene_ = new OpenGLScene(this);
