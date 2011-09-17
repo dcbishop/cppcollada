@@ -32,12 +32,6 @@ set(qt_HPP
 # TODO: Fix me, Unprocessed QT source files should be reoved in favour of the MOC generated ones
 list(REMOVE_ITEM cppcollada_SRC $qt_CPP)
 
-#file(GLOB to_remove "src/Viewport/ViewWindowQT.cpp")
-#list(REMOVE_ITEM cppcollada_SRC ${to_remove})
-#
-#file(GLOB to_remove "src/QtGui/*.cpp")
-#list(REMOVE_ITEM cppcollada_SRC ${to_remove})
-
 # Basic CMAKE supported libs
 find_package(OpenGL REQUIRED)
 find_package(DevIL REQUIRED)
@@ -58,14 +52,7 @@ add_definitions(-D_BOOSTPTR)
 # QT
 find_package(Qt4 4.6 COMPONENTS QtCore QtGui QtOpenGL QtWebKit REQUIRED)
 include(${QT_USE_FILE})
-
-#file(GLOB_RECURSE viewport_HEADERS src/Viewport/*.hpp")
-#file(GLOB_RECURSE qtgui_HEADERS src/QtGui/*.hpp")
 QT4_WRAP_CPP(cppcollada_SRC ${qt_HPP})
-#QT4_WRAP_CPP(cppcollada_SRC )
-#add_library(cppcollada SHARED ${cppcollada_viewport_MOC} ${cppcollada_qtgui_MOC})
-
-message(MOCFILES: ${cppcollada_SRC})
 
 # Final target
 add_executable(colladatest ${cppcollada_SRC})
