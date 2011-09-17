@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include "../GameData/Globals.hpp"
+
 #include "../Collada/Collada.hpp"
 #include "../Collada/ColladaManager.hpp"
 #include "../Collada/ColladaDocManager.hpp"
@@ -36,7 +38,7 @@ using namespace std;
 using namespace xercesc;
 
 int main(int argc, char* argv[]) {
-   LOG("Starting main...");
+   LOG("Starting %s %s, build: %s...", argv[0], g.getGitVersion().c_str(), g.getBuildDate().c_str());
    
    RendererGL render;
    render.init();

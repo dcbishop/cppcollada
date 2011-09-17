@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os.path
+import datetime
 from glob import glob
 
 prog_target = 'colladatest'
@@ -46,6 +47,23 @@ env.ParseConfig('pkg-config --libs --cflags QtGui QtOpenGL QtWebKit')
 #	env.ParseConfig('pkg-config --libs --cflags QtGui')
 
 #env.ParseConfig('pkg-config --libs --cflags xerces-c')
+
+# Get the git repository version
+build_date = datetime.datetime.today().strftime("%Y-%m-%d %H:%M")
+git_version = os.popen("git describe --always").read().strip()
+git_sha1 = os.popen("git rev-parse --verify HEAD").read().strip()
+
+if(git_version == ""):
+   git_version = "UNKNOWN"
+if(git_sha1 == ""):
+   git_sha1 == "UNKNOWN"
+
+print("Git commit version: " + git_version)
+
+env.Append(CPPDEFINES=['_BUILD_DATE=\\"' + build_date + '\\"'])
+env.Append(CPPDEFINES=['_GIT_VERSION=\\"' + git_version + '\\"'])
+env.Append(CPPDEFINES=['_GIT_SHA1=\\"' + git_sha1 + '\\"'])
+
 env.ParseConfig('sdl-config --cflags --libs')
 
 if int(debug_flag):
