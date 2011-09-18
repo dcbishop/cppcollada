@@ -5,6 +5,21 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_SOURCE_DIR}/cmake
     ${CMAKE_MODULE_PATH})
 
+# Set the defines
+# Build time define
+include(GetDateTime)
+DATETIME(BUILD_DATETIME)
+add_definitions(-D_BUILD_DATE="${BUILD_DATETIME}")
+
+# Git version info
+include(GetGitRevisionDescription)
+git_describe(GIT_DESCRIBE "--always")
+add_definitions(-D_GIT_VERSION="${GIT_DESCRIBE}")
+
+# Git SHA1 define
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+add_definitions(-D_GIT_SHA1="${GIT_SHA1}")
+
 # Note this is the 'bad' way of doing this, but the recommended alternative is to keep a list of *all* source files =/
 file(GLOB_RECURSE cppcollada_SRC "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
@@ -29,7 +44,7 @@ set(qt_HPP
    "${CMAKE_SOURCE_DIR}/src/Viewport/ViewWindowQT.hpp"
 )
 
-# TODO: Fix me, Unprocessed QT source files should be reoved in favour of the MOC generated ones
+# Remove unprocessed QT source files should be reoved in favour of the MOC generated ones
 list(REMOVE_ITEM cppcollada_SRC $qt_CPP)
 
 # Basic CMAKE supported libs
@@ -42,7 +57,7 @@ find_package(XercesC REQUIRED)
 find_package(Noise REQUIRED)
 
 # SDL
-find_package(SDL)
+find_package(SDL REQUIRED)
 include_directories(${SDL_INCLUDE_DIR})
 
 # Boost
@@ -57,4 +72,3 @@ QT4_WRAP_CPP(cppcollada_SRC ${qt_HPP})
 # Final target
 add_executable(colladatest ${cppcollada_SRC})
 target_link_libraries(colladatest ${QT_LIBRARIES} ${Boost_LIBRARIES} ${SDL_LIBRARY} ${XERCESC_LIBRARIES} ${IL_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} ${NOISE_LIBRARY})
-

@@ -38,3 +38,4 @@ HTML5 Logo from W3 under CC-by license: http://www.w3.org/html/logo/
 http://nvidia-texture-tools.googlecode.com/svn/trunk/cmake/FindGLEW.cmake
 http://geant4.cern.ch/support/source/geant4.9.4/cmake/Modules/FindXercesC.cmake
 https://github.com/fador/mineserver/blob/master/CMakeModules/FindNoise.cmake
+GetGitRevisionDescription: https://github.com/rpavlik/cmake-modules
