@@ -30,7 +30,6 @@ set(qt_CPP
    "${CMAKE_SOURCE_DIR}/src/QTGui/QTEditScene.cpp"
    "${CMAKE_SOURCE_DIR}/src/QTGui/QTEditGeneric.cpp"
    "${CMAKE_SOURCE_DIR}/src/QTGui/QTEditColladas.cpp"
-   #"${CMAKE_SOURCE_DIR}/src/QTGui/QTColladaObjectTreeItem.cpp"
    "${CMAKE_SOURCE_DIR}/src/Viewport/ViewWindowQT.cpp"
 )
 
@@ -40,7 +39,6 @@ set(qt_HPP
    "${CMAKE_SOURCE_DIR}/src/QTGui/QTEditScene.hpp"
    "${CMAKE_SOURCE_DIR}/src/QTGui/QTEditGeneric.hpp"
    "${CMAKE_SOURCE_DIR}/src/QTGui/QTEditColladas.hpp"
-   #"${CMAKE_SOURCE_DIR}/src/QTGui/QTColladaObjectTreeItem.hpp"
    "${CMAKE_SOURCE_DIR}/src/Viewport/ViewWindowQT.hpp"
 )
 
