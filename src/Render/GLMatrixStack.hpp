@@ -1,83 +1,73 @@
-#ifndef COLLADACPP_RENDERERGL_MATRIXSTACK_HPP_
-#define COLLADACPP_RENDERERGL_MATRIXSTACK_HPP_
+/*
+ * GLMatricStack.hpp - Implements a simple replacement for the deprecated
+ * OpenGL matrix functions using GLM.
+ *
+ * Written in 2011 by David C. Bishop <david@davidbishop.org>
+ *
+ * To the extent possible under law, the author(s) have dedicated all copyright
+ * and related and neighboring rights to this software to the public domain
+ * worldwide. This software is distributed without any warranty.
+ *
+ * You should have received a copy of the CC0 Public Domain Dedication along
+ * with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
+ */
 
-#include <cmath>
+#ifndef GLMMATRIXSTACK_HPP_
+#define GLMMATRIXSTACK_HPP_
+
 #include <stack>
 using namespace std;
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "../Debug/console.h"
-
-/*inline void printMatrix(glm::mat4& matrix) {
-   DEBUG_M("------------------");
-   DEBUG_M("[ %f, %f, %f, %f ]", matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0]);
-   DEBUG_M("[ %f, %f, %f, %f ]", matrix[0][1], matrix[1][1], matrix[2][1], matrix[3][1]);
-   DEBUG_M("[ %f, %f, %f, %f ]", matrix[0][2], matrix[1][2], matrix[2][2], matrix[3][2]);
-   DEBUG_M("[ %f, %f, %f, %f ]", matrix[0][3], matrix[1][3], matrix[2][3], matrix[3][3]);
-}
-
-inline void printMatrices(GLfloat* glmatrix, glm::mat4& matrix) {
-   DEBUG_M("------------------");
-   DEBUG_M("[ %f, %f, %f, %f ] [ %f, %f, %f, %f ]", glmatrix[0], glmatrix[4], glmatrix[8], glmatrix[12], matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0]);
-   DEBUG_M("[ %f, %f, %f, %f ] [ %f, %f, %f, %f ]", glmatrix[1], glmatrix[5], glmatrix[9], glmatrix[13], matrix[0][1], matrix[1][1], matrix[2][1], matrix[3][1]);
-   DEBUG_M("[ %f, %f, %f, %f ] [ %f, %f, %f, %f ]", glmatrix[2], glmatrix[6], glmatrix[10], glmatrix[14], matrix[0][2], matrix[1][2], matrix[2][2], matrix[3][2]);
-   DEBUG_M("[ %f, %f, %f, %f ] [ %f, %f, %f, %f ]", glmatrix[3], glmatrix[7], glmatrix[11], glmatrix[15], matrix[0][3], matrix[1][3], matrix[2][3], matrix[3][3]);
-}*/
 
 class GLMatrixStack {
    public:
       GLMatrixStack();
       void pushMatrix();
       void popMatrix();
-      void rotate(const float& x, const float& y, const float& z, const float& angle);
-      void translate(const float& x, const float& y, const float& z);
-      void scale(const float& x, const float& y, const float& z);
+      void rotate(const GLfloat& x, const GLfloat& y, const GLfloat& z, const GLfloat& angle);
+      void translate(const GLfloat& x, const GLfloat& y, const GLfloat& z);
+      void scale(const GLfloat& x, const GLfloat& y, const GLfloat& z);
       void loadIdentity();
-      void setPerspective(const float& fovy, const float& aspect, const float& near, const float& far);
-      float* getOpenGLMatrix();
+      void setPerspective(const GLfloat& fovy, const GLfloat& aspect, const GLfloat& near, const GLfloat& far);
+      GLfloat* getOpenGLMatrix();
       glm::mat4& getMatrix();
-      glm::mat3 getNormalMatrix(const bool normalized);
+      glm::mat3 getNormalMatrix();
 
    private:
       stack<glm::mat4> matricies_;
 };
 
+inline GLMatrixStack::GLMatrixStack() {
+   matricies_.push(glm::mat4());
+}
+
 inline void GLMatrixStack::pushMatrix() {
    matricies_.push(matricies_.top());
-   glLoadMatrixf(getOpenGLMatrix());
 }
 
 inline void GLMatrixStack::popMatrix() {
    if(matricies_.size() <= 1) {
-      ERROR("Tried to pop last stack element");
       return;
    }
    matricies_.pop();
-   glLoadMatrixf(getOpenGLMatrix());
 }
 
-inline void GLMatrixStack::rotate(const float& angle, const float& x, const float& y, const float& z) {
+inline void GLMatrixStack::rotate(const GLfloat& angle, const GLfloat& x, const GLfloat& y, const GLfloat& z) {
    if(angle == 0) {
       return;
    }
    
    matricies_.top() = glm::rotate(matricies_.top(), angle, glm::vec3(x, y, z));
-   glLoadMatrixf(getOpenGLMatrix());
 }
 
-inline void GLMatrixStack::translate(const float& x, const float& y, const float& z) {
+inline void GLMatrixStack::translate(const GLfloat& x, const GLfloat& y, const GLfloat& z) {
    matricies_.top() = glm::translate(matricies_.top(), glm::vec3(x, y, z));
-   glLoadMatrixf(getOpenGLMatrix());
 }
 
-inline void GLMatrixStack::scale(const float& x, const float& y, const float& z) {
+inline void GLMatrixStack::scale(const GLfloat& x, const GLfloat& y, const GLfloat& z) {
    matricies_.top() = glm::scale(matricies_.top(), glm::vec3(x, y, z));
-   glLoadMatrixf(getOpenGLMatrix());
 }
 
 inline void GLMatrixStack::loadIdentity() {
@@ -85,12 +75,12 @@ inline void GLMatrixStack::loadIdentity() {
    matricies_.push(glm::mat4());   
 }
 
-inline void GLMatrixStack::setPerspective(const float& fovy, const float& aspect, const float& near, const float& far) {
+inline void GLMatrixStack::setPerspective(const GLfloat& fovy, const GLfloat& aspect, const GLfloat& near, const GLfloat& far) {
    matricies_.pop();
    matricies_.push(glm::perspective(fovy, aspect, near, far));
 }
 
-inline float* GLMatrixStack::getOpenGLMatrix() {
+inline GLfloat* GLMatrixStack::getOpenGLMatrix() {
    return &matricies_.top()[0][0];
 }
 
@@ -98,10 +88,8 @@ inline glm::mat4& GLMatrixStack::getMatrix() {
    return matricies_.top();
 }
 
-inline glm::mat3 GLMatrixStack::getNormalMatrix(const bool normalized = true) {
-   // We should be able to just use the upper 3x3 portion of the matrix unless there is nonuniform scaling...
-   //return glm::mat3x3(matricies_.top());
+inline glm::mat3 GLMatrixStack::getNormalMatrix() {
    return glm::transpose(glm::inverse(glm::mat3x3(matricies_.top())));
 }
 
-#endif /* COLLADACPP_RENDERERGL_MATRIXSTACK_HPP_ */
+#endif /* GLMMATRIXSTACK_HPP_ */
