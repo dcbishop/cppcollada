@@ -60,7 +60,6 @@ void RendererGL::preFrame() {
    stack_.loadIdentity();
    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
    glClearDepth(10000.0f);
-   glShadeModel(GL_SMOOTH);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    setPolygonMode_();
    setRenderMode_();
@@ -104,18 +103,6 @@ void RendererGL::setSize(const int width, const int height) {
 
 void RendererGL::setPerspective_() {
    projection_matrix_ = glm::perspective(90.0f, (float)1.0 * width_ / height_, 0.1f, 10000.0f);
-   bindProjectionMatrix_();
-}
-
-void RendererGL::bindModelviewMatrix_() {
-   glMatrixMode(GL_MODELVIEW);
-   glLoadMatrixf(stack_.getOpenGLMatrix());
-}
-
-void RendererGL::bindProjectionMatrix_() {
-   glMatrixMode(GL_PROJECTION);
-   glLoadMatrixf(&projection_matrix_[0][0]);
-   glMatrixMode(GL_MODELVIEW);
 }
 
 void RendererGL::render(ColladaObject* colladaObject) {
@@ -355,7 +342,6 @@ void RendererGL::setCameraMatrix(Camera* camera) {
 
    setPerspective_();
    projection_matrix_ *= glm::lookAt(glm::vec3(camera->getX()+cx, camera->getY()+cy, camera->getZ()+cz), glm::vec3(cx, cy, cz), glm::vec3(0.0f, 10.0f, 0.0f));
-   bindProjectionMatrix_();
 }
 
 
@@ -371,9 +357,9 @@ void RendererGL::render(Grid* grid) {
    float spacing = grid->getSpacing();
 
    // TODO: This is a stupid way of drawing grid. Add Z grid.
-   glColor3f(grid->getRed(), grid->getGreen(), grid->getBlue());
-   bindModelviewMatrix_();
-   glBegin(GL_LINES);
+   glColor3f(grid->getRed(), grid->getGreen(), grid->getBlue()); /* Note: GL3_DEPRECATED */
+
+   glBegin(GL_LINES); /* Note: GL3_DEPRECATED */
    for(int z = 0; z < size_z; z++) {
       float z1 = z * spacing;
       float z2 = z1 + spacing;
@@ -402,7 +388,7 @@ void RendererGL::render(Grid* grid) {
          glVertex3f(-x1, 0.0, -z2);
       }
    }
-   glEnd();
+   glEnd(); /* Note: GL3_DEPRECATED */
 }
 
 void RendererGL::render(Geometry* geometry) {
@@ -551,126 +537,15 @@ void RendererGL::renderCube_(const float& size) {
    stack_.popMatrix();
 
    // TODO: Delete cube buffers on exit!
-
-/*  
-	static GLuint cubeid = 0;
-	static int offset = 0;
-	if(cubeid == 0) {
-		GLfloat vertices[] = {1,1,1,		-1,1,1,		-1,-1,1,		1,-1,1, //BACK OR FRONT
-									 1,1,1,		1,-1,1,		1,-1,-1,  	1,1,-1, //LEFT
-                            1,1,1,		1,1,-1,		-1,1,-1,  	-1,1,1, //TOP
-                            -1,1,1,		-1,1,-1,		-1,-1,-1,  	-1,-1,1, // RIGHT
-                            -1,-1,-1,	1,-1,-1,		1,-1,1,		-1,-1,1, // BOTTOM
-                            1,-1,-1,	-1,-1,-1,	-1,1,-1, 	 1,1,-1 //FRONT
-                            };
-
-		GLfloat normals[] = {0,0,1,	0,0,1,   0,0,1,   0,0,1,
-                           1,0,0,   1,0,0,   1,0,0,	1,0,0,
-                           0,1,0,   0,1,0,   0,1,0,	0,1,0,
-                           -1,0,0,  -1,0,0,	-1,0,0,  -1,0,0,
-                           0,-1,0,  0,-1,0,  0,-1,0,  0,-1,0,
-                           0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1
-                           };
-
-		offset = sizeof(vertices);
-
-		DEBUG_M("Initilizing cube VBO.");
-		glGenBuffers(1, &cubeid);
-		glBindBuffer(GL_ARRAY_BUFFER, cubeid);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals), 0, GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-		glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
-
-	//setPolygonMode_();
-	glBindBuffer(GL_ARRAY_BUFFER, cubeid);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-
-	glVertexPointer(3, GL_FLOAT, 0, 0);
-	glNormalPointer(GL_FLOAT, 0, (void*)offset);
-
-	glDrawArrays(GL_QUADS, 0, 24);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
-
-	/* Lazy cube
-   float hsize = size/2;
-
-   // Front faces
-   float left_front_bottom[] = {-hsize, -hsize, -hsize};
-   float right_front_bottom[] = {hsize, -hsize, -hsize};
-   float left_back_bottom[] = {-hsize, hsize, -hsize};
-   float right_back_bottom[] = {hsize, hsize, -hsize};
-
-   // Back faces 
-   float right_back_top[] = {hsize, hsize, hsize};
-   float left_back_top[] = {-hsize, hsize, hsize};
-   float left_front_top[] = {-hsize, -hsize, hsize};
-   float right_front_top[] = {hsize, -hsize, hsize};
-
-   setRenderMode_();
-   glBegin(GL_QUADS);
-      // Front face
-      glNormal3f(0.0, -1.0, 0.0);
-      glVertex3fv(left_front_bottom);
-      glVertex3fv(right_front_bottom);
-      glVertex3fv(right_front_top);
-      glVertex3fv(left_front_top);
-
-      // Back face
-      glNormal3f(0.0, 1.0, 0.0);
-      glVertex3fv(left_back_top);
-      glVertex3fv(right_back_top);
-      glVertex3fv(right_back_bottom);
-      glVertex3fv(left_back_bottom);
-
-      // Top face
-      glNormal3f(0.0, 0.0, 1.0);
-      glVertex3fv(left_front_top);
-      glVertex3fv(right_front_top);
-      glVertex3fv(right_back_top);
-      glVertex3fv(left_back_top);
-
-      // Bottom face
-      glNormal3f(0.0, 0.0, -1.0);
-      glVertex3fv(left_back_bottom);
-      glVertex3fv(right_back_bottom);
-      glVertex3fv(right_front_bottom);
-      glVertex3fv(left_front_bottom);
-      
-      // Right face
-      glNormal3f(1.0, 0.0, 0.0);
-      glVertex3fv(right_front_bottom);
-      glVertex3fv(right_back_bottom);
-      glVertex3fv(right_back_top);
-      glVertex3fv(right_front_top);
-
-      // Left face
-      glNormal3f(-1.0, 0.0, 0.0);
-      glVertex3fv(left_front_top);
-      glVertex3fv(left_back_top);
-      glVertex3fv(left_back_bottom);
-      glVertex3fv(left_front_bottom);
-   glEnd();
-	*/
 }
 
 
 void RendererGL::setRenderMode_() {
-   glDisable(GL_COLOR_MATERIAL);
-   /*glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);*/
    glEnable(GL_DEPTH_TEST);
-   glEnable(GL_NORMALIZE);
 }
 
 void RendererGL::setUnlitMode_() {
    bindShader_(shader_manager_.getFlat());
-   /*glDisable(GL_LIGHTING);*/
 }
 
 void RendererGL::setPolygonMode_() {
@@ -707,8 +582,6 @@ void RendererGL::setLights_() {
    
    debugPos2+=0.01;
    
-   //glDisable(GL_LIGHTING);
-
    float lx = cos(debugPos2)*10;
    float ly = debugPos;
    float lz = sin(debugPos2)*10;
@@ -723,9 +596,6 @@ void RendererGL::setLights_() {
    stack_.rotate(45.0, 0.0f, 1.0f, 0.0f);
    renderCube_(0.1f);
    stack_.popMatrix();
-
-   /*float light_pos[] = {lx, ly, lz, 1.0};
-   glLightfv(GL_LIGHT0, GL_POSITION, light_pos);*/
 }
 
 void RendererGL::render(ColladaLitShader* lit) {

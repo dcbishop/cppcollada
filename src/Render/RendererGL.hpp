@@ -58,8 +58,6 @@ class RendererGL : public Renderer {
       void setUnlitMode_();
       void setLights_();
       void renderOctreeNode_(Octree* octree);
-      void bindModelviewMatrix_();
-      void bindProjectionMatrix_();
       void bindShader_(const GLSLShaderPtr& shader);
 
       Phong defaultMaterial_;
