@@ -20,6 +20,12 @@ add_definitions(-D_GIT_VERSION="${GIT_DESCRIBE}")
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 add_definitions(-D_GIT_SHA1="${GIT_SHA1}")
 
+# Add _DEBUG define
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+   add_definitions(-D_DEBUG)
+endif(CMAKE_BUILD_TYPE MATCHES "Debug")
+
+
 # Note this is the 'bad' way of doing this, but the recommended alternative is to keep a list of *all* source files =/
 file(GLOB_RECURSE cppcollada_SRC "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
