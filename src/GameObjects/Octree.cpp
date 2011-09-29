@@ -73,30 +73,30 @@ OctreePtr Octree::digCell(const int x, const int y, const int z) {
 }
 
 void Octree::generateRandomOctree(Octree* octree) {
-	//Use perlin for heightmap
-	module::Perlin perlinModule;
-	for(int z = 0; z < octree->getGridDepth(); z++) {
-		for(int x = 0; x < octree->getGridWidth(); x++) {
-			float value = (perlinModule.GetValue(0.0+(x/100.0), 0.75, 0.0+(z/100.0))+1.0)/2.0;
-			if(value > 1.0) {
-				value = 1.0;
-			} else if(value < 0.0f) {
-				value = 0.0f;
-			}
-			int height = (int)(value*octree->getGridHeight()/2);
-			
-			for(int y = 0; y < height; y++) {
+   //Use perlin for heightmap
+   module::Perlin perlinModule;
+   for(int z = 0; z < octree->getGridDepth(); z++) {
+      for(int x = 0; x < octree->getGridWidth(); x++) {
+         float value = (perlinModule.GetValue(0.0+(x/100.0), 0.75, 0.0+(z/100.0))+1.0)/2.0;
+         if(value > 1.0) {
+            value = 1.0;
+         } else if(value < 0.0f) {
+            value = 0.0f;
+         }
+         int height = (int)(value*octree->getGridHeight()/2);
+         
+         for(int y = 0; y < height; y++) {
 
-				//int y = 0;
-				//DEBUG_A("x=%d, y=%d, z=%d, value=%f", x, y, z, value);
-				OctreePtr test = octree->digCell(x, y, z);
-				test->setIsSolid(true);
-				ColorRGBAPtr defcol(new ColorRGBA(0.2, 0.75, 0.3));
-				test->setColor(defcol);
-			}
-		}
-	}
-	
+            //int y = 0;
+            //DEBUG_A("x=%d, y=%d, z=%d, value=%f", x, y, z, value);
+            OctreePtr test = octree->digCell(x, y, z);
+            test->setIsSolid(true);
+            ColorRGBAPtr defcol(new ColorRGBA(0.2, 0.75, 0.3));
+            test->setColor(defcol);
+         }
+      }
+   }
+   
 /*if(getLevel() < 4) {
       for(int i = 0; i < 8; i++) {
          OctreePtr octree(new Octree());
@@ -114,16 +114,15 @@ void Octree::generateRandomOctree(Octree* octree) {
    }*/
 
 /*
-	// Solid Fill
+   // Solid Fill
    for(int z = 0; z < octree->getGridDepth(); z++) {
      for(int y = 0; y < octree->getGridHeight(); y++) {
-		for(int x = 0; x < octree->getGridWidth(); x++) {
-			  
-			 OctreePtr test = octree->digCell(x, y, z);
-			 test->setIsSolid(true);
-			 ColorRGBAPtr defcol(new ColorRGBA(0.2, 0.75, 0.3));
-			 test->setColor(defcol);
-		}
+      for(int x = 0; x < octree->getGridWidth(); x++) {
+          OctreePtr test = octree->digCell(x, y, z);
+          test->setIsSolid(true);
+          ColorRGBAPtr defcol(new ColorRGBA(0.2, 0.75, 0.3));
+          test->setColor(defcol);
+      }
       }
    }
 */   

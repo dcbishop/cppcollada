@@ -381,18 +381,18 @@ shared_ptr<Mesh> ColladaDoc::loadMesh(const DOMElement* element) {
          } else if(isString_(tagName, "polygons")) {
             TrianglesPtr polygons = loadPolygons(currentElement);
             if(polygons != TrianglesPtr()) {
-					mesh->addPrimitive(polygons);
-				}
+               mesh->addPrimitive(polygons);
+            }
          } else if(isString_(tagName, "polylist")) {
             TrianglesPtr polylist = loadPolylist(currentElement);
             if(polylist != TrianglesPtr()) {
-					mesh->addPrimitive(polylist);
-				}
+               mesh->addPrimitive(polylist);
+            }
          } else if(isString_(tagName, "triangles")) {
             TrianglesPtr triangles = loadTriangles(currentElement);
             if(triangles != TrianglesPtr()) {
-					mesh->addPrimitive(triangles);
-				}
+               mesh->addPrimitive(triangles);
+            }
          } else if(isString_(tagName, "trifans")) {
             WARNING("trifans not yet supported.");
          } else if(isString_(tagName, "tristrips")) {
@@ -425,7 +425,7 @@ TrianglesPtr ColladaDoc::loadTriangles(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    TrianglesPtr triangles(new Triangles);
-	VectorOfIntsPtr primitives;
+   VectorOfIntsPtr primitives;
 
    string count = getAttribute(element, "count");
    triangles->setCount(atoi(count.c_str()));
@@ -467,7 +467,7 @@ TrianglesPtr ColladaDoc::loadPolylist(const DOMElement* element) {
    DEBUG_M("Entering function...");
 
    TrianglesPtr triangles(new Triangles);
-	VectorOfIntsPtr polyprims;
+   VectorOfIntsPtr polyprims;
    VectorOfIntsPtr vcount;
 
    string count = getAttribute(element, "count");

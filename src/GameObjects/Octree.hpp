@@ -74,7 +74,7 @@ class Octree : public GameObject {
 
       OctreePtr digCell(const int x, const int y, const int z);
 
-		void generateRandomOctree(Octree* octree);
+      void generateRandomOctree(Octree* octree);
 
       bool getHasChildren() { return children_; }
 

@@ -8,13 +8,13 @@ enum { INDEX_RED, INDEX_GREEN, INDEX_BLUE, INDEX_ALPHA };
 class ColorRGBA {
    public:
       ColorRGBA() {
-		  setColor(1.0f, 1.0f, 1.0f, 1.0f);
-	  }
+        setColor(1.0f, 1.0f, 1.0f, 1.0f);
+     }
 
       ColorRGBA(const float& red, const float& green, const float& blue, const float& alpha) {
-	      setColor(red, green, blue, alpha);
-	  }
-	  ColorRGBA(const float& red, const float& green, const float& blue) {
+         setColor(red, green, blue, alpha);
+     }
+     ColorRGBA(const float& red, const float& green, const float& blue) {
          setColor(red, green, blue);
       }
       
