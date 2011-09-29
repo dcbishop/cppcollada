@@ -8,49 +8,43 @@
 
 class Source: public ColladaObject {
    public:
-      /*void setFloats(shared_ptr< vector<float> > floats) {
-         floats_ = floats;
-         if(!floats_) {
-            WARNING("Setting of floats screwed up");
-         }
-      }*/
       Source() {
-	 floats_ = NULL;
-	 num_ = 0;
+         floats_ = NULL;
+         num_ = 0;
       }
-	 
+         
       ~Source() {
-	 delete [] floats_;
+         delete [] floats_;
       }
 
       /**
       * Sets the sources floats based on a array of floats and number of floats.
       */
       void setFloats(float* floats, const int &num) {
-	 floats_ = floats;
-	 num_ = num;
+         floats_ = floats;
+         num_ = num;
       }
-	 
+         
       /**
        * Sets the sources floats based on a shared pointer to a vector of floats.
        */
       void setFloats(shared_ptr< vector<float> > floats) {
-	 if(floats_) {
-	    WARNING("Trying to reset floats...");
-	 }
+         if(floats_) {
+            WARNING("Trying to reset floats...");
+         }
 
-	 delete [] floats_;
-	 floats_ = new float[floats->size()];
+         delete [] floats_;
+         floats_ = new float[floats->size()];
 
-	 for(unsigned int i = 0; i < floats->size(); i++) {
-	    floats_[i] = floats->at(i);
-	 }
+         for(unsigned int i = 0; i < floats->size(); i++) {
+            floats_[i] = floats->at(i);
+         }
 
-	 num_ = floats->size();
+         num_ = floats->size();
       }
-	 
+         
       float* getFloats() {
-	 return floats_;
+         return floats_;
       }
 
       virtual int getCount() { return num_; }
