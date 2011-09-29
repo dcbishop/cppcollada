@@ -47,15 +47,15 @@ void RendererGL::init() {
  * OpenGL stuff to run prior to each drawing of the frame.
  */
 void RendererGL::preFrame() {
-	if(glewInit_ == false) {
-		GLenum err = glewInit();
-		if (GLEW_OK != err)
-		{
-			ERROR("%s", glewGetErrorString(err));
-		}
-		DEBUG_M("GLEW inited version %s", glewGetString(GLEW_VERSION));
-		glewInit_ = true;
-	}
+   if(glewInit_ == false) {
+      GLenum err = glewInit();
+      if (GLEW_OK != err)
+      {
+         ERROR("%s", glewGetErrorString(err));
+      }
+      DEBUG_M("GLEW inited version %s", glewGetString(GLEW_VERSION));
+      glewInit_ = true;
+   }
    setPerspective_();
    stack_.loadIdentity();
    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -82,9 +82,9 @@ void RendererGL::postFrame() {
    // Log any OpenGL errors.
    int glerrno = glGetError();
    if(glerrno) {
-		const GLubyte *glerr = gluErrorString(glerrno);
-		ERROR("OpenGL Error #%d: %s!", glerrno, glerr);
-	}
+      const GLubyte *glerr = gluErrorString(glerrno);
+      ERROR("OpenGL Error #%d: %s!", glerrno, glerr);
+   }
 
    glPolygonMode(GL_FRONT, GL_FILL);
 
@@ -261,7 +261,7 @@ void RendererGL::renderAxis_() {
    glVertexPointer(3, GL_FLOAT, 0, verticies);
    glDrawElements(GL_LINES, 3, 0, verticies);*/
    setUnlitMode_();
-   glBegin(GL_LINES);
+   glBegin(GL_LINES); /* Note: GL3_DEPRECATED */
       glColor3f(1.0f, 0.0f, 0.0f);
       glVertex3f(0.0, 0.0, 0.0);
       glVertex3f(1.0, 0.0, 0.0);
@@ -403,7 +403,7 @@ void RendererGL::render(Geometry* geometry) {
 void RendererGL::render(Triangles* triangles) {
    DEBUG_H("RendererGL::render(Triangles* triangles)");
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-   glBegin(GL_TRIANGLES);
+   glBegin(GL_TRIANGLES); /* Note: GL3_DEPRECATED */
       triangles->GeometricPrimitive::render();
    glEnd();
 }
@@ -475,48 +475,48 @@ void RendererGL::render(TestRenderable* tr) {
 }
 
 void RendererGL::renderCube_(const float& size) {
-	// Render a cube from a VAO
+   // Render a cube from a VAO
    static GLuint vao = 0;
    static GLuint cube_buf_id = 0;
-	static int offset = 0;
-	if(vao == 0) {
+   static int offset = 0;
+   if(vao == 0) {
       glGenVertexArrays(1, &vao);
       glBindVertexArray(vao);
-		GLfloat vertices[] = {1,1,1,		-1,1,1,		-1,-1,1,		1,-1,1, //BACK OR FRONT
-									 1,1,1,		1,-1,1,		1,-1,-1,  	1,1,-1, //LEFT
-                            1,1,1,		1,1,-1,		-1,1,-1,  	-1,1,1, //TOP
-                            -1,1,1,		-1,1,-1,		-1,-1,-1,  	-1,-1,1, // RIGHT
-                            -1,-1,-1,	1,-1,-1,		1,-1,1,		-1,-1,1, // BOTTOM
-                            1,-1,-1,	-1,-1,-1,	-1,1,-1, 	 1,1,-1 //FRONT
+      GLfloat vertices[] = {1,1,1,      -1,1,1,      -1,-1,1,      1,-1,1, //BACK OR FRONT
+                            1,1,1,      1,-1,1,      1,-1,-1,     1,1,-1, //LEFT
+                            1,1,1,      1,1,-1,      -1,1,-1,     -1,1,1, //TOP
+                            -1,1,1,      -1,1,-1,      -1,-1,-1,     -1,-1,1, // RIGHT
+                            -1,-1,-1,   1,-1,-1,      1,-1,1,      -1,-1,1, // BOTTOM
+                            1,-1,-1,   -1,-1,-1,   -1,1,-1,     1,1,-1 //FRONT
                             };
 
-		GLfloat normals[] = {0,0,1,	0,0,1,   0,0,1,   0,0,1,
-                           1,0,0,   1,0,0,   1,0,0,	1,0,0,
-                           0,1,0,   0,1,0,   0,1,0,	0,1,0,
-                           -1,0,0,  -1,0,0,	-1,0,0,  -1,0,0,
+      GLfloat normals[] = {0,0,1,   0,0,1,   0,0,1,   0,0,1,
+                           1,0,0,   1,0,0,   1,0,0,   1,0,0,
+                           0,1,0,   0,1,0,   0,1,0,   0,1,0,
+                           -1,0,0,  -1,0,0,   -1,0,0,  -1,0,0,
                            0,-1,0,  0,-1,0,  0,-1,0,  0,-1,0,
                            0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1
                            };
 
-      GLfloat colors[] = {1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
-                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
-                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
-                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
-                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
-                           1,1,1,1,	1,1,1,1,   1,1,1,1,   1,1,1,1,
+      GLfloat colors[] = {1,1,1,1,   1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,   1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,   1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,   1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,   1,1,1,1,   1,1,1,1,   1,1,1,1,
+                           1,1,1,1,   1,1,1,1,   1,1,1,1,   1,1,1,1,
                            };
 
-		offset = sizeof(vertices);
+      offset = sizeof(vertices);
 
-		DEBUG_M("Initilizing cube Vertex Array Object.");
-		glGenBuffers(1, &cube_buf_id);
-		glBindBuffer(GL_ARRAY_BUFFER, cube_buf_id);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals)+sizeof(colors), 0, GL_STATIC_DRAW);
-		
+      DEBUG_M("Initilizing cube Vertex Array Object.");
+      glGenBuffers(1, &cube_buf_id);
+      glBindBuffer(GL_ARRAY_BUFFER, cube_buf_id);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)+sizeof(normals)+sizeof(colors), 0, GL_STATIC_DRAW);
+      
       glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-		glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
+      glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(normals), normals);
       glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(normals), sizeof(colors), colors);
-		
+      
       glVertexAttribPointer(shader_manager_.getVertexAttribId(), 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
       glEnableVertexAttribArray(shader_manager_.getVertexAttribId());
       glVertexAttribPointer(shader_manager_.getNormalAttribId(), 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)sizeof(vertices));
@@ -526,7 +526,7 @@ void RendererGL::renderCube_(const float& size) {
       glDisableVertexAttribArray(shader_manager_.getTextureAttribId());
       glBindVertexArray(0);
       glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
+   }
 
    stack_.pushMatrix();
    stack_.scale(size, size, size);
@@ -537,6 +537,11 @@ void RendererGL::renderCube_(const float& size) {
    stack_.popMatrix();
 
    // TODO: Delete cube buffers on exit!
+   /* glBindVertexArray(0);
+   glBindBuffer(GL_ARRAY_BUFFER, 0);
+   glDeleteVertexArrays(vao, 1);
+   glDeleteBuffers(1, &cube_buf_id)
+   */
 }
 
 
@@ -620,11 +625,9 @@ void RendererGL::render(ColladaLitShader* lit) {
       }
       if(texid > 0) {
          glBindTexture(GL_TEXTURE_2D, texid);
-         glEnable(GL_TEXTURE_2D);
          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       } else {
-         glDisable(GL_TEXTURE_2D);
       }
    } else {
       glBindTexture(GL_TEXTURE_2D, NULL);
@@ -675,7 +678,7 @@ void RendererGL::renderOctreeNode_(Octree* octree) {
 void RendererGL::render(Octree* octree) {
    /*stack_.pushMatrix();
 
-	setPolygonMode_();
+   setPolygonMode_();
    octree->GameObject::render();
    
    if(octree->getHasChildren()) {
