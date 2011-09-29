@@ -16,7 +16,6 @@
 #define GLMMATRIXSTACK_HPP_
 
 #include <stack>
-using namespace std;
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -36,7 +35,7 @@ class GLMatrixStack {
       glm::mat3 getNormalMatrix();
 
    private:
-      stack<glm::mat4> matricies_;
+      std::stack<glm::mat4> matricies_;
 };
 
 inline GLMatrixStack::GLMatrixStack() {
