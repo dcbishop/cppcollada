@@ -21,6 +21,7 @@ To compile using llvm:
 scons clang=1 boost=1
 
 The folowing libraries are used:
+cmake
 libglew1.5-dev - OpenGL extentions.
 glm - For OpenGL Matrix functions.
 libdevil-dev - For texture loading.
@@ -29,6 +30,9 @@ libqt4-dev - For the QT interface.
 libqt4-opengl-dev
 libnoise-dev - Use for an experiment using noise for random level generation.
 libsdl1.2-dev
+
+To install them in Ubuntu (except for GLM which much be done manually):
+sudo apt-get install cmake libglew1.5-dev libdevil-dev libxerces-c-dev libqt4-dev libqt4-opengl-dev libnoise-dev libsdl1.2-dev
 
 Notes
 =====
