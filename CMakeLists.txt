@@ -69,7 +69,7 @@ find_package(Boost COMPONENTS thread system REQUIRED)
 add_definitions(-D_BOOSTPTR)
 
 # QT
-find_package(Qt4 4.6 COMPONENTS QtCore QtGui QtOpenGL QtWebKit REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtGui QtOpenGL QtWebKit REQUIRED)
 include(${QT_USE_FILE})
 QT4_WRAP_CPP(cppcollada_SRC ${qt_HPP})
 
